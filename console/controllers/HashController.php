@@ -7,6 +7,7 @@
 namespace console\controllers;
 
 use yii\console\Controller;
+use Yii;
 /**
  * This command echoes the first argument that you have entered.
  *
@@ -24,7 +25,9 @@ class HashController extends Controller
     public function actionHash($password = 'hello,world')
     {
         echo $password . "\n";
+//        echo time();
         $hash = Yii::$app->getSecurity()->generatePasswordHash($password);
         echo $hash . "\n" ;
+//        echo time();
     }
 }
