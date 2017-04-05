@@ -16,6 +16,11 @@ return [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
           ],
+        'hash' => [
+            'class' => 'console\controllers\HashController',
+
+        ],
+
     ],
     'components' => [
         'log' => [
