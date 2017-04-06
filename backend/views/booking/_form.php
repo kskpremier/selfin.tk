@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\Booking */
@@ -12,9 +13,33 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'arrival_date')->textInput() ?>
+    <?php // <?= $form->field($model, 'arrival_date')->textInput() ?>
 
-    <?= $form->field($model, 'depature_date')->textInput() ?>
+    <?= $form->field($model, 'arrival_date')->widget(DatePicker::className(), [
+        'model' => $model,
+//        'value' => date(),
+        'attribute' => 'arrival_date',
+        'options' => ['placeholder' => 'Arrival date'],
+        'type' => DatePicker::TYPE_INPUT ,
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'autoclose' => true,]
+    ]);
+    ?>
+
+    <?php // <?= $form->field($model, 'depature_date')->textInput() ?>
+
+    <?= $form->field($model, 'depature_date')->widget(DatePicker::className(), [
+        'model' => $model,
+//        'value' => date(),
+        'attribute' => 'depature_date',
+        'options' => ['placeholder' => 'Departure date'],
+        'type' => DatePicker::TYPE_INPUT ,
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'autoclose' => true,]
+    ]);
+    ?>
 
     <?= $form->field($model, 'apartment_id')->textInput() ?>
 
