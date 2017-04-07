@@ -28,7 +28,7 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'Rona-Reception',
+        'brandLabel' => 'Rona-rEception',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -36,9 +36,12 @@ AppAsset::register($this);
     ]);
     $menuItems = [
         ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Apartments', 'url' => ['/apartment/index']],
+        ['label' => 'Booking', 'url' => ['/booking/index']],
         ['label' => 'Faces', 'url' => ['/photo-image/index']],
         ['label' => 'Documents', 'url' => ['/photo-document/index']],
-        ['label' => 'Door locks', 'url' => ['/booking/index']],
+        ['label' => 'DoorLocks', 'url' => ['/door-lock/index']],
+
 //        ['label' => 'Check-in', 'url' => ['/photo-document/index']],
     ];
     if (Yii::$app->user->isGuest) {
