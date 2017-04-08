@@ -10,12 +10,10 @@ use Yii;
  * @property integer $id
  * @property string $location
  * @property string $name
- * @property integer $door_lock_id
- * @property integer $camera_id
  *
- * @property Camera $camera
- * @property DoorLock $doorLock
  * @property Booking[] $bookings
+ * @property Camera[] $cameras
+ * @property DoorLock[] $doorLocks
  */
 class Apartment extends \yii\db\ActiveRecord
 {
@@ -33,11 +31,7 @@ class Apartment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['location', 'name'], 'safe'],
-            [['door_lock_id', 'camera_id'], 'required'],
-            [['door_lock_id', 'camera_id'], 'integer'],
-            [['camera_id'], 'exist', 'skipOnError' => true, 'targetClass' => Camera::className(), 'targetAttribute' => ['camera_id' => 'id']],
-            [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
+            [['location', 'name'], 'string', 'max' => 200],
         ];
     }
 
@@ -47,28 +41,10 @@ class Apartment extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'location' => 'Location',
-            'name' => 'Name',
-            'door_lock_id' => 'Door Lock ID',
-            'camera_id' => 'Camera ID',
+            'id' => Yii::t('app', 'ID'),
+            'location' => Yii::t('app', 'Location'),
+            'name' => Yii::t('app', 'Name'),
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCamera()
-    {
-        return $this->hasOne(Camera::className(), ['id' => 'camera_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDoorLock()
-    {
-        return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
 
     /**
@@ -77,5 +53,21 @@ class Apartment extends \yii\db\ActiveRecord
     public function getBookings()
     {
         return $this->hasMany(Booking::className(), ['apartment_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCameras()
+    {
+        return $this->hasMany(Camera::className(), ['apartment_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDoorLocks()
+    {
+        return $this->hasMany(DoorLock::className(), ['apartment_id' => 'id']);
     }
 }

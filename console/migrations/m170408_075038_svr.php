@@ -8,10 +8,10 @@ class m170408_075038_svr extends Migration
     {
 //        Связь таблицы “Apartment” и таблицы “Door_Lock”. Удалить из  “Apartment” поле door_lock_id, добавить в таблицу “Door_Lock” поле apartment_id и соответствующую связь (constrain).
         //убиваю старые связи и индекс
-//        $this->dropForeignKey('fk-apartment-door_lock_id', '{{%apartment}}', 'door_lock_id', '{{%door_lock}}', 'id', 'CASCADE', 'RESTRICT');
-//        $this->dropIndex('idx-apartment-door_lock_id', '{{%apartment}}', 'door_lock_id');
-//
-//        $this->dropColumn('{{%apartment}}', 'door_lock_id');
+        $this->dropForeignKey('fk-apartment-door_lock_id', '{{%apartment}}', 'door_lock_id', '{{%door_lock}}', 'id', 'CASCADE', 'RESTRICT');
+        $this->dropIndex('idx-apartment-door_lock_id', '{{%apartment}}', 'door_lock_id');
+
+        $this->dropColumn('{{%apartment}}', 'door_lock_id');
         //прописываю новые
         $this->addColumn('{{%door_lock}}', 'apartment_id', 'integer');
         $this->createIndex('idx-door_lock-apartment_id', '{{%door_lock}}', 'apartment_id');

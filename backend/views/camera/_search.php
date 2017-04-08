@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\DoorLockSearch */
+/* @var $model backend\models\CameraSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="door-lock-search">
+<div class="camera-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -18,6 +18,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'id') ?>
 
     <?= $form->field($model, 'admin_pin') ?>
+
+    <?= $form->field($model, 'ip') ?>
 
     <?= $form->field($model, 'type') ?>
 

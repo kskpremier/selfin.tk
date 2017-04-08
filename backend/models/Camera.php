@@ -11,8 +11,10 @@ use Yii;
  * @property integer $admin_pin
  * @property string $ip
  * @property string $type
+ * @property integer $apartment_id
  *
- * @property Apartment[] $apartments
+ * @property Apartment $apartment
+ * @property PhotoImage[] $photoImages
  */
 class Camera extends \yii\db\ActiveRecord
 {
@@ -30,8 +32,9 @@ class Camera extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['admin_pin'], 'integer'],
+            [['admin_pin', 'apartment_id'], 'integer'],
             [['ip', 'type'], 'string', 'max' => 255],
+            [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
         ];
     }
 
@@ -41,19 +44,20 @@ class Camera extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'admin_pin' => 'Admin Pin',
-            'ip' => 'Ip',
-            'type' => 'Type',
+            'id' => Yii::t('app', 'ID'),
+            'admin_pin' => Yii::t('app', 'Admin Pin'),
+            'ip' => Yii::t('app', 'Ip'),
+            'type' => Yii::t('app', 'Type'),
+            'apartment_id' => Yii::t('app', 'Apartment ID'),
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getApartments()
+    public function getApartment()
     {
-        return $this->hasMany(Apartment::className(), ['camera_id' => 'id']);
+        return $this->hasOne(Apartment::className(), ['id' => 'apartment_id']);
     }
 
     /**

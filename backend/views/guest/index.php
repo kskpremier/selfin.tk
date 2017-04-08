@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\GuestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Guests';
+$this->title = Yii::t('app', 'Guests');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="guest-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Guest', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Guest'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'second_name',
             'contact_email:email',
             'application_id',
-            // 'document_id',
+            // 'user_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

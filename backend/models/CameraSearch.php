@@ -5,12 +5,12 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Guest;
+use backend\models\Camera;
 
 /**
- * GuestSearch represents the model behind the search form about `backend\models\Guest`.
+ * CameraSearch represents the model behind the search form about `backend\models\Camera`.
  */
-class GuestSearch extends Guest
+class CameraSearch extends Camera
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class GuestSearch extends Guest
     public function rules()
     {
         return [
-            [['id', 'application_id', 'user_id'], 'integer'],
-            [['first_name', 'second_name', 'contact_email'], 'safe'],
+            [['id', 'admin_pin', 'apartment_id'], 'integer'],
+            [['ip', 'type'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class GuestSearch extends Guest
      */
     public function search($params)
     {
-        $query = Guest::find();
+        $query = Camera::find();
 
         // add conditions that should always apply here
 
@@ -60,13 +60,12 @@ class GuestSearch extends Guest
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'application_id' => $this->application_id,
-            'user_id' => $this->user_id,
+            'admin_pin' => $this->admin_pin,
+            'apartment_id' => $this->apartment_id,
         ]);
 
-        $query->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'second_name', $this->second_name])
-            ->andFilterWhere(['like', 'contact_email', $this->contact_email]);
+        $query->andFilterWhere(['like', 'ip', $this->ip])
+            ->andFilterWhere(['like', 'type', $this->type]);
 
         return $dataProvider;
     }

@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Token;
-use backend\models\TokenSearch;
+use backend\models\Camera;
+use backend\models\CameraSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TokenController implements the CRUD actions for Token model.
+ * CameraController implements the CRUD actions for Camera model.
  */
-class TokenController extends Controller
+class CameraController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,12 +30,12 @@ class TokenController extends Controller
     }
 
     /**
-     * Lists all Token models.
+     * Lists all Camera models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TokenSearch();
+        $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class TokenController extends Controller
     }
 
     /**
-     * Displays a single Token model.
+     * Displays a single Camera model.
      * @param integer $id
      * @return mixed
      */
@@ -57,13 +57,13 @@ class TokenController extends Controller
     }
 
     /**
-     * Creates a new Token model.
+     * Creates a new Camera model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Token();
+        $model = new Camera();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -75,7 +75,7 @@ class TokenController extends Controller
     }
 
     /**
-     * Updates an existing Token model.
+     * Updates an existing Camera model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -94,7 +94,7 @@ class TokenController extends Controller
     }
 
     /**
-     * Deletes an existing Token model.
+     * Deletes an existing Camera model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -107,15 +107,15 @@ class TokenController extends Controller
     }
 
     /**
-     * Finds the Token model based on its primary key value.
+     * Finds the Camera model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Token the loaded model
+     * @return Camera the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Token::findOne($id)) !== null) {
+        if (($model = Camera::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

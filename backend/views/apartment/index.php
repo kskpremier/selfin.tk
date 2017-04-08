@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\ApartmentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Apartments';
+$this->title = Yii::t('app', 'Apartments');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="apartment-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Apartment', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Apartment'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -27,8 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'location',
             'name',
-            'door_lock_id',
-            'camera_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

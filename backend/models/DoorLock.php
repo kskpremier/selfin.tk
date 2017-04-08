@@ -10,8 +10,10 @@ use Yii;
  * @property integer $id
  * @property integer $admin_pin
  * @property string $type
+ * @property integer $apartment_id
  *
- * @property Apartment[] $apartments
+ * @property Apartment $apartment
+ * @property Token[] $tokens
  */
 class DoorLock extends \yii\db\ActiveRecord
 {
@@ -29,8 +31,9 @@ class DoorLock extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['admin_pin'], 'integer'],
+            [['admin_pin', 'apartment_id'], 'integer'],
             [['type'], 'string', 'max' => 255],
+            [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
         ];
     }
 
@@ -40,17 +43,26 @@ class DoorLock extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'admin_pin' => 'Admin Pin',
-            'type' => 'Type',
+            'id' => Yii::t('app', 'ID'),
+            'admin_pin' => Yii::t('app', 'Admin Pin'),
+            'type' => Yii::t('app', 'Type'),
+            'apartment_id' => Yii::t('app', 'Apartment ID'),
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getApartments()
+    public function getApartment()
     {
-        return $this->hasMany(Apartment::className(), ['door_lock_id' => 'id']);
+        return $this->hasOne(Apartment::className(), ['id' => 'apartment_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTokens()
+    {
+        return $this->hasMany(Token::className(), ['door_lock_id' => 'id']);
     }
 }

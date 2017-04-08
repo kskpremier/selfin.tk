@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\DoorLock */
 
-$this->title = 'Create Door Lock';
-$this->params['breadcrumbs'][] = ['label' => 'Door Locks', 'url' => ['index']];
+$this->title = Yii::t('app', 'Create Door Lock');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Door Locks'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="door-lock-create">

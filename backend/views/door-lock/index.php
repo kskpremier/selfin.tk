@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\DoorLockSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Door Locks';
+$this->title = Yii::t('app', 'Door Locks');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="door-lock-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Door Lock', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Door Lock'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'admin_pin',
             'type',
+            'apartment_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

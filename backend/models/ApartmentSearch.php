@@ -18,7 +18,7 @@ class ApartmentSearch extends Apartment
     public function rules()
     {
         return [
-            [['id', 'door_lock_id', 'camera_id'], 'integer'],
+            [['id'], 'integer'],
             [['location', 'name'], 'safe'],
         ];
     }
@@ -60,11 +60,10 @@ class ApartmentSearch extends Apartment
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'location' => $this->location,
-            'name' => $this->name,
-            'door_lock_id' => $this->door_lock_id,
-            'camera_id' => $this->camera_id,
         ]);
+
+        $query->andFilterWhere(['like', 'location', $this->location])
+            ->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

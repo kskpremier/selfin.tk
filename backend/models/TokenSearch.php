@@ -18,8 +18,8 @@ class TokenSearch extends Token
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['token', 'expires', 'type'], 'safe'],
+            [['id', 'expires', 'door_lock_id'], 'integer'],
+            [['token', 'type'], 'safe'],
         ];
     }
 
@@ -61,6 +61,7 @@ class TokenSearch extends Token
         $query->andFilterWhere([
             'id' => $this->id,
             'expires' => $this->expires,
+            'door_lock_id' => $this->door_lock_id,
         ]);
 
         $query->andFilterWhere(['like', 'token', $this->token])

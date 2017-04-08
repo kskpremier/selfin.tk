@@ -2,7 +2,6 @@
 
 namespace backend\models;
 
-use Codeception\Lib\Interfaces\ActiveRecord;
 use Yii;
 
 /**
@@ -10,8 +9,11 @@ use Yii;
  *
  * @property integer $id
  * @property string $token
- * @property string $expires
+ * @property integer $expires
  * @property string $type
+ * @property integer $door_lock_id
+ *
+ * @property DoorLock $doorLock
  */
 class Token extends \yii\db\ActiveRecord
 {
@@ -29,9 +31,10 @@ class Token extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['token', 'type','expires'], 'required'],
-            [['expires'], 'safe'],
+            [['token', 'expires', 'type'], 'required'],
+            [['expires', 'door_lock_id'], 'integer'],
             [['token', 'type'], 'string', 'max' => 255],
+            [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];
     }
 
@@ -41,20 +44,19 @@ class Token extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'token' => 'token',
-            'expires' => 'expire',
-            'type' => 'type',
+            'id' => Yii::t('app', 'ID'),
+            'token' => Yii::t('app', 'Token'),
+            'expires' => Yii::t('app', 'Expires'),
+            'type' => Yii::t('app', 'Type'),
+            'door_lock_id' => Yii::t('app', 'Door Lock ID'),
         ];
     }
+
     /**
-     * Renders the first existing and valid token AR or return false
-     * @return ActiveRecord or boolean
+     * @return \yii\db\ActiveQuery
      */
-    public function findValidToken() {
-        $properToken = $this->find()->where(['>','expires', strtotime(date('Y-m-d\TH:i:s\+P'))])->one();
-        if ($properToken)
-            return $properToken;
-        return false;
+    public function getDoorLock()
+    {
+        return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
 }

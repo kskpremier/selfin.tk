@@ -18,7 +18,7 @@ class DocumentSearch extends Document
     public function rules()
     {
         return [
-            [['id', 'photo_document_face_id', 'document_type_id', 'country_id', 'photo_document_id'], 'integer'],
+            [['id', 'photo_document_face_id', 'document_type_id', 'country_id', 'photo_document_id', 'guest_id'], 'integer'],
             [['first_name', 'second_name', 'number', 'seria', 'date_of_issue', 'valid_before'], 'safe'],
         ];
     }
@@ -65,6 +65,7 @@ class DocumentSearch extends Document
             'country_id' => $this->country_id,
             'valid_before' => $this->valid_before,
             'photo_document_id' => $this->photo_document_id,
+            'guest_id' => $this->guest_id,
         ]);
 
         $query->andFilterWhere(['like', 'first_name', $this->first_name])

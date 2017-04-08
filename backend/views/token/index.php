@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\TokenSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Tokens';
+$this->title = Yii::t('app', 'Tokens');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="token-index">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Token', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Token'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'token',
             'expires',
             'type',
+            'door_lock_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

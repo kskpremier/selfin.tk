@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use backend\models\DoorLock;
@@ -17,7 +18,7 @@ class DoorLockSearch extends DoorLock
     public function rules()
     {
         return [
-            [['id', 'admin_pin'], 'integer'],
+            [['id', 'admin_pin', 'apartment_id'], 'integer'],
             [['type'], 'safe'],
         ];
     }
@@ -60,6 +61,7 @@ class DoorLockSearch extends DoorLock
         $query->andFilterWhere([
             'id' => $this->id,
             'admin_pin' => $this->admin_pin,
+            'apartment_id' => $this->apartment_id,
         ]);
 
         $query->andFilterWhere(['like', 'type', $this->type]);

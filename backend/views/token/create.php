@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\Token */
 
-$this->title = 'Create Token';
-$this->params['breadcrumbs'][] = ['label' => 'Tokens', 'url' => ['index']];
+$this->title = Yii::t('app', 'Create Token');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Tokens'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="token-create">
