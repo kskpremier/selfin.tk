@@ -62,7 +62,7 @@ class Guest extends \yii\db\ActiveRecord
      */
     public function getBookings()
     {
-        return $this->hasMany(Booking::className(), ['guest_id' => 'id']);
+        return $this->hasMany(Booking::className(), ['id' => 'booking_id'])->viaTable('{{%booking_guest}}', ['guest_id'=>'id']);
     }
 
     /**
