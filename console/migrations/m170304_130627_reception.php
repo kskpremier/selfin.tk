@@ -61,8 +61,8 @@ class m170304_130627_reception extends Migration
         //таблица для хранения информации об апартаментах
         $this->createTable('{{%apartment}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'location' => $this->date(),
-            'name' => $this->date(),
+            'location' => $this->string(200),
+            'name' => $this->string(200),
             'door_lock_id' => $this->integer()->notNull(),
             'camera_id' => $this->integer()->notNull(),
 
