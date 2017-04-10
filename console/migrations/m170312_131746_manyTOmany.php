@@ -57,10 +57,4 @@ class m170312_131746_manyTOmany extends Migration
     {
     }
     */
-}<?php
-/**
- * Created by PhpStorm.
- * User: SAS
- * Date: 08.04.17
- * Time: 19:46
- */
+}

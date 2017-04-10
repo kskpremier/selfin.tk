@@ -20,7 +20,6 @@ class m170312_164045_ekeys extends Migration
             'pin' => $this->integer(),
             'e_key'=>$this->string(15),
             'booking_id'=>$this->integer(),
-            'till' => $this->dateTime(),
 
         ], $tableOptions);
 
@@ -45,10 +44,3 @@ class m170312_164045_ekeys extends Migration
     }
     */
 }
-<?php
-/**
- * Created by PhpStorm.
- * User: SAS
- * Date: 08.04.17
- * Time: 19:48
- */
