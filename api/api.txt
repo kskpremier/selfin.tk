@@ -1,0 +1,35 @@
+1. Запрос токена
+POST URL + /auth
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+
+
+параметры в формате json
+    {
+        "username": "admin",
+        "password": "admin"
+    }
+
+Ответ в формате json
+
+{
+    "token": "jfuZelbb-9Sazow14yjgvaNWQoqCjIMa",
+    "expired": "2017-04-16T00:37:07+02:00"
+}
+
+2. Запрос информации о пользователе
+GET URL + /user
+
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+
+Ответ в формате json
+{
+    "id": 1,
+    "username": "admin",
+    "email": "svrybin@gmail.com"
+}          

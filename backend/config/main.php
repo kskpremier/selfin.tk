@@ -10,6 +10,11 @@ return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
+    'controllerMap' => [
+        'user'=>[
+            'class'=>'common\controllers\UserController',
+        ],
+    ],
     'bootstrap' => ['log'],
     'modules' => [
         'Facematica' => [
@@ -31,6 +36,12 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+
+            // Включение JSON на прием данных
+//            'application/json' => 'yii\web\JsonParser',
+//            'parsers' => [
+//                'application/json' => 'yii\web\JsonParser',
+//            ]
         ],
         'facematica' => [
             'class' => 'backend\modules\faces\models\FaceClient',
@@ -67,10 +78,14 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+
+        // Настройка правил URL для  RESTful API
         'urlManager' => [
-//            'enablePrettyUrl' => true,
-//            'showScriptName' => false,
+            'enablePrettyUrl' => true,
+//            'enableStrictParsing' => true,
+            'showScriptName' => false,
 //            'rules' => [
+//                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
 //                '' => 'site/index',
 //                '\booking'=>'booking/index',
 //                '<_c:[\w-]+>' => '<_c>/index',
@@ -79,5 +94,10 @@ return [
 //            ],
          ],
     ],
+//    'request' => [
+//        'parsers' => [
+//            'application/json' => 'yii\web\JsonParser',
+//        ]
+//    ],
     'params' => $params,
 ];

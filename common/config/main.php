@@ -6,4 +6,6 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
     ],
+    'controllerNamespace' => 'common\controllers',
+
 ];

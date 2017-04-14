@@ -2,3 +2,12 @@
 vendor
 composer.lock
 debugger.xml
+/_windows/
+/_mac/
+/backend/config/test-local.php
+/backend/config/params-local.php
+/backend/config/main-local.php
+/api/config/test-local.php
+/api/config/params-local.php
+/api/config/main-local.php
+api/tests/
