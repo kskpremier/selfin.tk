@@ -55,10 +55,20 @@ class LoginForm extends Model
     public function auth()
     {
         if ($this->validate()) {
-            $token = new Token();
-            $token->user_id = $this->getUser()->id;
-            $token->generateToken(time() + 3600 * 24);
-            return $token->save() ? $token : null;
+            // Chek if valid token exist
+            $token = Token::find()
+                ->andWhere(['user_id' => $this->getUser()->id])
+                ->andWhere(['>', 'expired_at', time()])
+                ->one();
+            if ($token === null) {
+               $token = new Token();
+               $token->user_id = $this->getUser()->id;
+               // Define duraion of token valid
+               $token->generateToken(time() + 3600 * 24 * 7);
+               return $token->save() ? $token : null;
+            } else {
+                return $token;
+            }
         } else {
             return null;
         }
