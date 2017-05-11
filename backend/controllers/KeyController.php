@@ -84,7 +84,9 @@ class KeyController extends Controller
         if ($model->load(Yii::$app->request->post()) ) {
             $model->from = Yii::$app->formatter->asDateTime($model->from,'php:d-m-Y H:i:s');
             $model->till = Yii::$app->formatter->asDateTime($model->till,'php:d-m-Y H:i:s');
-            $model->save();
+            if ($model->getKeyboardPwd()) {
+                $model->save();
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [

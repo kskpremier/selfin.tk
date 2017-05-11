@@ -56,6 +56,12 @@ return [
 
                 'GET user' => 'user/index',
                 'PUT,PATCH photoimage' => 'photo-image/update',
+                'PUT,PATCH doorlock' => 'door-lock/update',
+                'PUT,PATCH delete' => 'door-lock/delete',
+                'POST photoimage' => 'photo-image/create',
+                'POST doorlock' => 'door-lock/create',
+                'GET e-key' => 'door-lock/key',
+                'GET keyboardPassword'=> 'door-lock/keyboard-password'
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
         ],

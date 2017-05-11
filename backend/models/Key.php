@@ -3,6 +3,8 @@
 namespace backend\models;
 
 use Yii;
+use \backend\models\DOMOUPRAV;
+use yii\httpclient\Client;
 
 /**
  * This is the model class for table "key".
@@ -60,5 +62,43 @@ class Key extends \yii\db\ActiveRecord
     public function getBooking()
     {
         return $this->hasOne(Booking::className(), ['id' => 'booking_id']);
+    }
+
+
+    public function getKeyboardPwd(){
+        //тут надо сформировать запрос и послать его на китайский рестапи
+        $client = $client = new Client([
+            'baseUrl' => 'http://api.domoupar.hr',
+            'requestConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],
+            'responseConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],
+        ]);
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
+            ->addHeaders(['Accept' => 'application/json'])
+            ->setUrl('/door-lock/keyboard-password')
+            ->setData(['lockId' => $this->id,
+                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
+                'keyboardPwdType' =>0,//$this->keyboardPwdType,//нет пока этого поля в модели, надо добавить миграцию
+                '$startDate'=>$this->from,
+                '$endDate'=>$this->till,
+                'date'=>$this->getCurrentTimeMillis(),
+                'accessToken'=>DOMOUPRAV::TTL_TOKEN
+            ])
+            ->send();
+        if ($response->isOk) {
+            $this->pin = $response->data['keyboardPwd'];
+            return true;
+        }
+        else return false;
+    }
+    //return current time in milliseconds
+    private function getCurrentTimeMillis(){
+        list($usec, $sec) = explode(" ", microtime());
+        return (integer)(( (float)$usec + (float)$sec )*1000);
     }
 }

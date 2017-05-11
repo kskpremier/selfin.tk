@@ -32,4 +32,64 @@ Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
     "id": 1,
     "username": "admin",
     "email": "svrybin@gmail.com"
-}          
+}   
+       
+3. Запрос информации о Замке
+GET URL + /door-lock/view?id=...  //идентификатор замка
+
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+
+Ответ в формате json
+{
+    "id": 1,
+    "admin_pin":0856378,
+    "apartment_id":32,
+     "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
+    =======надо вносить изменения в модель========
+
+    "lockVersion":4, //непонятно пока, но в запросе пишет 4
+    "modelNum":?? // наверное тут должен быть серийный номер, который пока хз где найти
+     "lockName": ?? //
+}             
+
+3. Добавление нового замка
+
+POST URL + /door-lock/create&apartment_id=...  //идентификатор замка
+
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+
+Ответ в формате json
+{
+    "id": 1,
+    "admin_pin":0856378,
+    "apartment_id":32,
+     "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
+    =======надо вносить изменения в модель========
+
+    "lockVersion":4, //непонятно пока, но в запросе пишет 4
+    "modelNum":?? // наверное тут должен быть серийный номер, который пока хз где найти
+     "lockName": ?? //
+}
+
+x. Получение цифрового пароля для замка
+
+GET URL + /door-lock/keyboard-password?=...  //идентификатор замка
+
+params:
+'id'=>наш внутренний идентификатор замка
+'keyboardPwdType' => тип (0-постоянный, 1-на период, 2-циклический, 3-разовый
+'startDate' => дата начала действия (формат надо уточнять)
+'endDate' => дата окончания действия
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+

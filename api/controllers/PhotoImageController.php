@@ -8,7 +8,7 @@ use yii\rest\ActiveController;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\AccessControl;
-use backend\models\photoimage;
+use backend\models\PhotoImage;
 use yii\web\ServerErrorHttpException;
 use yii\helpers\Url;
 
@@ -49,7 +49,7 @@ class PhotoImageController extends \yii\rest\ActiveController
     public function actionCreate()
     {
         $model = new PhotoImage();
-        $model->date =time();
+        $model->date = time();
 
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
         if ($model->save()) {
@@ -63,10 +63,10 @@ class PhotoImageController extends \yii\rest\ActiveController
         return $model;
     }
 
-    public function prepareDataProvider()
-    {
-        $searchModel = new PhotoImageSearch();
-        return $searchModel->search(Yii::$app->request->queryParams);
-    }
+//    public function prepareDataProvider()
+//    {
+//        $searchModel = new PhotoImageSearch();
+//        return $searchModel->search(Yii::$app->request->queryParams);
+//    }
 
 }

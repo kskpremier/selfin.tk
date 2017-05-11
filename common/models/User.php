@@ -206,12 +206,17 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Token::className(), ['user_id' => 'id']);
     }
+    /**
+     * For REST/API controller
+     * @return array
+     */
     public function fields()
     {
         return [
             'id' => 'id',
             'username' => 'username',
             'email' => 'email',
+
 //            'description' => 'description',
         ];
     }

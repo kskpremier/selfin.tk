@@ -65,4 +65,18 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Token::className(), ['door_lock_id' => 'id']);
     }
+    /**
+     * For REST/API controller
+     * @return array
+     */
+    public function fields()
+    {
+        return [
+            'id' => 'id',
+            'admin_pin'=>'admin_pwd',
+            'apartment_id'=>'apartment_id',
+            'type' => 'type',
+
+        ];
+    }
 }
