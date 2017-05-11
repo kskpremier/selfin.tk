@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "door_lock".
  *
  * @property integer $id
+ * @property string $lockId
  * @property integer $admin_pin
  * @property string $type
  * @property integer $apartment_id
@@ -32,7 +33,7 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return [
             [['admin_pin', 'apartment_id'], 'integer'],
-            [['type'], 'string', 'max' => 255],
+            [['type','lockId'], 'string', 'max' => 255],
             [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
         ];
     }
@@ -44,6 +45,7 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'lockId' => Yii::t('app', 'lockId'),
             'admin_pin' => Yii::t('app', 'Admin Pin'),
             'type' => Yii::t('app', 'Type'),
             'apartment_id' => Yii::t('app', 'Apartment ID'),
@@ -65,6 +67,24 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Token::className(), ['door_lock_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeys()
+    {
+        return $this->hasMany(Key::className(), ['door_lock_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeyboardPwds()
+    {
+        return $this->hasMany(KeyboardPwd::className(), ['door_lock_id' => 'id']);
+    }
+
+
     /**
      * For REST/API controller
      * @return array
@@ -76,7 +96,7 @@ class DoorLock extends \yii\db\ActiveRecord
             'admin_pin'=>'admin_pwd',
             'apartment_id'=>'apartment_id',
             'type' => 'type',
-
+            'lockId'=>'lockId'
         ];
     }
 }

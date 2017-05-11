@@ -71,6 +71,23 @@ class Booking extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Guest::className(), ['id' => 'guest_id'])->viaTable('{{%booking_guest}}', ['booking_id'=>'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeys()
+    {
+        return $this->hasMany(Key::className(), ['booking_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeyboardPwds()
+    {
+        return $this->hasMany(KeyboardPwd::className(), ['booking_id' => 'id']);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

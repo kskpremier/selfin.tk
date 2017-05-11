@@ -1,0 +1,62 @@
+<RestClientRequest>
+    <option name="biscuits">
+        <list/>
+    </option>
+    <option name="httpMethod" value="POST"/>
+    <option name="urlBase" value="https://api.sciener.cn"/>
+    <option name="urlPath" value="/v3/key/send"/>
+    <option name="headers">
+        <list>
+            <KeyValuePair>
+                <option name="key" value="Content-Type"/>
+                <option name="value" value="application/x-www-form-urlencoded"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="Content-Type"/>
+                <option name="value" value="application/json; charset=utf-8"/>
+
+            </KeyValuePair>
+        </list>
+    </option>
+    <option name="parameters">
+        <list>
+            <KeyValuePair>
+                <option name="key" value="accessToken"/>
+                <option name="value" value="7c714894bea74accb1b98d028dbc8dd5"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="client_id"/>
+                <option name="value" value="7946f0d923934a61baefb3303de4d132"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="date"/>
+                <option name="value" value="1494449894905"/>
+            </KeyValuePair>
+
+            <KeyValuePair>
+                <option name="key" value="startDate"/>
+                <option name="value" value="1494499894905"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="endDate"/>
+                <option name="value" value="1525982400000"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="lockId"/>
+                <option name="value" value="50088"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="receiverUsername"/>
+                <option name="value" value="doorlockadmin@domouprav.hr"/>
+            </KeyValuePair>
+            <KeyValuePair>
+                <option name="key" value="remarks"/>
+                <option name="value" value="some comments"/>
+            </KeyValuePair>
+        </list>
+    </option>
+    <option name="parametersEnabled" value="true"/>
+    <option name="haveTextToSend" value="false"/>
+    <option name="haveFileToSend" value="false"/>
+    <option name="isFileUpload" value="false"/>
+</RestClientRequest>

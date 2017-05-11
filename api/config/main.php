@@ -56,12 +56,27 @@ return [
 
                 'GET user' => 'user/index',
                 'PUT,PATCH photoimage' => 'photo-image/update',
-                'PUT,PATCH doorlock' => 'door-lock/update',
-                'PUT,PATCH delete' => 'door-lock/delete',
                 'POST photoimage' => 'photo-image/create',
-                'POST doorlock' => 'door-lock/create',
-                'GET e-key' => 'door-lock/key',
-                'GET keyboardPassword'=> 'door-lock/keyboard-password'
+                'GET photoimage' => 'photo-image/view',
+
+
+
+               //crud  для замков
+                'POST door_lock' => 'door-lock/create',
+                'PUT,PATCH door_lock' => 'door-lock/update',
+                'GET door_lock' => 'door-lock/view',
+                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
+                //crud для электронных ключей
+                'POST e-key' => 'key/create',
+                'PUT,PATCH e-key' => 'key/update',
+                'GET e-key' => 'key/view',
+                'PUT,PATCH e-key/delete' => 'key/delete',
+                //curd для буквенно-цифрового ключа (pin)
+                'POST password' => 'keyboard-pwd/create',
+                'PUT,PATCH password' => 'keyboard-pwd/update',
+                'GET password' => 'keyboard-pwd/view',
+                'PUT,PATCH password/delete' => 'keyboard-pwd/delete',
+
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
         ],

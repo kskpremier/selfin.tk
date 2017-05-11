@@ -1,0 +1,32 @@
+@startuml
+|Rona Mobile APP|
+start
+:Make PhotoOf DOC;
+:Make Selfy;
+|#AntiqueWhite|E-Reception|
+:Recognision Photo from DOC;
+:Compearing with selfy;
+if (photos equals?)
+:Send Data with OK status;
+else
+:Send Data with not-OK status;
+endif
+|Myrent|
+:Registaration Tourists;
+:Send Data;
+|#AntiqueWhite|E-visitor|
+:Send answear;
+|Myrent|
+:Sending Confirmation Letter;
+:Request for E-key Generation for
+all period of Staying;
+|E-Reception|
+:Generate E-key;
+:Sending Confirmation Letter and
+E-key to App;
+|Rona Mobile APP|
+:Notification;
+stop
+@enduml
+
+http://www.plantuml.com/plantuml/png/VP71Ri8m38RlUGfBksm7Ng0zJ0ZG3eE1ODBE6NMeHOb3uWvLoiFFfPN6nBHRxFp-_DlEM_OMLln93S9qiyacYOrYYfKz8cng5buxcAzdvPZQOUEwqkI7gHSwj_XHas1UJBQuno34Ffj2ttpmb3GQ4E0YdqRAZ4y1RIH_W0j93Ma0aeF7q6iJuBcrJNf-CiKEVGLpAtQGhbz1tKcRIeDDmhj_ppAvrVYAdCchBgANgwq3zTFPtYQySnirLDqFve-vldGCuPX7bVNfekxB6soVxwUPiNSKJmDzYIAeCcsgi2JWEC9YSiGENj3ZwA5F6jiq430ILy0ETc8xfMc3tpiTgt20bF-sLPUL6PhfxgSXAEtkpiKR2pdQNmjBFJk7Rm00

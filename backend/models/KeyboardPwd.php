@@ -1,34 +1,39 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: SAS
+ * Date: 11.05.17
+ * Time: 12:28
+ */
 
 namespace backend\models;
 
 use Yii;
 use \backend\models\DOMOUPRAV;
-use \api\models\TTL;
 use yii\httpclient\Client;
 
 /**
  * This is the model class for table "key".
  *
  * @property integer $id
- * @property string $from
- * @property string $till
- * @property string $type
- * @property integer $pin
- * @property string $e_key
+ * @property string $end_day
+ * @property string $start_day
+ * @property integer $keyboard_pwd_version
+ * @property integer $value
+ * @property string $keyboard_pwd_type
+ * @property integer $door_lock_id
  * @property integer $booking_id
- * @property integer door_lock_id
  *
  * @property Booking $booking
  */
-class Key extends \yii\db\ActiveRecord
+class KeyboardPwd extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'key';
+        return 'keyboard_pwd';
     }
 
     /**
@@ -37,10 +42,9 @@ class Key extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pin', 'booking_id','door_lock_id'], 'integer'],
-            [['from', 'till'], 'string', 'max' => 20],
-            [['e_key'], 'string', 'max' => 15],
-            [['type'],'string','max' => 15],
+            [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
+            [['start_day', 'start_day'], 'string', 'max' => 20],
+            [['keyboard_pwd_type'],'string','max' => 15],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];
@@ -53,10 +57,7 @@ class Key extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'from' => Yii::t('app', 'From'),
-            'till' => Yii::t('app', 'Till'),
-            'pin' => Yii::t('app', 'Pin'),
-            'e_key' => Yii::t('app', 'E Key'),
+            'door_lock_id' => Yii::t('app', 'Booking ID'),
             'booking_id' => Yii::t('app', 'Booking ID'),
         ];
     }
@@ -68,7 +69,6 @@ class Key extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Booking::className(), ['id' => 'booking_id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -76,45 +76,8 @@ class Key extends \yii\db\ActiveRecord
     {
         return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
-    /*
-     * Этот вызов будет дергать наш китайский api контроллер
-     * */
 
-    public function sendEKey(){
-        //тут надо сформировать запрос и послать его на китайский рестапи
-        $client = $client = new Client([
-            'baseUrl' => 'https://api.sciener.cn',
-            'requestConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
-            'responseConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
-        ]);
-        $response = $client->createRequest()
-            ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
-            ->addHeaders(['Accept' => 'application/json'])
-            ->setUrl('/v3/key/send')
-            ->setData(['lockId' => $this->id,
-                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
-                'receiverUsername' =>DOMOUPRAV::DOMOUPRAV_RECIEVE_USERNAME,//
-                '$startDate'=>$this->from,
-                '$endDate'=>$this->till,
-                'date'=>$this->getCurrentTimeMillis(),
-                'accessToken'=>TTL::TTL_TOKEN
-            ])
-            ->send();
-        if ($response->isOk) {
-            $this->e_key = $response->data['E-key'];
-            return true;
-        }
-        else return false;
-    }
-/*
- * Этот вызов будет дергать наш api контроллер
- * */
-    public function getKeyValue(){
+    public function getKeyboardPwd(){
         //тут надо сформировать запрос и послать его на китайский рестапи
         $client = $client = new Client([
             'baseUrl' => 'http://api.domoupar.hr',
@@ -127,26 +90,24 @@ class Key extends \yii\db\ActiveRecord
         ]);
         $response = $client->createRequest()
             ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/json'])
+            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
             ->addHeaders(['Accept' => 'application/json'])
-            ->setUrl('/key/create')
-            ->setData(['id' => $this->id,
-                'door_lock_id' =>$this->door_lock_id,
-                'booking_id' =>$this->booking_id,
-                'from'=>$this->from,
-                'till'=>$this->till,
-                'type'=>$this->type,
-               // 'date'=>$this->getCurrentTimeMillis(),
+            ->setUrl('/door-lock/keyboard-password')
+            ->setData(['lockId' => $this->id,
+                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
+                'keyboardPwdType' =>0, //$this->keyboardPwdType,//нет пока этого поля в модели, надо добавить миграцию
+                '$startDate'=>$this->start_day,
+                '$endDate'=>$this->end_day,
+                'date'=>$this->getCurrentTimeMillis(),
                 'accessToken'=>DOMOUPRAV::DOMOUPRAV_TOKEN
             ])
             ->send();
         if ($response->isOk) {
-            $this->e_key = $response->data['E-key'];
+            $this->value = $response->data['keyboardPwd']; //пока непонятно какой ответ возвращает сервер
             return true;
         }
         else return false;
     }
-
     //return current time in milliseconds
     private function getCurrentTimeMillis(){
         list($usec, $sec) = explode(" ", microtime());
@@ -160,11 +121,14 @@ class Key extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'id',
-            'from'=>'start_date',
-            'till'=>'end_date',
+            'start_date'=>'start_date',
+            'end_date'=>'end_date',
             'booking_id' => 'booking',
             'door_lock_id'=>'door_lock',
-            'e_key'=>'E-key'
+            'value'=>'keyboard_password',
+            'keyboard_pwd_type'=>'keyboard_password_type',
+            'keyboard_pwd_version'=>'keyboard_pwd_version'
+
         ];
     }
 }

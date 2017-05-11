@@ -84,14 +84,14 @@ return [
             'enablePrettyUrl' => true,
 //            'enableStrictParsing' => true,
             'showScriptName' => false,
-//            'rules' => [
-//                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
-//                '' => 'site/index',
-//                '\booking'=>'booking/index',
-//                '<_c:[\w-]+>' => '<_c>/index',
-//                '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
-//                '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
-//            ],
+            'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
+                '' => 'site/index',
+                //'\booking'=>'booking/index',
+                '<_c:[\w-]+>' => '<_c>/index',
+                '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
+                '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
+            ],
          ],
     ],
 //    'request' => [

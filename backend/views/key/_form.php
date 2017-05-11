@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
-use \kartik\datetime\DateTimePicker;
+use kartik\datetime\DateTimePicker;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
@@ -53,6 +53,13 @@ $model->e_key = md5(uniqid(rand(), true));
     <?= $form->field($model, 'e_key')->textInput(['maxlength' => true, 'disabled'=>true,'value'=>$model->e_key]) ?>
 
     <?= $form->field($model, 'booking_id')->textInput(['disabled'=>true]) ?>
+    <?= $form->field($model, 'door_lock_id')->textInput(['disabled'=>true]) ?>
+    <?= $form->field($model, 'type')->widget(Select2::className(), [
+            'data'=>['0'=>'Permanent','2'=>'Period'],
+            'value'=>$model->type,
+            'options' => ['placeholder' => 'Select a type ...'],
+            'pluginOptions' => []
+    ])->label('E-Key type');?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

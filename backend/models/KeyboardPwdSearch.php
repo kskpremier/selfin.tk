@@ -1,26 +1,34 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: SAS
+ * Date: 11.05.17
+ * Time: 13:08
+ */
 
 namespace backend\models;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\DoorLock;
+use backend\models\KeyboardPwd;
 
 /**
- * DoorLockSearch represents the model behind the search form about `backend\models\DoorLock`.
+ * KeySearch represents the model behind the search form about `backend\models\Key`.
  */
-class DoorLockSearch extends DoorLock
+class KeyboardPwdSearch extends KeyboardPwd
 {
     /**
      * @inheritdoc
      */
     public function rules()
     {
-        return [
-            [['id', 'admin_pin', 'apartment_id'], 'integer'],
-            [['type','lockId'], 'safe'],
-        ];
+        return[
+        [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
+            [['keyboard_pwd_type'],'string','max' => 15],
+            [['start_day', 'start_day'], 'string', 'max' => 20],
+
+    ];
     }
 
     /**
@@ -41,7 +49,7 @@ class DoorLockSearch extends DoorLock
      */
     public function search($params)
     {
-        $query = DoorLock::find();
+        $query = Key::find();
 
         // add conditions that should always apply here
 
@@ -60,13 +68,16 @@ class DoorLockSearch extends DoorLock
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'admin_pin' => $this->admin_pin,
-            'apartment_id' => $this->apartment_id,
-
+            'value' => $this->value,
+            'booking_id' => $this->booking_id,
+            'door_lock_id' => $this->door_lock_id,
         ]);
 
-        $query->andFilterWhere(['like', 'type', $this->type]);
-        $query->andFilterWhere(['like', 'lockId', $this->lockId]);
+        $query->andFilterWhere(['like', 'start_day', $this->start_day])
+            ->andFilterWhere(['like', 'end_day', $this->end_day])
+            ->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
+            ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
+            ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);
 
         return $dataProvider;
     }

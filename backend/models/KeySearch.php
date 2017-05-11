@@ -18,7 +18,8 @@ class KeySearch extends Key
     public function rules()
     {
         return [
-            [['id', 'pin', 'booking_id'], 'integer'],
+            [['id', 'pin', 'booking_id','door_lock_id'], 'integer'],
+            [['type'],'string','max' => 15],
             [['from', 'till', 'e_key'], 'safe'],
         ];
     }
@@ -62,11 +63,13 @@ class KeySearch extends Key
             'id' => $this->id,
             'pin' => $this->pin,
             'booking_id' => $this->booking_id,
+            'door_lock_id' => $this->door_lock_id,
         ]);
 
         $query->andFilterWhere(['like', 'from', $this->from])
             ->andFilterWhere(['like', 'till', $this->till])
-            ->andFilterWhere(['like', 'e_key', $this->e_key]);
+            ->andFilterWhere(['like', 'e_key', $this->e_key])
+             ->andFilterWhere(['like', 'type', $this->type]);
 
         return $dataProvider;
     }
