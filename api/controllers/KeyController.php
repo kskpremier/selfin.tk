@@ -10,6 +10,8 @@ namespace api\controllers;
 use Yii;
 use backend\models\Key;
 use backend\models\KeySearch;
+use yii\filters\auth\HttpBasicAuth;
+use yii\filters\auth\HttpBearerAuth;
 use backend\models\Booking;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -34,17 +36,17 @@ class KeyController extends Controller
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-        $behaviors['access'] = [
-            'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete'],
-            'rules' => [
-                [
-                    'allow' => true,
-                    // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['@'],
-                ],
-            ],
-        ];
+//        $behaviors['access'] = [
+//            'class' => AccessControl::className(),
+//            'only' => ['create', 'update', 'delete'],
+//            'rules' => [
+//                [
+//                    'allow' => true,
+//                    // ролей пока нет, поэтому я закоментировал
+//                    'roles' => ['@'],
+//                ],
+//            ],
+//        ];
 
         return $behaviors;
     }

@@ -35,17 +35,17 @@ class DoorLockController extends Controller
                 HttpBasicAuth::className(),
                 HttpBearerAuth::className(),
             ];
-            $behaviors['access'] = [
-                'class' => AccessControl::className(),
-                'only' => ['create', 'update', 'delete'],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        // ролей пока нет, поэтому я закоментировал
-                         'roles' => ['@'],
-                    ],
-                ],
-            ];
+//            $behaviors['access'] = [
+//                'class' => AccessControl::className(),
+//                'only' => ['create', 'update', 'delete'],
+//                'rules' => [
+//                    [
+//                        'allow' => true,
+//                        // ролей пока нет, поэтому я закоментировал
+//                         'roles' => ['@'],
+//                    ],
+//                ],
+//            ];
 
             return $behaviors;
     }

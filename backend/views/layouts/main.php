@@ -42,6 +42,8 @@ AppAsset::register($this);
         ['label' => 'Documents', 'url' => ['/photo-document/index']],
         ['label' => 'DoorLocks', 'url' => ['/door-lock/index']],
         ['label' => 'Users', 'url' => ['/user/index']],
+        ['label' => 'Keys', 'url' => ['/key/index']],
+        ['label' => 'Passwords', 'url' => ['/keyboard-pwd/index']],
 
 //        ['label' => 'Check-in', 'url' => ['/photo-document/index']],
     ];

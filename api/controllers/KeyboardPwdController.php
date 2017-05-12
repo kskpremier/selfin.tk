@@ -10,6 +10,8 @@ namespace api\controllers;
 use Yii;
 use backend\models\KeyboardPwd;
 use backend\models\KeyboardPwdSearch;
+use yii\filters\auth\HttpBasicAuth;
+use yii\filters\auth\HttpBearerAuth;
 
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -34,17 +36,17 @@ class KeyboardPwdController extends Controller
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-        $behaviors['access'] = [
-            'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete'],
-            'rules' => [
-                [
-                    'allow' => true,
-                    // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['@'],
-                ],
-            ],
-        ];
+//        $behaviors['access'] = [
+//            'class' => AccessControl::className(),
+//            'only' => ['create', 'update', 'delete'],
+//            'rules' => [
+//                [
+//                    'allow' => true,
+//                    // ролей пока нет, поэтому я закоментировал
+//                    'roles' => ['@'],
+//                ],
+//            ],
+//        ];
 
         return $behaviors;
     }
@@ -91,12 +93,12 @@ class KeyboardPwdController extends Controller
         $model = new KeyboardPwd();
         // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-        if ($model->getKeyboardPwd() && $model->save()) {
+        if ($$model->sendKeyboardPwdRequest() && $model->save()) {
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));
             $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-            $model->getKeyboardPwd();
+
         } elseif (!$model->hasErrors()) {
             throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
         }

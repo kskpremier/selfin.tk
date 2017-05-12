@@ -26,7 +26,7 @@ class KeyboardPwdSearch extends KeyboardPwd
         return[
         [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
             [['keyboard_pwd_type'],'string','max' => 15],
-            [['start_day', 'start_day'], 'string', 'max' => 20],
+            [['start_day', 'end_day'], 'string', 'max' => 20],
 
     ];
     }
@@ -49,7 +49,7 @@ class KeyboardPwdSearch extends KeyboardPwd
      */
     public function search($params)
     {
-        $query = Key::find();
+        $query = KeyboardPwd::find();
 
         // add conditions that should always apply here
 

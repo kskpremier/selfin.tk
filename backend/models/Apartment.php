@@ -66,8 +66,8 @@ class Apartment extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDoorLocks()
+    public function getDoorLock()
     {
-        return $this->hasMany(DoorLock::className(), ['apartment_id' => 'id']);
+        return $this->hasOne(DoorLock::className(), ['apartment_id' => 'id']);
     }
 }

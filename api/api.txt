@@ -93,3 +93,91 @@ Accept: application/json
 Content-type: application/json
 Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
 
+=============разбираю китайский сервис
+
+json:{"lastUpdateDate":1494533094128,"keyList":[{"date":1494449730000,
+"lockAlias":"M201T_780566","keyStatus":"110401","endDate":0,"noKeyPwd":"5145746","keyId":367238,
+"lockMac":"C0:DE:EE:66:05:78","deletePwd":"","timezoneRawOffset":7200000,"lockId":50088,
+"electricQuantity":100,"adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
+"lockFlagPos":0,"aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
+"lockVersion":{"showAdminKbpwdFlag":true,"groupId":1,
+"protocolVersion":3,"protocolType":5,"orgId":1,
+"logoUrl":"","scene":2},"userType":"110301",
+"lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+"lockName":"M201T_780566","startDate":0,"remarks":""}]}
+
+
+при инициализации
+{"lastUpdateDate":1494532201960,"keyList":[{
+"date":1494449730000,
+"lockAlias":"M201T_780566",
+"keyStatus":"110401",
+"endDate":0,
+"noKeyPwd":"5145746",
+"keyId":367238,
+"lockMac":"C0:DE:EE:66:05:78",
+"deletePwd":"",
+"timezoneRawOffset":7200000,
+"lockId":50088,
+"electricQuantity":100,
+"adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
+"lockFlagPos":0,
+"aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
+"lockVersion":{
+    "showAdminKbpwdFlag":true,
+    "groupId":1,
+    "protocolVersion":3,
+    "protocolType":5,
+    "orgId":1,
+    "logoUrl":"",
+    "scene":2
+    },
+"userType":"110301",
+"lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+"lockName":"M201T_780566",
+"startDate":0,
+"remarks":""
+}
+]
+}
+при запросе пассворда
+
+Request{method=POST, url=https://api.sciener.cn/v3/keyboardPwd/get, tag=null}
+
+0 = {HashMap$HashMapEntry@5577} "clientId" -> "7946f0d923934a61baefb3303de4d132"
+1 = {HashMap$HashMapEntry@5578} "date" -> "1494535130363"
+2 = {HashMap$HashMapEntry@5579} "accessToken" -> "7c714894bea74accb1b98d028dbc8dd5"
+3 = {HashMap$HashMapEntry@5580} "startDate" -> "1494534987691"
+4 = {HashMap$HashMapEntry@5581} "endDate" -> "1494536417166"
+5 = {HashMap$HashMapEntry@5582} "keyboardPwdVersion" -> "4"
+6 = {HashMap$HashMapEntry@5583} "lockId" -> "50088"
+7 = {HashMap$HashMapEntry@5584} "keyboardPwdType" -> "9"  - Это значение для циклических замков, выдаваемых по вторникам
+
+
+
+
+{"keyboardPwdId":501168,"keyboardPwd":"45866000"}
+
+при попытке отправить электронный ключ самому себе
+
+
+при попытке послать запрос на sergey.sap@rona.hr   https://api.sciener.cn/v3/key/send
+0 = ""
+1 = "7946f0d923934a61baefb3303de4d132"
+2 = "1494533281606"
+3 = "7c714894bea74accb1b98d028dbc8dd5"
+4 = "0"
+5 = "0"
+6 = "sergey.sap%40rona.hr"
+7 = "50088"
+names
+0 = "remarks"
+1 = "clientId"
+2 = "date"
+3 = "accessToken"
+4 = "startDate"
+5 = "endDate"
+6 = "receiverUsername"
+7 = "lockId"
+
+ответ {"errcode":0,"errmsg":"none error message or means yes","description":"表示成功或是"}

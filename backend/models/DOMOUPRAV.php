@@ -11,7 +11,7 @@ namespace backend\models;
 
 class DOMOUPRAV
 {
- public const DOMOUPRAV_TOKEN = "jfuZelbb-9Sazow14yjgvaNWQoqCjIMa";
+ public const DOMOUPRAV_TOKEN = "bsAo_jbsPUPCpibo3mxx3m-sFYzjIGsI";
  public const DOMOUPRAV_RECIEVE_USERNAME = "doorlockadmin@domouprav.hr";
 
 }

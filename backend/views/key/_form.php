@@ -19,9 +19,16 @@ $model->e_key = md5(uniqid(rand(), true));
 <div class="key-form">
 
     <?php $form = ActiveForm::begin(); ?>
-    <?= //$form->field($model, 'from')->textInput()
 
-    $form->field($model, 'from')->widget(DateTimePicker::className(), [
+
+    <?= $form->field($model, 'type')->widget(Select2::className(), [
+        'data'=>['0'=>'Permanent','2'=>'Period'],
+        'value'=>($model->type == 0)? 'Permanent':'Period',
+        'options' => ['placeholder' => 'Select a type ...'],
+        'pluginOptions' => [],
+    ])->label('E-Key type');?>
+
+    <?= $form->field($model, 'from')->widget(DateTimePicker::className(), [
         //'model' => $model,
         'value' => $model->from ,//date('M-d-Y, h:i'),
         //'attribute' => 'from',
@@ -48,18 +55,16 @@ $model->e_key = md5(uniqid(rand(), true));
         ]
     ]);?>
 
+
+    <?= $form->field($model, 'booking_id')->textInput(['disabled'=>true]) ?>
+    <?= $form->field($model, 'door_lock_id')->textInput(['disabled'=>true]) ?>
+
     <?= $form->field($model, 'pin')->textInput(['disabled'=>true,'value'=>$model->pin]) ?>
 
     <?= $form->field($model, 'e_key')->textInput(['maxlength' => true, 'disabled'=>true,'value'=>$model->e_key]) ?>
 
-    <?= $form->field($model, 'booking_id')->textInput(['disabled'=>true]) ?>
-    <?= $form->field($model, 'door_lock_id')->textInput(['disabled'=>true]) ?>
-    <?= $form->field($model, 'type')->widget(Select2::className(), [
-            'data'=>['0'=>'Permanent','2'=>'Period'],
-            'value'=>$model->type,
-            'options' => ['placeholder' => 'Select a type ...'],
-            'pluginOptions' => []
-    ])->label('E-Key type');?>
+
+
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

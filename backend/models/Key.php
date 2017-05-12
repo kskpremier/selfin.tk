@@ -17,7 +17,7 @@ use yii\httpclient\Client;
  * @property integer $pin
  * @property string $e_key
  * @property integer $booking_id
- * @property integer door_lock_id
+ * @property integer $door_lock_id
  *
  * @property Booking $booking
  */
@@ -38,7 +38,7 @@ class Key extends \yii\db\ActiveRecord
     {
         return [
             [['pin', 'booking_id','door_lock_id'], 'integer'],
-            [['from', 'till'], 'string', 'max' => 20],
+            [['from', 'till'], 'string', 'max' => 30],
             [['e_key'], 'string', 'max' => 15],
             [['type'],'string','max' => 15],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
@@ -117,7 +117,7 @@ class Key extends \yii\db\ActiveRecord
     public function getKeyValue(){
         //тут надо сформировать запрос и послать его на китайский рестапи
         $client = $client = new Client([
-            'baseUrl' => 'http://api.domoupar.hr',
+            'baseUrl' => 'http://restapi.domouprav.hr',
             'requestConfig' => [
                 'format' => Client::FORMAT_JSON
             ],

@@ -43,7 +43,7 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     {
         return [
             [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
-            [['start_day', 'start_day'], 'string', 'max' => 20],
+            [['start_day', 'end_day'], 'string', 'max' => 30],
             [['keyboard_pwd_type'],'string','max' => 15],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
@@ -77,33 +77,35 @@ class KeyboardPwd extends \yii\db\ActiveRecord
         return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
 
-    public function getKeyboardPwd(){
+    public function getKeyboardPwdLocal(){
         //тут надо сформировать запрос и послать его на китайский рестапи
         $client = $client = new Client([
-            'baseUrl' => 'http://api.domoupar.hr',
-            'requestConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
-            'responseConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
+            'baseUrl' => 'api.domouprav.local',
+//            'requestConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
+//            'responseConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
         ]);
         $response = $client->createRequest()
             ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
+            ->setHeaders(['content-type' => 'application/json'])
             ->addHeaders(['Accept' => 'application/json'])
-            ->setUrl('/door-lock/keyboard-password')
+            ->addHeaders(['Authorization' => 'Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-'])
+            ->setUrl('/password')
             ->setData(['lockId' => $this->id,
                 'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
                 'keyboardPwdType' =>0, //$this->keyboardPwdType,//нет пока этого поля в модели, надо добавить миграцию
                 '$startDate'=>$this->start_day,
                 '$endDate'=>$this->end_day,
                 'date'=>$this->getCurrentTimeMillis(),
-                'accessToken'=>DOMOUPRAV::DOMOUPRAV_TOKEN
+                //'accessToken'=>DOMOUPRAV::DOMOUPRAV_TOKEN
             ])
             ->send();
         if ($response->isOk) {
             $this->value = $response->data['keyboardPwd']; //пока непонятно какой ответ возвращает сервер
+            $this->keyboardPwdId = $response->data['keyboardPwdId']; //пока непонятно какой ответ возвращает сервер
             return true;
         }
         else return false;
@@ -113,6 +115,48 @@ class KeyboardPwd extends \yii\db\ActiveRecord
         list($usec, $sec) = explode(" ", microtime());
         return (integer)(( (float)$usec + (float)$sec )*1000);
     }
+
+    /*
+     * Этот вызов будет дергать наш китайский api контроллер
+     * */
+
+    public function getKeyboardPwd(){//sendKeyboardPwdRequest(){
+        //тут надо сформировать запрос и послать его на китайский рестапи
+        $client = $client = new Client([
+            'baseUrl' => 'https://api.sciener.cn',
+   /*         'requestConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],
+            'responseConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],*/
+        ]);
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
+           // ->addHeaders(['Accept' => 'application/json'])
+            ->setUrl('/v3/keyboardPwd/get')
+            ->setData(['lockId' => "50088",//$this->id,
+                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
+                //'receiverUsername' =>DOMOUPRAV::DOMOUPRAV_RECIEVE_USERNAME,//
+                "clientId" => "7946f0d923934a61baefb3303de4d132",
+                //'$startDate'=>$this->from,
+                "startDate" => "1494534987691",
+//                '$endDate'=>$this->till,
+                "endDate" =>  "1494536417166",
+                //'date'=>$this->getCurrentTimeMillis(),
+                "keyboardPwdType" =>  "9",
+                //'accessToken'=>TTL::TTL_TOKEN,
+                "accessToken" =>  "7c714894bea74accb1b98d028dbc8dd5"
+            ])
+            ->send();
+        if ($response->isOk) {
+           // $this->e_key = $response->data['E-key'];
+            return true;
+        }
+        else return false;
+    }
+
     /**
      * For REST/API controller
      * @return array

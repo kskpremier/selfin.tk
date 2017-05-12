@@ -64,37 +64,42 @@ class KeyController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($bookingId  = null)
+    public function actionCreate($booking_id  = null)
     {
-        $booking = ($bookingId) ? Booking::findOne($bookingId) : null;
-        if (($booking)) {
+        $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
+       if (isset($booking)) {
+
             $model = new Key(['from' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
                 'till' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
-                'e_key' => md5(uniqid(rand(), true)),
-                'pin' => 123456,
-                'booking_id' => $bookingId]);
-        } else {
-            $model = new Key(['from' => Yii::$app->formatter->asDateTime(time(), "php:D, d-M-Y H:i"),
-                'till' => Yii::$app->formatter->asDateTime(time() + 24 * 60 * 60, "php:D, d-M-Y H:i"),
-                'e_key' => md5(uniqid(rand(), true)),
-                'pin' => 123456,
-                'booking_id' => null]);
-        }
+                'booking_id' => $booking_id,
+                'door_lock_id'=> $booking->apartment->doorLock->id]);
+       } else {
+           $model = new Key();
+           $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
+       }
+//        $model->booking_id = (array_key_exists('booking_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['booking_id']:$model->booking_id;
+//        $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->from = Yii::$app->formatter->asDateTime($model->from,'php:d-m-Y H:i:s');
             $model->till = Yii::$app->formatter->asDateTime($model->till,'php:d-m-Y H:i:s');
-            if ($model->getKeyboardPwd()) {
+            if ($model->getKeyValue()) {
+                Yii::$app->session->setFlash('success', 'Key is successfully generated');
                 $model->save();
+                return $this->redirect(['view', 'id' => $model->id]);
             }
-            return $this->redirect(['view', 'id' => $model->id]);
+            else {
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
             ]);
         }
     }
-
     /**
      * Updates an existing Key model.
      * If update is successful, the browser will be redirected to the 'view' page.
