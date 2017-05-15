@@ -1,0 +1,349 @@
+2017-05-12 01:11:17 [127.0.0.1][-][-][error][yii\web\HttpException:404] yii\web\NotFoundHttpException: Page not found. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Request.php:193
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(82): yii\web\Request->resolve()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#2 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#3 {main}
+2017-05-12 01:11:17 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_PRAGMA' => 'no-cache'
+    'HTTP_CACHE_CONTROL' => 'no-cache'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+    'HTTP_ACCEPT' => 'image/webp,image/*,*/*;q=0.8'
+    'HTTP_DNT' => '1'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, sdch'
+    'HTTP_ACCEPT_LANGUAGE' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '58880'
+    'REDIRECT_URL' => '/favicon.ico'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/favicon.ico'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494544277.501
+    'REQUEST_TIME' => 1494544277
+]
+2017-05-12 01:13:18 [127.0.0.1][-][-][error][yii\web\HttpException:404] yii\web\NotFoundHttpException: Page not found. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Request.php:193
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(82): yii\web\Request->resolve()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#2 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#3 {main}
+2017-05-12 01:13:18 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    'HTTP_DNT' => '1'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, sdch'
+    'HTTP_ACCEPT_LANGUAGE' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '59534'
+    'REDIRECT_URL' => '/keyboard-pwd/create'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/keyboard-pwd/create'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494544398.493
+    'REQUEST_TIME' => 1494544398
+]
+2017-05-12 01:14:46 [127.0.0.1][-][-][error][yii\web\HttpException:404] yii\web\NotFoundHttpException: Page not found. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Request.php:193
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(82): yii\web\Request->resolve()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#2 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#3 {main}
+2017-05-12 01:14:46 [127.0.0.1][-][-][info][application] $_GET = [
+    'id' => '1'
+]
+
+$_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    'HTTP_DNT' => '1'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, sdch'
+    'HTTP_ACCEPT_LANGUAGE' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '59978'
+    'REDIRECT_URL' => '/key/view'
+    'REDIRECT_QUERY_STRING' => 'id=1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=1'
+    'REQUEST_URI' => '/key/view?id=1'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494544486.446
+    'REQUEST_TIME' => 1494544486
+]
+2017-05-12 01:15:05 [127.0.0.1][-][-][error][yii\web\HttpException:404] yii\web\NotFoundHttpException: Page not found. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Request.php:193
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(82): yii\web\Request->resolve()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#2 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#3 {main}
+2017-05-12 01:15:05 [127.0.0.1][-][-][info][application] $_GET = [
+    'id' => '1'
+]
+
+$_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    'HTTP_DNT' => '1'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, sdch'
+    'HTTP_ACCEPT_LANGUAGE' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '60079'
+    'REDIRECT_URL' => '/key/view'
+    'REDIRECT_QUERY_STRING' => 'id=1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=1'
+    'REQUEST_URI' => '/key/view?id=1'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494544505.13
+    'REQUEST_TIME' => 1494544505
+]
+2017-05-12 02:54:13 [127.0.0.1][-][-][error][yii\web\HttpException:400] yii\web\BadRequestHttpException: Missing required parameters: id in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Controller.php:149
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php(51): yii\web\Controller->bindActionParams(Object(yii\base\InlineAction), Array)
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(156): yii\base\InlineAction->runWithParams(Array)
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction('view', Array)
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction('keyboard-pwd/vi...', Array)
+#4 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#5 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#6 {main}
+2017-05-12 02:54:13 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    'HTTP_DNT' => '1'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, sdch'
+    'HTTP_ACCEPT_LANGUAGE' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '57736'
+    'REDIRECT_URL' => '/password'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/password'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494550453.132
+    'REQUEST_TIME' => 1494550453
+]
+2017-05-12 03:00:06 [127.0.0.1][3][-][error][yii\base\ErrorException:4096] yii\base\ErrorException: Object of class backend\models\KeyboardPwd could not be converted to string in /Users/SAS/Sites/E-reception/api/controllers/KeyboardPwdController.php:96
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php(57): ::call_user_func_array:{/Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php:57}()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(156): yii\base\InlineAction->runWithParams()
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction()
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction()
+#4 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest()
+#5 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#6 {main}
+2017-05-12 03:00:06 [127.0.0.1][3][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json;'
+    'HTTP_ACCEPT' => 'application/json'
+    'CONTENT_LENGTH' => '0'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '59622'
+    'REDIRECT_URL' => '/password'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'POST'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/password'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494550806.779
+    'REQUEST_TIME' => 1494550806
+]
+2017-05-12 03:00:20 [127.0.0.1][3][-][error][yii\base\ErrorException:4096] yii\base\ErrorException: Object of class backend\models\KeyboardPwd could not be converted to string in /Users/SAS/Sites/E-reception/api/controllers/KeyboardPwdController.php:96
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php(57): ::call_user_func_array:{/Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php:57}()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(156): yii\base\InlineAction->runWithParams()
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction()
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction()
+#4 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest()
+#5 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#6 {main}
+2017-05-12 03:00:20 [127.0.0.1][3][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json;'
+    'HTTP_ACCEPT' => 'application/json'
+    'CONTENT_LENGTH' => '0'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '59695'
+    'REDIRECT_URL' => '/password'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'POST'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/password'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494550820.126
+    'REQUEST_TIME' => 1494550820
+]
+2017-05-12 03:00:21 [127.0.0.1][3][-][error][yii\base\ErrorException:4096] yii\base\ErrorException: Object of class backend\models\KeyboardPwd could not be converted to string in /Users/SAS/Sites/E-reception/api/controllers/KeyboardPwdController.php:96
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php(57): ::call_user_func_array:{/Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/InlineAction.php:57}()
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(156): yii\base\InlineAction->runWithParams()
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction()
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction()
+#4 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest()
+#5 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#6 {main}
+2017-05-12 03:00:21 [127.0.0.1][3][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json;'
+    'HTTP_ACCEPT' => 'application/json'
+    'CONTENT_LENGTH' => '0'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '59705'
+    'REDIRECT_URL' => '/password'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'POST'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/password'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1494550821.925
+    'REQUEST_TIME' => 1494550821
+]
