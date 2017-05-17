@@ -75,6 +75,13 @@ class Booking extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getPhotoImage()
+    {
+        return $this->hasMany(PhotoImage::className(), ['booking_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getKeys()
     {
         return $this->hasMany(Key::className(), ['booking_id' => 'id']);

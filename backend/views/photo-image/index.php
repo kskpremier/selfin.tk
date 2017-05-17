@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Add New Image', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Add New Image via REST/API', ['create-rest'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -31,6 +32,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute'=>'camera_id',
                     'label'=>'Type of camera',
                     'value'=> 'camera.type'
+            ],
+            [
+                'attribute'=>'booking_id',
+                'label'=>'Reservation',
+                'value'=> 'booking_id'
+            ],
+            [
+                'attribute'=>'user_id',
+                'label'=>'User',
+                'value'=> 'user.username'
             ],
             [
                 'attribute'=>'album_id',

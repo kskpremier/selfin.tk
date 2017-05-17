@@ -11,6 +11,7 @@ use yii\filters\AccessControl;
 use backend\models\PhotoImage;
 use yii\web\ServerErrorHttpException;
 use yii\helpers\Url;
+use yii\web\UploadedFile;
 
 class PhotoImageController extends \yii\rest\ActiveController
 {
@@ -24,35 +25,90 @@ class PhotoImageController extends \yii\rest\ActiveController
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-        $behaviors['access'] = [
-            'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete'],
-            'rules' => [
-                [
-                    'allow' => true,
-                    // ролей пока нет, поэтому я закоментировал
-                    // 'roles' => ['@'],
-                ],
-            ],
-        ];
+//        $behaviors['access'] = [
+//            'class' => AccessControl::className(),
+//            'only' => ['create', 'update', 'delete'],
+//            'rules' => [
+//                [
+//                    'allow' => true,
+//                    // ролей пока нет, поэтому я закоментировал
+//                     'roles' => ['@'],
+//                ],
+//            ],
+//        ];
         return $behaviors;
     }
 
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['create']);
-        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
-        return $actions;
-    }
+//    public function checkAccess($action, $model = null, $params = [])
+//    {
+//        if (in_array($action, ['update', 'delete','view','create'])) {
+//            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
+//                throw  new ForbiddenHttpException('Forbidden.');
+//            }
+//        }
+//    }
+
+//    public function actions()
+//    {
+//        $actions = parent::actions();
+//       // unset($actions['create']);
+//        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+//        return $actions;
+//    }
+/**
+ * Upload photo with POST Request
+ * @parameter in request
+ * { "booking_id":"2",
+ *   "user_id":"1"
+ * }
+ *
+ *  multipart/form-data
+ *  file .jpg /png
+ *
+ *  POST restapi.domouprav.hr/photoimage HTTP/1.1
+ * *  header for request
+ *
+ *  Authorization: Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-
+ *  Content-Type: multipart/form-data;
+ *  Content-Type: image/jpeg
+ *  Content-Disposition: form-data; name="img1"; filename="image1.jpg"
+ *
+ * HTTP/1.1 200 OK
+ * Content-Type: application/json
+ * {
+ *  "description": "Photo of tourist",
+ *   "img1": {
+ *   "filename": "image1.JPG",
+ *   "booking": "123",
+ *   "user":"12",
+ *   "uploaded": "2016-11-05T23:09:50+00:00",
+ *   "id": "123",
+ * }
+ *
+ **/
 
     public function actionCreate()
     {
-        $model = new PhotoImage();
-        $model->date = time();
+        $model = new \backend\models\PhotoImage();
 
-        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+        $model->load(Yii::$app->request->getBodyParams(), '');
+        $model->date = date();
+//        $headers = Yii::$app->request->headers['Authorization'];
+//        $pos = strripos ( $headers, ' ');
+//        $token = substr($headers, $pos+1, strlen($headers)-strlen("Bearer ") );
+//        $user = \common\models\User::findIdentityByAccessToken($token);
+        $model->user_id = (Yii::$app->user->id)?Yii::$app->user->id:2;//$user->id;
+        //echo Yii::$app->user->id;//надеюсь, что из токена я это получу
+        $model->album_id = ($model->album_id)?$model->album_id:1; //по дефолту 1 - нераспознаные
+
         if ($model->save()) {
+
+            $image = UploadedFile::getInstance($model,'file_name');
+            $imageName = 'real_face_via_api_'.$model->id.'.'.$image->getExtension() ;
+            $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
+            $model->file_name = $imageName;
+            $model->save();
+
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));

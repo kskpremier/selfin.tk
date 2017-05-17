@@ -18,7 +18,7 @@ class PhotoImageSearch extends PhotoImage
     public function rules()
     {
         return [
-            [['id', 'camera_id', 'album_id'], 'integer'],
+            [['id', 'camera_id', 'album_id','user_id','booking_id'], 'integer'],
             [['date', 'file_name'], 'safe'],
         ];
     }
@@ -63,6 +63,8 @@ class PhotoImageSearch extends PhotoImage
             'date' => $this->date,
             'camera_id' => $this->camera_id,
             'album_id' => $this->album_id,
+            'user_id' => $this->album_id,
+            'booking_id' => $this->album_id,
         ]);
 
         $query->andFilterWhere(['like', 'file_name', $this->file_name]);

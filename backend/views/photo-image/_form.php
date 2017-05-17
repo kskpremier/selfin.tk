@@ -30,13 +30,18 @@ use backend\models\Album;
         'pluginOptions' => [
             'format' => 'Y-m-d',
             'autoclose' => true,]
-    ]);
-    ?>
+    ]); ?>
 
     <?= $form->field($model, 'camera_id')->widget(Select2::classname(), [
         'data' => ArrayHelper::map(Camera::find()->all(),'id','type'),
         //'pluginOptions' => ['highlight' => true],
         'options' => ['placeholder' => 'Enter type of camera ...'],
+    ]); ?>
+
+    <?= $form->field($model, 'booking_id')->widget(Select2::classname(), [
+        'data' => ArrayHelper::map(\backend\models\Booking::find()->all(),'id','id'),
+        //'pluginOptions' => ['highlight' => true],
+        'options' => ['placeholder' => 'Enter reservation number ...'],
     ]); ?>
 
     <?= $form->field($model, 'album_id')->widget(Select2::classname(), [

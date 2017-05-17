@@ -20,6 +20,11 @@ return [
         'request' => [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
+                'multipart/form-data' => [
+                    'class'=>'yii\web\MultipartFormDataParser',
+                    'uploadFileMaxCount' => 10,
+                    'uploadFileMaxSize' => 20000000
+                    ],
                 'application/xml' => 'yii\web\XmlParser',
             ],
         ],

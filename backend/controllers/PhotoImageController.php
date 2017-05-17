@@ -64,9 +64,10 @@ class PhotoImageController extends Controller
      */
     public function actionCreate()
     {
-        $model = new PhotoImage();
+        $model = new \backend\models\PhotoImage();
 
         if ($model->load(Yii::$app->request->post()) ) {
+            $model->user_id = Yii::$app->getUser()->id;
             $model->save();
             $image = UploadedFile::getInstance($model,'file_name');
             $imageName = 'real_'.$model->id.'.'.$image->getExtension() ;
@@ -75,6 +76,39 @@ class PhotoImageController extends Controller
             $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Creates a new PhotoImage model using RestApi controller
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateRest()
+    {
+        $model = new \backend\models\PhotoImage();
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->user_id = Yii::$app->getUser()->id;
+            $image = UploadedFile::getInstance($model, 'file_name');
+            $imageName = $image->name;
+            $model->file_name = $imageName;
+
+            if ($model->postPhotoImage()) {
+                Yii::$app->session->setFlash('success', 'Photo was successfully uploaded - ' . $model->file_name);
+                $model->save();
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
+        }
+        else {
             return $this->render('create', [
                 'model' => $model,
             ]);
