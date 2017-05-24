@@ -70,7 +70,7 @@ class PhotoImageController extends Controller
             $model->user_id = Yii::$app->getUser()->id;
             $model->save();
             $image = UploadedFile::getInstance($model,'file_name');
-            $imageName = 'real_'.$model->id.'.'.$image->getExtension() ;
+            $imageName = 'face_'.$model->id.'_'.$model->user_id.'.'.$image->getExtension() ;
             $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
             $model->file_name = $imageName;
             $model->save();
@@ -93,16 +93,21 @@ class PhotoImageController extends Controller
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->user_id = Yii::$app->getUser()->id;
+            $model->date= date('Y-m-d');
             $image = UploadedFile::getInstance($model, 'file_name');
-            $imageName = $image->name;
-            $model->file_name = $imageName;
 
-            if ($model->postPhotoImage()) {
+            $model->save();
+            $imageName = 'face_'.$model->booking_id.'_'.$model->id.'.'.$image->getExtension();
+            $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
+            $model->file_name = $imageName;
+            $model->save();
+
+            $response = $model->postPhotoImage(); 
+            if ($response->isOk) {
                 Yii::$app->session->setFlash('success', 'Photo was successfully uploaded - ' . $model->file_name);
-                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
-                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator : '. $response);
                 return $this->render('create', [
                     'model' => $model,
                 ]);

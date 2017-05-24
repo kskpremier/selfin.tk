@@ -23,7 +23,7 @@ use kartik\select2\Select2;
 
 
     <?= $form->field($model, 'keyboard_pwd_type')->widget(Select2::className(), [
-        'data'=>['0'=>'Permanent','2'=>'Period','3'=>'Cycle','4'=>'One-time'],
+        'data'=>['2'=>'Permanent','3'=>'Period','5'=>'Cycle','1'=>'One-time'],
         'value'=>($model->keyboard_pwd_type == 0)? 'Permanent':'Period',
         'options' => ['placeholder' => 'Select a type ...'],
         'pluginOptions' => [],

@@ -22,6 +22,8 @@ use Yii;
  */
 class PhotoImage extends \yii\db\ActiveRecord
 {
+
+     public $file;
     /**
      * @inheritdoc
      */
@@ -36,8 +38,8 @@ class PhotoImage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['booking_id','album_id'], 'safe'],
-            [['date'], 'safe'],
+            [['booking_id','album_id'], 'required'],
+            [['date','file'], 'safe'],
             [['camera_id', 'album_id','user_id','booking_id'], 'integer'],
             [['file_name'], 'string', 'max' => 255],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
@@ -114,7 +116,7 @@ class PhotoImage extends \yii\db\ActiveRecord
             'id' => 'id',
             'file_name'=>'file_name',
             'album' => 'album_id',
-            'uploaded'=> 'date',
+            'date'=> 'date',
             'booking'=>'booking_id',
             'user'=>'user_id'
         ];
@@ -130,7 +132,7 @@ class PhotoImage extends \yii\db\ActiveRecord
         $client = $client = new Client();
         $response = $client->createRequest()
                             ->setMethod('post')
-                            ->setHeaders(['Authorization' => 'Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-'])
+                            ->setHeaders(['Authorization' => 'Bearer CWADri54WVNIs_ammPUDmwQSuuhDTw6G'])
                             ->setUrl('http://api.domouprav.local/photoimage')
                             ->setData(['user_id' => $this->user_id,
                                 'album_id' =>$this->album_id,
@@ -138,10 +140,6 @@ class PhotoImage extends \yii\db\ActiveRecord
                                 'file_name'=>$this->file_name])
                             ->addFile($this->file_name, $imagePath)
                             ->send();
-        if ($response->isOk) {
-//            $this-> = $response->data['E-key'];
-            return true;
-        }
-        else return false;
+       return $response;
     }
 }

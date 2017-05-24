@@ -11,6 +11,9 @@ namespace backend\models;
 use Yii;
 use \backend\models\DOMOUPRAV;
 use yii\httpclient\Client;
+use api\models\test\BodyPost;
+use api\models\test\oFile;
+use api\models\TTL;
 
 /**
  * This is the model class for table "key".
@@ -122,40 +125,74 @@ class KeyboardPwd extends \yii\db\ActiveRecord
 
     public function getKeyboardPwd(){//sendKeyboardPwdRequest(){
         //тут надо сформировать запрос и послать его на китайский рестапи
-        $client = $client = new Client([
-            'baseUrl' => 'https://api.sciener.cn',
+      //  $client = $client = new Client([
+        //    'baseUrl' => 'https://api.sciener.cn/v3/keyboardPwd/get',
    /*         'requestConfig' => [
                 'format' => Client::FORMAT_JSON
             ],
             'responseConfig' => [
                 'format' => Client::FORMAT_JSON
             ],*/
-        ]);
-        $response = $client->createRequest()
-            ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
-           // ->addHeaders(['Accept' => 'application/json'])
-            ->setUrl('/v3/keyboardPwd/get')
-            ->setData(['lockId' => "50088",//$this->id,
-                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
-                //'receiverUsername' =>DOMOUPRAV::DOMOUPRAV_RECIEVE_USERNAME,//
-                "clientId" => "7946f0d923934a61baefb3303de4d132",
-                //'$startDate'=>$this->from,
-                "startDate" => "1494534987691",
-//                '$endDate'=>$this->till,
-                "endDate" =>  "1494536417166",
-                //'date'=>$this->getCurrentTimeMillis(),
-                "keyboardPwdType" =>  "9",
-                //'accessToken'=>TTL::TTL_TOKEN,
-                "accessToken" =>  "7c714894bea74accb1b98d028dbc8dd5"
-            ])
-            ->send();
-        if ($response->isOk) {
-           // $this->e_key = $response->data['E-key'];
+      //  ]);
+//        $response = $client->createRequest()
+//            ->setMethod('post')
+//            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
+//           // ->addHeaders(['Accept' => 'application/json'])
+//           // ->setUrl('/v3/keyboardPwd/get')
+//            ->setData(['lockId' => "50088",//$this->id,
+//                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
+//                //'receiverUsername' =>DOMOUPRAV::DOMOUPRAV_RECIEVE_USERNAME,//
+//                "clientId" => "7946f0d923934a61baefb3303de4d132",
+//                //'$startDate'=>$this->from,
+//                "startDate" => "1495635099651",
+////                '$endDate'=>$this->till,
+//                "endDate" =>  "1495635099655",
+//                //'date'=>$this->getCurrentTimeMillis(),
+//                "keyboardPwdType" =>  "1",
+//                //'accessToken'=>TTL::TTL_TOKEN,
+//                "accessToken" =>  "7c714894bea74accb1b98d028dbc8dd5"
+//            ])
+//            ->send();
+        $response = KeyboardPwd::SendPost(
+            time(),
+            strtotime($this->start_day),
+            strtotime($this->end_day),
+            TTL::TTL_LOCKID,
+            $this->keyboard_pwd_type,
+            TTL::TTL_CLIENT_ID,
+            TTL::TTL_TOKEN);
+        $data= json_decode($response,true);
+        if (array_key_exists( 'keyboardPwd',$data) ) {
+
+            $this->value = $data['keyboardPwd'];
+            $this->door_lock_id = TTL::TTL_LOCKID;
             return true;
         }
         else return false;
     }
+
+    public static function SendPost($date, $startDate, $endDate, $lockId, $keyboardPwdType, $clientId, $accessToken )
+    {
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => 'https://api.sciener.cn/v3/keyboardPwd/get',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query([
+            'clientId'=>$clientId,//'7946f0d923934a61baefb3303de4d132',
+            'date'=> 1000*$date,//+(8*60+60),
+            'accessToken'=>$accessToken,//'7c714894bea74accb1b98d028dbc8dd5',
+            'startDate'=> ($startDate)*1000, //китайцы добавляют милисекунды
+            'endDate'=> ($endDate)*1000,//китайцы добавляют милисекунды
+            'keyboardPwdVersion'=>4,
+            'lockId'=>$lockId, //5088
+            'keyboardPwdType'=>$keyboardPwdType]) //1-
+        ));
+        $result = curl_exec ($ch) or die(curl_error($ch));
+        curl_close ($ch);
+        return $result;
+    }
+
 
     /**
      * For REST/API controller

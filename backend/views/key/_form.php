@@ -41,6 +41,13 @@ $model->e_key = md5(uniqid(rand(), true));
     ]);
     ?>
 
+    <?= $form->field($model, 'guest_id')->widget(Select2::className(), [
+        'data'=>['1'=>'svrybin','4'=>'domouprav'],
+        'value'=>0,
+        'options' => ['placeholder' => 'Select a guest ...'],
+        'pluginOptions' => [],
+    ])->label('for Guest');?>
+
 
     <?=// $form->field($model, 'till')->textInput()
     $form->field($model, 'till')->widget(DateTimePicker::className(), [

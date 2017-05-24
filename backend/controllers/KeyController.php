@@ -83,12 +83,14 @@ class KeyController extends Controller
         if ($model->load(Yii::$app->request->post()) ) {
             $model->from = Yii::$app->formatter->asDateTime($model->from,'php:d-m-Y H:i:s');
             $model->till = Yii::$app->formatter->asDateTime($model->till,'php:d-m-Y H:i:s');
-            if ($model->getKeyValue()) {
+            $model->save();
+            if ($model->sendEKey()) {
                 Yii::$app->session->setFlash('success', 'Key is successfully generated');
                 $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             else {
+                $model->delete();
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
                 return $this->render('create', [
                     'model' => $model,

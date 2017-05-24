@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use kartik\date\DatePicker;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -27,7 +28,24 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
           //  'id',
-            'date',
+            ['attribute'=>'date',
+                'filter'=>  DatePicker::widget([
+                    'model' => $searchModel,
+                    'language' => 'ru-RU',
+                    'attribute' => 'date_from',
+                    'attribute2' => 'date_to',
+                    'options' => ['placeholder' => 'от'],
+                    'options2' => ['placeholder' => 'до'],
+                    'type' => DatePicker::TYPE_RANGE,
+                    'separator'=>'-',
+//                            'form' => $form,
+                    'pluginOptions' => [
+                        'todayHighLight'=>true,
+                        'autoclose'=>true,
+                        'format' => 'yyyy-mm-dd',
+                    ],
+                ]),
+                'format'=>'datetime'],
             [
                     'attribute'=>'camera_id',
                     'label'=>'Type of camera',

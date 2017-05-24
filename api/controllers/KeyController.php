@@ -16,6 +16,7 @@ use backend\models\Booking;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 
 
 
@@ -68,14 +69,14 @@ class KeyController extends Controller
         return $actions;
     }
 
-    public function checkAccess($action, $model = null, $params = [])
-    {
-        if (in_array($action, ['update', 'delete','view','create'])) {
-            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
-                throw  new ForbiddenHttpException('Forbidden.');
-            }
-        }
-    }
+//    public function checkAccess($action, $model = null, $params = [])
+//    {
+//        if (in_array($action, ['update', 'delete','view','create'])) {
+//            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
+//                throw  new ForbiddenHttpException('Forbidden.');
+//            }
+//        }
+//    }
 
     public function prepareDataProvider()
     {
@@ -88,12 +89,15 @@ class KeyController extends Controller
      * If creation is successful, return model
      * @return Active Record model
      */
-    public function actionCreate()
+    public function actionCreateKey()
     {
         $model = new Key();
         // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-        if ($model->sendEKey() && $model->save()) {
+
+
+        $response = $model->getKeyValue();
+        if ( $model->save()) {
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));
@@ -101,7 +105,7 @@ class KeyController extends Controller
         } elseif (!$model->hasErrors()) {
             throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
         }
-        return $model;
+        return  $model;
     }
 
     /**

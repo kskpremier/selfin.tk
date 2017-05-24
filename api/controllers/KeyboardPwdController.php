@@ -93,7 +93,7 @@ class KeyboardPwdController extends Controller
         $model = new KeyboardPwd();
         // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-        if ($$model->sendKeyboardPwdRequest() && $model->save()) {
+        if ($model->sendKeyboardPwdRequest() && $model->save()) {
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));

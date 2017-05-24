@@ -27,7 +27,8 @@
         "kartik-v/yii2-widget-select2": "@dev",
         "costa-rico/yii2-images": "dev-master",
         "yiisoft/yii2-httpclient": "*",
-        "kartik-v/yii2-widget-datepicker": "@dev"
+        "kartik-v/yii2-widget-datepicker": "@dev",
+        "kartik-v/yii2-field-range": "dev-master"
 
     },
     "require-dev": {
@@ -39,15 +40,16 @@
         "guzzlehttp/guzzle": "^6.2",
         "flow/jsonpath": "^0.3.4"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
     "config": {
         "process-timeout": 1800
     },
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
-        }
-    },
+
     "scripts": {
         "post-install-cmd": "php init --env=Development --overwrite=n"
     }

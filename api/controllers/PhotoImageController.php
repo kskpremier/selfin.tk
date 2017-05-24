@@ -10,8 +10,10 @@ use yii\filters\auth\HttpBearerAuth;
 use yii\filters\AccessControl;
 use backend\models\PhotoImage;
 use yii\web\ServerErrorHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
+
 
 class PhotoImageController extends \yii\rest\ActiveController
 {
@@ -27,7 +29,7 @@ class PhotoImageController extends \yii\rest\ActiveController
         ];
 //        $behaviors['access'] = [
 //            'class' => AccessControl::className(),
-//            'only' => ['create', 'update', 'delete'],
+////            'only' => ['create-image', 'update', 'delete'],
 //            'rules' => [
 //                [
 //                    'allow' => true,
@@ -42,19 +44,22 @@ class PhotoImageController extends \yii\rest\ActiveController
 //    public function checkAccess($action, $model = null, $params = [])
 //    {
 //        if (in_array($action, ['update', 'delete','view','create'])) {
-//            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
+//            if (in_array($params,['start_day','end_day'])) {
+//
+//
 //                throw  new ForbiddenHttpException('Forbidden.');
 //            }
 //        }
 //    }
 
-//    public function actions()
-//    {
-//        $actions = parent::actions();
-//       // unset($actions['create']);
-//        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
-//        return $actions;
-//    }
+    public function actions()
+    {
+        $actions = parent::actions();
+//        unset($actions['create']);
+
+        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+        return $actions;
+    }
 /**
  * Upload photo with POST Request
  * @parameter in request
@@ -87,42 +92,91 @@ class PhotoImageController extends \yii\rest\ActiveController
  *
  **/
 
-    public function actionCreate()
+    public function actionCreateImage()
     {
         $model = new \backend\models\PhotoImage();
 
+        \yii::$app->request->enableCsrfValidation = false;
+
         $model->load(Yii::$app->request->getBodyParams(), '');
-        $model->date = date();
-//        $headers = Yii::$app->request->headers['Authorization'];
-//        $pos = strripos ( $headers, ' ');
-//        $token = substr($headers, $pos+1, strlen($headers)-strlen("Bearer ") );
-//        $user = \common\models\User::findIdentityByAccessToken($token);
-        $model->user_id = (Yii::$app->user->id)?Yii::$app->user->id:2;//$user->id;
-        //echo Yii::$app->user->id;//надеюсь, что из токена я это получу
-        $model->album_id = ($model->album_id)?$model->album_id:1; //по дефолту 1 - нераспознаные
 
-        if ($model->save()) {
+        $headers = Yii::$app->request->headers;
 
-            $image = UploadedFile::getInstance($model,'file_name');
-            $imageName = 'real_face_via_api_'.$model->id.'.'.$image->getExtension() ;
-            $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
-            $model->file_name = $imageName;
-            $model->save();
+        if ( Yii::$app->request->headers->has('Authorization') ) {
+            $user = \common\models\User::findIdentityByAccessToken($headers->get('Authorization'));
+            Yii::$app->user->setIdentity($user);
+            if (true) {
+//            if (Yii::$app->user->can('createPhotoImage', ['arrival_date'=>$model->booking->arrival_date, 'depature_date'=>$model->booking->depature_date ])) {
+                //в массив надо передавать сроки пребывания туриста
+                $model->date = date('Y-m-d');
+                $model->user_id = ($user) ? $user->id : 1;
+                $model->album_id = ($model->album_id) ? $model->album_id : 1; //по дефолту 1 - нераспознаные
+                $model->camera_id=1;
 
-            $response = Yii::$app->getResponse();
-            $response->setStatusCode(201);
-            $id = implode(',', array_values($model->getPrimaryKey(true)));
-            $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-        } elseif (!$model->hasErrors()) {
-            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+                if ($model->save()) {
+
+                    $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
+                    $extension = substr( $_FILES[ 'file' ][ 'name' ], strrpos( $_FILES[ 'file' ][ 'name' ], '.' ) );
+                    $filename =  $model->id.'_'. uniqid() . $extension;
+                    /* Open a file for writing */
+                    $fp = fopen( Yii::getAlias('@imagePath') . '/'.$filename, "w" );
+                    /* Read the data 1 KB at a time and write to the file */
+                    while( $data = fread( $postdata, 1024 ) )
+                        fwrite( $fp, $data );
+                    fclose( $fp );
+                    fclose( $postdata );
+                    $model->file_name = $filename;
+                    $model->save();
+                    $response = Yii::$app->getResponse();
+                    $response->setStatusCode(201);
+                    $id = implode(',', array_values($model->getPrimaryKey(true)));
+                    $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
+                }
+                elseif (!$model->hasErrors()) {
+                    throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+                }
+                return  $model;
+            }
+            else throw new ForbiddenHttpException('You are not authorized for added photos');
         }
-        return $model;
+        else  throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
     }
 
-//    public function prepareDataProvider()
-//    {
-//        $searchModel = new PhotoImageSearch();
-//        return $searchModel->search(Yii::$app->request->queryParams);
-//    }
+
+
+    private function fileUpload($result)
+    {
+        $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
+        /* Get file extension */
+        $extension = substr( $_FILES[ 'file' ][ 'name' ], strrpos( $_FILES[ 'file' ][ 'name' ], '.' ) );
+
+        /* Generate unique name */
+        $filename =  uniqid() . $extension;
+
+        /* Open a file for writing */
+        $fp = fopen( Yii::getAlias('@imagePath') . '/'.$filename, "w" );
+
+            /* Read the data 1 KB at a time
+              and write to the file */
+            while( $data = fread( $postdata, 1024 ) )
+                fwrite( $fp, $data );
+
+            /* Close the streams */
+        fclose( $fp );
+        fclose( $postdata );
+
+        /* the result object that is sent to client*/
+//        $result = new UploadResult;
+        $result->file_name = $filename;
+//        $result->document = $_FILES[ 'data' ][ 'name' ];
+//        $result->create_time = date( "Y-m-d H:i:s" );
+        return $result->file_name;
+    }
+
+    public function prepareDataProvider()
+    {
+        $searchModel = new PhotoImageSearch();
+        return $searchModel->search(Yii::$app->request->queryParams);
+    }
 
 }
