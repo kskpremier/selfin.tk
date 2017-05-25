@@ -19,12 +19,17 @@ use yii\httpclient\Client;
  * @property integer $guest_id
  * @property integer $booking_id
  * @property integer $door_lock_id
+ * @property string $remarks
+ * @property string $email
+ * @property string $key_status
+ * @property integer $key_id
  *
  * @property Booking $booking
+ * @property DoorLock $doorLock
+
  */
 class Key extends \yii\db\ActiveRecord
 {
-
     public $guest_id;
     /**
      * @inheritdoc
@@ -40,10 +45,11 @@ class Key extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pin', 'booking_id','door_lock_id','guest_id'], 'integer'],
+            [['pin', 'booking_id','door_lock_id','guest_id','key_id'], 'integer'],
+            [['remarks'], 'string'],
             [['from', 'till'], 'string', 'max' => 30],
             [['e_key'], 'string', 'max' => 15],
-            [['type'],'string','max' => 15],
+            [['type', 'email', 'key_status'], 'string', 'max' => 255],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];

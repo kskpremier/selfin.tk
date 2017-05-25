@@ -66,8 +66,8 @@ class PhotoImageSearch extends PhotoImage
             'date' => $this->date,
             'camera_id' => $this->camera_id,
             'album_id' => $this->album_id,
-            'user_id' => $this->album_id,
-            'booking_id' => $this->album_id,
+            'user_id' => $this->user_id,
+            'booking_id' => $this->booking_id,
         ]);
 
         $query->andFilterWhere(['like', 'file_name', $this->file_name])

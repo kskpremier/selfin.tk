@@ -10,7 +10,7 @@ use backend\models\Key;
 /**
  * KeySearch represents the model behind the search form about `backend\models\Key`.
  */
-class KeySearch extends Key
+class KeySearch extends \backend\models\Key
 {
     /**
      * @inheritdoc

@@ -73,18 +73,18 @@ class KeyboardPwdController extends Controller
     public function actionCreate($booking_id  = null)
     {
         $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
-        if (isset($booking)) {
 
+        if (isset($booking)) {
             $model = new KeyboardPwd(['start_day' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
                 'end_day' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
                 'booking_id' => $booking_id,
                 'door_lock_id'=> $booking->apartment->doorLock->id]);
         } else {
             $model = new KeyboardPwd();
-            $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
+            $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?
+                                    Yii::$app->request->queryParams['door_lock_id']:
+                                    $model->door_lock_id;
         }
-//        $model->booking_id = (array_key_exists('booking_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['booking_id']:$model->booking_id;
-//        $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->start_day = Yii::$app->formatter->asDateTime($model->start_day,'php:d-m-Y H:i:s');

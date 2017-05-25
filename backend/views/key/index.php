@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
@@ -29,7 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'till',
             'pin',
             'e_key',
-            // 'booking_id',
+            [
+                    'attribute'=>'booking_id',
+                    'format'=>'raw',
+                    'value'=> function($model) {
+                                return HTML::a($model->booking_id, Url::to(['booking/view', 'id'=>$model->booking_id]) );
+                    } ,
+                ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

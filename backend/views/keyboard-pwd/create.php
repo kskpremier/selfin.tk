@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\KeyboardPwd */
 
-$this->title = Yii::t('app', 'Create Keyboard Pwd');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Keyboard Pwds'), 'url' => ['index']];
+$this->title = Yii::t('app', 'Create Keyboard Password');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Keyboard Password'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="keyboard-pwd-create">

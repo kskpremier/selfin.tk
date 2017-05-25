@@ -51,10 +51,25 @@ use kartik\select2\Select2;
             'autoclose' => true,
         ]
     ]);?>
-    <?php  echo $form->field($model, 'keyboard_pwd_version')->textInput(['disabled'=>true]); ?>
-    <?= $form->field($model, 'booking_id')->textInput(['disabled'=>true]) ?>
-    <?= $form->field($model, 'door_lock_id')->textInput(['disabled'=>true]) ?>
-    <?= $form->field($model, 'value')->textInput(['disabled'=>true,'value'=>$model->value]) ?>
+
+
+    <?php
+    if ($model->booking_id)
+       echo  $form->field($model, 'booking_id')->textInput(['disabled'=>true])->label('for Booking #');
+    else echo $form->field($model, 'booking_id')->widget(Select2::className(), [
+        'data'=> ArrayHelper::map(\backend\models\Booking::find()->all() ,'id','id'),
+        'options' => ['placeholder' => 'Select a booking ...'],
+        'pluginOptions' => [],
+    ])->label('for Booking #');
+    ?>
+    <?php
+    if ($model->door_lock_id)
+        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true])->label('for Door lock #') ?>
+
+    <?php $model->keyboard_pwd_version = 4;
+
+    echo $form->field($model, 'keyboard_pwd_version')->textInput(['disabled'=>true]); ?>
+
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

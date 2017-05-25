@@ -16,18 +16,20 @@ use api\models\test\oFile;
 use api\models\TTL;
 
 /**
- * This is the model class for table "key".
+ * This is the model class for table "keyboard_pwd".
  *
  * @property integer $id
- * @property string $end_day
  * @property string $start_day
- * @property integer $keyboard_pwd_version
+ * @property string $end_day
  * @property integer $value
  * @property string $keyboard_pwd_type
+ * @property integer $keyboard_pwd_version
  * @property integer $door_lock_id
  * @property integer $booking_id
+ * @property string $keyboard_pwd_id
  *
  * @property Booking $booking
+ * @property DoorLock $doorLock
  */
 class KeyboardPwd extends \yii\db\ActiveRecord
 {
@@ -45,9 +47,11 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
-            [['start_day', 'end_day'], 'string', 'max' => 30],
+            [['keyboard_pwd_version', 'booking_id','value','door_lock_id','value'], 'integer'],
+            [['start_day', 'end_day'], 'date'],
             [['keyboard_pwd_type'],'string','max' => 15],
+            [['keyboard_pwd_type', 'keyboard_pwd_id'], 'string', 'max' => 255],
+            [['booking_id','door_lock_id','keyboard_pwd_type','keyboard_pwd_version'], 'required'],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];
@@ -95,11 +99,11 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             ->setMethod('post')
             ->setHeaders(['content-type' => 'application/json'])
             ->addHeaders(['Accept' => 'application/json'])
-            ->addHeaders(['Authorization' => 'Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-'])
+            ->addHeaders(['Authorization' => 'cWADri54WVNIs_ammPUDmwQSuuhDTw6-'])
             ->setUrl('/password')
             ->setData(['lockId' => $this->id,
-                'keyboardPwdVersion' =>4,// $this->keyboardPwdVersion,
-                'keyboardPwdType' =>0, //$this->keyboardPwdType,//нет пока этого поля в модели, надо добавить миграцию
+                'keyboardPwdVersion' =>$this->keyboard_pwd_version,// $this->keyboardPwdVersion,
+                'keyboardPwdType' =>$this->keyboard_pwd_type , //$this->keyboardPwdType,//нет пока этого поля в модели, надо добавить миграцию
                 '$startDate'=>$this->start_day,
                 '$endDate'=>$this->end_day,
                 'date'=>$this->getCurrentTimeMillis(),
@@ -204,12 +208,11 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             'id' => 'id',
             'start_date'=>'start_date',
             'end_date'=>'end_date',
-            'booking_id' => 'booking',
-            'door_lock_id'=>'door_lock',
-            'value'=>'keyboard_password',
-            'keyboard_pwd_type'=>'keyboard_password_type',
+            'booking_id' => 'booking_id',
+            'door_lock_id'=>'door_lock_id',
+            'value'=>'value',
+            'keyboard_pwd_type'=>'keyboard_pwd_type',
             'keyboard_pwd_version'=>'keyboard_pwd_version'
-
         ];
     }
 }

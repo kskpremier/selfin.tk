@@ -54,9 +54,11 @@ class PhotoImage extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'date' => 'Date',
-            'camera_id' => 'Camera ID',
-            'album_id' => 'Album ID',
+            'camera_id' => 'Camera #',
+            'album_id' => 'Album #',
             'file_name' => 'File Name',
+            'booking_id' => 'Booking #',
+            'door_lock_id' => 'Door lock #'
         ];
     }
 
