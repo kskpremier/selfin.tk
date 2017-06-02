@@ -50,6 +50,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
     <?= Html::a('Send image for faces recognition',
-                 ['faces/detect-face', 'imageUrl' => Yii::getAlias('@imageUrl').'/'.$model->file_name],
+                 ['face/detect-face', 'photoImageId' => $model->id],
                  ['class' => 'btn btn-primary']) ?>
 </div>

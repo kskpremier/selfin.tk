@@ -53,6 +53,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+//            [['email'],'email','required' ],
+//            [['username'],'string','max'=>255,'required'],
         ];
     }
 
@@ -86,6 +88,16 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+    }
+    /**
+     * Finds user by user email
+     *
+     * @param string $userEmail
+     * @return static|null
+     */
+    public static function findByUserEmail($userEmail)
+    {
+        return static::findOne(['email' => $userEmail, 'status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -206,13 +218,42 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Token::className(), ['user_id' => 'id']);
     }
+    /**
+     * For REST/API controller
+     * @return array
+     */
     public function fields()
     {
         return [
             'id' => 'id',
             'username' => 'username',
             'email' => 'email',
+
 //            'description' => 'description',
         ];
     }
+    /**
+     * @param string $view
+     * @param string $subject
+     * @param array $params
+     * @return bool
+     */
+    public function sendMail($view, $subject, $params = []) {
+        // Set layout params
+        \Yii::$app->mailer->getView()->params['userName'] = $this->username;
+        \Yii::$app->mailer->getView()->params['userName'] = $params[''];
+
+        $result = \Yii::$app->mailer->compose([
+            'html' => 'views/' . $view . '-html',
+            'text' => 'views/' . $view . '-text',
+        ], $params)->setTo([$this->email => $this->username])
+            ->setSubject($subject)
+            ->send();
+
+        // Reset layout params
+        \Yii::$app->mailer->getView()->params['userName'] = null;
+
+        return $result;
+    }
+
 }

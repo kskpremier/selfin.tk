@@ -47,10 +47,11 @@ class UserController extends Controller
     {
         $model = $this->findModel();
         $model->load(Yii::$app->request->getBodyParams(), '');
-        if ($model->save() === false && !$model->hasErrors()) {
-            throw new ServerErrorHttpException('Failed to update the object for unknown reason.');
-        }
-        return $model;
+//        if ($model->save() === false && !$model->hasErrors()) {
+//            throw new ServerErrorHttpException('Failed to update the object for unknown reason.');
+//        }
+//        return $model;
+        return json_encode(Yii::$app->request->getBodyParams());
     }
     public function verbs()
     {

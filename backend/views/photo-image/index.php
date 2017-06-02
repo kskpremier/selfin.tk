@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use kartik\date\DatePicker;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -18,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Add New Image', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Add New Image via REST/API', ['create-rest'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,11 +28,38 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
           //  'id',
-            'date',
+            ['attribute'=>'date',
+                'filter'=>  DatePicker::widget([
+                    'model' => $searchModel,
+                    'language' => 'ru-RU',
+                    'attribute' => 'date_from',
+                    'attribute2' => 'date_to',
+                    'options' => ['placeholder' => 'от'],
+                    'options2' => ['placeholder' => 'до'],
+                    'type' => DatePicker::TYPE_RANGE,
+                    'separator'=>'-',
+//                            'form' => $form,
+                    'pluginOptions' => [
+                        'todayHighLight'=>true,
+                        'autoclose'=>true,
+                        'format' => 'yyyy-mm-dd',
+                    ],
+                ]),
+                'format'=>'datetime'],
             [
                     'attribute'=>'camera_id',
                     'label'=>'Type of camera',
                     'value'=> 'camera.type'
+            ],
+            [
+                'attribute'=>'booking_id',
+                'label'=>'Reservation',
+                'value'=> 'booking_id'
+            ],
+            [
+                'attribute'=>'user_id',
+                'label'=>'User',
+                'value'=> 'user.username'
             ],
             [
                 'attribute'=>'album_id',

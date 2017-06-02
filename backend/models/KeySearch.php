@@ -10,7 +10,7 @@ use backend\models\Key;
 /**
  * KeySearch represents the model behind the search form about `backend\models\Key`.
  */
-class KeySearch extends Key
+class KeySearch extends \backend\models\Key
 {
     /**
      * @inheritdoc
@@ -18,8 +18,9 @@ class KeySearch extends Key
     public function rules()
     {
         return [
-            [['id', 'pin', 'booking_id'], 'integer'],
-            [['from', 'till', 'e_key'], 'safe'],
+            [['id', 'pin', 'booking_id','door_lock_id'], 'integer'],
+            [['type'],'string','max' => 15],
+            [['start_day', 'end_day', 'e_key'], 'safe'],
         ];
     }
 
@@ -62,11 +63,13 @@ class KeySearch extends Key
             'id' => $this->id,
             'pin' => $this->pin,
             'booking_id' => $this->booking_id,
+            'door_lock_id' => $this->door_lock_id,
         ]);
 
-        $query->andFilterWhere(['like', 'from', $this->from])
-            ->andFilterWhere(['like', 'till', $this->till])
-            ->andFilterWhere(['like', 'e_key', $this->e_key]);
+        $query ->andFilterWhere(['like', 'e_key', $this->e_key])
+               ->andFilterWhere(['like', 'type', $this->type]);
+        $query->andFilterWhere(['>=', 'key.start_day', $this->start_day ? strtotime($this->start_day . ' 00:00:00'):null])
+               ->andFilterWhere(['<=', 'key.end_day', $this->end_day ? strtotime($this->end_day . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

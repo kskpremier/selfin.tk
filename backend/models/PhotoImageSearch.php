@@ -12,14 +12,17 @@ use backend\models\PhotoImage;
  */
 class PhotoImageSearch extends PhotoImage
 {
+    public $date_from;
+    public $date_to;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'camera_id', 'album_id'], 'integer'],
+            [['id', 'camera_id', 'album_id','user_id','booking_id'], 'integer'],
             [['date', 'file_name'], 'safe'],
+            [['date_from','date_to'],'date']
         ];
     }
 
@@ -63,9 +66,13 @@ class PhotoImageSearch extends PhotoImage
             'date' => $this->date,
             'camera_id' => $this->camera_id,
             'album_id' => $this->album_id,
+            'user_id' => $this->user_id,
+            'booking_id' => $this->booking_id,
         ]);
 
-        $query->andFilterWhere(['like', 'file_name', $this->file_name]);
+        $query->andFilterWhere(['like', 'file_name', $this->file_name])
+        ->andFilterWhere(['>=', 'photo_image.date', $this->date_from ? strtotime($this->date_from . '00:00:00'):null])
+        ->andFilterWhere(['<=', 'photo_image.date', $this->date_to ? strtotime($this->date_to . '23:59:59'):null]);
 
         return $dataProvider;
     }

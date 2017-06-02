@@ -1,0 +1,54 @@
+<RestClientRequest>
+  <option name="biscuits">
+    <list />
+  </option>
+  <option name="httpMethod" value="POST" />
+  <option name="urlBase" value="https://api.sciener.cn" />
+  <option name="urlPath" value="/oauth2/token" />
+  <option name="headers">
+    <list>
+      <KeyValuePair>
+        <option name="key" value="Content-Type" />
+        <option name="value" value="application/x-www-form-urlencoded" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="Accept" />
+        <option name="value" value="application/json" />
+      </KeyValuePair>
+    </list>
+  </option>
+  <option name="parameters">
+    <list>
+      <KeyValuePair>
+        <option name="key" value="client_secret" />
+        <option name="value" value="56d9721abbc3d22a58452c24131a5554" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="client_id" />
+        <option name="value" value="7946f0d923934a61baefb3303de4d132" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="grant_type" />
+        <option name="value" value="password" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="username" />
+        <option name="value" value="doorlockadmin@domouprav.hr" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="password" />
+        <option name="value" value="8a6cdf478c7ddcb0a15caa8ac3d0e7f8" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="redirect_uri" />
+        <option name="value" value="http://www.sciener.cn" />
+      </KeyValuePair>
+    </list>
+  </option>
+  <option name="parametersEnabled" value="true" />
+  <option name="haveTextToSend" value="true" />
+  <option name="haveFileToSend" value="false" />
+  <option name="isFileUpload" value="false" />
+  <option name="textToSend" value="" />
+  <option name="filesToSend" value="/Users/SAS/Sites/E-reception/backend/web/uploads/images/real_photos/example.png" />
+</RestClientRequest>

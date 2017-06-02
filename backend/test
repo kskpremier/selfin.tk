@@ -1,0 +1,81 @@
+https://192.168.41.100/restapi/myRent/test/v1/
+ We have there only cash register or payment-invoicing bridge as well?
+
+Could you send current version for me?
+
+It could be some technical description. Something like this (for cash register):
+
+1. U idei će se otvoriti za svaku recepciju jedna blagajna.
+
+2. Biti će potrebno povezati (uskladiti) djelatnike (myRent-idea) i blagajne (blagajna-recepcija).
+   - ove podatke možemo direktno upisati u bazu jer se ne mijenjaju često ev. ako se pokaže potreba možemo i naknadno napraviti neki ekran.
+
+3. Uplatnice će se kreirati automatski na dnevnoj bazi po blagajnama na temelju kreiranih računa koji su plaćeni gotovinom ili karticom.
+   - Ostaje utvrditi još kako će se formirati brojevi na uplatnicama. Svaka blagajna svoj brojač ili za sve blagajne jedan brojač.
+4. Postaviti ćemo mogućnost kreiranja uplatnice sa strane myRenta za posebne potrebe (ako bude opće). (POST, PUT)
+  - endpoint: serviceaddress/restapi/myRent/v1/uplatnica
+  - Json: 
+{
+ "myRent_id": "broj dokumenta u myRentu",
+ "docType": "payIn"
+ "date":      "2017-02-15",
+ "createdBy": "id_osobe",
+ "officeId":   "id_recepcije",
+ "currencyId": "HRK",
+ "note":       "napomena",
+ "items":[
+ {
+   "paymentTypeId": "cash",
+   "amount":        1254.20    
+ },
+ {
+   "paymentTypeId": "creditCard",
+   "amount":        256.30    
+ }
+ ]
+}
+
+5. Isplatnica. (POST, PUT)
+  - endpoint: serviceaddress/restapi/myRent/v1/isplatnica
+  - Json: isti kao i u gornjem slučaju razlika samo docType: "payOut" 
+  - Napomena: ono što određuje akciju (hoće li json biti tretiran kao uplatica ili isplatnica) je endpoint (url) u Jsonu docType je samo informativnog karaktera zbog logova.
+6. Pregled blagajne: (GET)
+  - endpoint: serviceaddress/restapi/myRent/v1/blagajna/id_blagajne/sredstvo/id_sredstva/od/datum/do/datum 
+ - Napomena: id_sredstva se ne mora navoditi znači može biti: serviceaddress/restapi/myRent/v1/blagajna/id_blagajne/od/datum/do/datum   
+   u tom slučaju se vraća lista za sva sredstva.
+ - Json: 
+{ 
+ "officeId":      "id_recepcije", 
+ "startDate":     "2017-02-15", 
+ "ebdDate":       "2017-02-15",
+ "currencyId": "HRK",
+ "initialAmount": 250.70 
+ "items":[ 
+ { 
+     "ordNumber": 1, 
+     "myRent_id":       "broj dokumenta u myRentu", 
+     "idea_id":        "broj dokumenta u idei", 
+     "date":              "2017-02-15", 
+     "createdBy":    "id_osobe", 
+     "note":              "napomena", 
+     "amount":         1548.00 
+   } 
+ ] 
+} 
+7. Stanje na dan (GET)
+  -endpoint: serviceaddress/restapi/myRent/v1/stanjeblagajne/id_blagajne/sredstvo/id_sredstva/datum/datum
+  - Napomena: id_sredstva se ne mora navoditi znači može biti i serviceaddress/restapi/myRent/v1/stanjeblagajne/id_blagajne/datum/datum
+    u tom slučaju se vraća stanje zbirno za sva sredstva.
+  -Json:
+{
+ "officeId": "id_recepcije",
+ "date":     "2017-02-15",
+ "currencyId": "HRK",
+ "amount":   250.70  
+}
+
+
+napomena: 
+datumi imaju format: yyyy-mm-dd
+"docType": "payIn", "payOut"
+myRent_id: uplatnice koje su kreirane sa strane idee neće imati myRent_id.

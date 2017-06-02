@@ -5,6 +5,10 @@ namespace api\controllers;
 use Yii;
 use yii\rest\Controller;
 use api\models\LoginForm;
+//use api\models\test\BodyPost;
+//use api\models\test\oFile;
+//include "/Users/SAS/Sites/E-reception/api/models/test/oFile.php";
+//include "/Users/SAS/Sites/E-reception/api/models/test/BodyPost.php";
 
 class SiteController extends Controller
 {
@@ -24,6 +28,7 @@ class SiteController extends Controller
         }
 
     }
+
     protected function verbs()
     {
         return [

@@ -43,20 +43,20 @@ return [
 //                'application/json' => 'yii\web\JsonParser',
 //            ]
         ],
-        'facematica' => [
-            'class' => 'backend\modules\faces\models\FaceClient',
-//            'baseUrl' => 'https://api.facematica.vocord.ru',
-//            'API_KEY' => 'fcm3d9fe7b8281bd750d4b852de9a7ab0a5fcm',
-            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/real_photos/'
-        ],
-        'OCR' => [
-            'class' => 'backend\modules\documents\models\FaceClient',
-//            'baseUrl' => 'http://cloud.ocrsdk.com',
-//            'serviceUrl' => 'http://cloud.ocrsdk.com',
-//            'password' => '1qUEQN09CAKveNT64f+UENVk',
-//            'applicationId' => 'e-reception',
-            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/document_photos/'
-        ],
+//        'facematica' => [
+//            'class' => 'backend\modules\faces\models\FaceClient',
+////            'baseUrl' => 'https://api.facematica.vocord.ru',
+////            'API_KEY' => 'fcm3d9fe7b8281bd750d4b852de9a7ab0a5fcm',
+//            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/real_photos/'
+//        ],
+//        'OCR' => [
+//            'class' => 'backend\modules\documents\models\FaceClient',
+////            'baseUrl' => 'http://cloud.ocrsdk.com',
+////            'serviceUrl' => 'http://cloud.ocrsdk.com',
+////            'password' => '1qUEQN09CAKveNT64f+UENVk',
+////            'applicationId' => 'e-reception',
+//            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/document_photos/'
+//        ],
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
@@ -84,14 +84,14 @@ return [
             'enablePrettyUrl' => true,
 //            'enableStrictParsing' => true,
             'showScriptName' => false,
-//            'rules' => [
-//                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
-//                '' => 'site/index',
-//                '\booking'=>'booking/index',
-//                '<_c:[\w-]+>' => '<_c>/index',
-//                '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
-//                '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
-//            ],
+            'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
+                '' => 'site/index',
+                //'\booking'=>'booking/index',
+                '<_c:[\w-]+>' => '<_c>/index',
+                '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
+                '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
+            ],
          ],
     ],
 //    'request' => [

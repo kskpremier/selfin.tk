@@ -14,12 +14,38 @@ return [
             'class'=>'api\controllers\UserController',
         ],
     ],
-    'bootstrap' => ['log'],
-    'modules' => [],
+    'bootstrap' => [
+        'log',
+        ['class' => 'yii\filters\ContentNegotiator',
+            'formats' => [
+                'application/json' => Response::FORMAT_JSON,
+                'application/xml' => Response::FORMAT_XML,
+            ],
+        ],
+    ],
+    'modules' => [
+        'yii2images' => [
+            'class' => 'rico\yii2images\Module',
+            //be sure, that permissions ok
+            //if you cant avoid permission errors you have to create "images" folder in web root manually and set 777 permissions
+            'imagesStorePath' => dirname(__DIR__).'/../web/uploads/images/real_photos',//images/store', //path to origin images
+            'imagesCachePath' => dirname(__DIR__).'/../web/uploads/images/real_photos/cash',//'images/cache', //path to resized copies
+            'graphicsLibrary' => 'GD', //but really its better to use 'Imagick'
+//            'placeHolderPath' => '@webroot/uploads/images/real_photos/real_2.jpg', // if you want to get placeholder when image not exists, string will be processed by Yii::getAlias
+        ],
+    ],
+
     'components' => [
         'request' => [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
+                'multipart/form-data' =>//'yii\web\MultipartFormDataParser',
+
+                    [
+                    'class'=>'yii\web\MultipartFormDataParser',
+                    'uploadFileMaxCount' => 10,
+                    'uploadFileMaxSize' => 20000000
+                    ],
                 'application/xml' => 'yii\web\XmlParser',
             ],
         ],
@@ -53,11 +79,44 @@ return [
             'rules' => [
                 '' => 'site/index',
                 'auth' => 'site/login',
+//                'PUT,POST update' => 'user/update',
+
 
                 'GET user' => 'user/index',
-                'PUT,PATCH photoimage' => 'photo-image/update',
+
+//                'PATCH photoimage' => 'photo-image/update',
+                'send' => 'site/send-post',
+                'POST photoimage' => 'photo-image/create-image',
+//                'GET photoimage' => 'photo-image/view',
+                'POST booking' => 'booking/create',
+
+//
+//               //crud  для замков
+//                'POST door_lock' => 'door-lock/create',
+//                'PUT,PATCH door_lock' => 'door-lock/update',
+//                'GET door_lock' => 'door-lock/view',
+//                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
+//                //crud для электронных ключей
+                'POST e-key' => 'key/create',
+//                'PUT,PATCH e-key' => 'key/update',
+                'GET e-key' => 'key/view',
+//                'PUT,PATCH e-key/delete' => 'key/delete',
+//                //curd для буквенно-цифрового ключа (pin)
+                'POST password' => 'keyboard-pwd/create',
+                'request-password' => 'site/request-password',
+//                'PUT,PATCH password' => 'keyboard-pwd/update',
+//                'GET password' => 'keyboard-pwd/view',
+//                'PUT,PATCH password/delete' => 'keyboard-pwd/delete',
+
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'itemFile' => '@console/rbac/items.php',
+            'assignmentFile' => '@console/rbac/assignments.php',
+            'ruleFile' => '@console/rbac/rules.php',
+            'defaultRoles' => ['tourist'],
         ],
     ],
     'params' => $params,

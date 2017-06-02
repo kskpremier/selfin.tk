@@ -60,12 +60,13 @@ class BookingSearch extends Booking
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'arrival_date' => $this->arrival_date,
-            'depature_date' => $this->depature_date,
             'apartment_id' => $this->apartment_id,
             'number_of_tourist' => $this->number_of_tourist,
             'guest_id' => $this->guest_id,
         ]);
+
+        $query->andFilterWhere(['>=', 'booking.arrival_date', $this->arrival_date ? strtotime($this->arrival_date . ' 00:00:00'):null])
+        ->andFilterWhere(['<=', 'booking.depature_date', $this->depature_date ? strtotime($this->depature_date . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

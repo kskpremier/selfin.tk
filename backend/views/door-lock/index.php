@@ -29,7 +29,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'type',
             'apartment_id',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete} {key} {pin}',
+                'buttons' => [
+                    'key' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-phone"></span>',
+                            ['key/index', 'door_lock_id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'pin' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-th"></span>',
+                            ['keyboard-pwd/create', 'booking_id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                ],
+            ],
         ],
+
     ]); ?>
 </div>

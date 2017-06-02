@@ -32,4 +32,251 @@ Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
     "id": 1,
     "username": "admin",
     "email": "svrybin@gmail.com"
-}          
+}   
+       
+3. Запрос информации о Замке
+GET URL + /door-lock/view?id=...  //идентификатор замка
+
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+
+Ответ в формате json
+{
+    "id": 1,
+    "admin_pin":0856378,
+    "apartment_id":32,
+     "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
+    =======надо вносить изменения в модель========
+
+    "lockVersion":4, //непонятно пока, но в запросе пишет 4
+    "modelNum":?? // наверное тут должен быть серийный номер, который пока хз где найти
+     "lockName": ?? //
+}             
+
+3. Добавление нового замка
+
+POST URL + /door-lock/create&apartment_id=...  //идентификатор замка
+
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+
+Ответ в формате json
+{
+    "id": 1,
+    "admin_pin":0856378,
+    "apartment_id":32,
+     "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
+    =======надо вносить изменения в модель========
+
+    "lockVersion":4, //непонятно пока, но в запросе пишет 4
+    "modelNum":?? // наверное тут должен быть серийный номер, который пока хз где найти
+     "lockName": ?? //
+}
+
+4. Добавление фотографии для регистрации
+POST URL + /photoimage или
+http://api.domouprav.local/photoimage
+
+Заголовок HTTP
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+Accept: application/json
+Content-type: multipart/form-data
+
+В теле запроса должны быть следующие поля:
+
+ 'user_id' : ставь пока 1 - в дальнейшем надо сделать распознавание по Токену я так думаю
+ 'booking_id' : по умолчанию ставь пока 1
+ 'album_id' : 3 или 4 - лица пихаем в 4, документы в 3
+ 'file_name' : 'image1.jpg' - здесь надо имя запихиваемого файла
+
+ Далее в тело запроса надо запихнуть сам файл
+ Content-Disposition: form-data; name="img1"; filename="image1.jpg"
+ Content-Type: image/jpeg
+    ну и собственно сам файл
+
+У меня этот  HTTP строит библиотека yii\httpclient\Client
+Соответственно у тебя надо что бы твоя библиотека (ретрофит или другая) корректно строила запрос
+в теле должны быть и параметры и прикрепленный файл - это важно.
+
+x. Получение цифрового пароля для замка
+
+GET URL + /door-lock/keyboard-password?=...  //идентификатор замка
+
+params:
+'id'=>наш внутренний идентификатор замка
+'keyboardPwdType' => тип (0-постоянный, 1-на период, 2-циклический, 3-разовый
+'startDate' => дата начала действия (формат надо уточнять)
+'endDate' => дата окончания действия
+Заголовок HTTP
+Accept: application/json
+Content-type: application/json
+Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
+
+=============разбираю китайский сервис
+
+json:{"lastUpdateDate":1494533094128,"keyList":[{"date":1494449730000,
+"lockAlias":"M201T_780566","keyStatus":"110401","endDate":0,"noKeyPwd":"5145746","keyId":367238,
+"lockMac":"C0:DE:EE:66:05:78","deletePwd":"","timezoneRawOffset":7200000,"lockId":50088,
+"electricQuantity":100,"adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
+"lockFlagPos":0,"aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
+"lockVersion":{"showAdminKbpwdFlag":true,"groupId":1,
+"protocolVersion":3,"protocolType":5,"orgId":1,
+"logoUrl":"","scene":2},"userType":"110301",
+"lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+"lockName":"M201T_780566","startDate":0,"remarks":""}]}
+
+
+при инициализации
+{"lastUpdateDate":1494532201960,
+ "keyList": [
+            {
+            "date":1494449730000,
+            "lockAlias":"M201T_780566",
+            "keyStatus":"110401",
+            "endDate":0,
+            "noKeyPwd":"5145746",
+            "keyId":367238,
+            "lockMac":"C0:DE:EE:66:05:78",
+            "deletePwd":"",
+            "timezoneRawOffset":7200000,
+            "lockId":50088,
+            "electricQuantity":100,
+            "adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
+            "lockFlagPos":0,
+            "aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
+            "lockVersion":{
+                "showAdminKbpwdFlag":true,
+                "groupId":1,
+                "protocolVersion":3,
+                "protocolType":5,
+                "orgId":1,
+                "logoUrl":"",
+                "scene":2
+                },
+            "userType":"110301",
+            "lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+            "lockName":"M201T_780566",
+            "startDate":0,
+            "remarks":""
+        }
+    ]
+}
+при запросе пассворда
+
+Request{method=POST, url=https://api.sciener.cn/v3/keyboardPwd/get, tag=null}
+
+0 = {HashMap$HashMapEntry@5577} "clientId" -> "7946f0d923934a61baefb3303de4d132"
+1 = {HashMap$HashMapEntry@5578} "date" -> "1494535130363"
+2 = {HashMap$HashMapEntry@5579} "accessToken" -> "7c714894bea74accb1b98d028dbc8dd5"
+3 = {HashMap$HashMapEntry@5580} "startDate" -> "1494534987691"
+4 = {HashMap$HashMapEntry@5581} "endDate" -> "1494536417166"
+5 = {HashMap$HashMapEntry@5582} "keyboardPwdVersion" -> "4"
+6 = {HashMap$HashMapEntry@5583} "lockId" -> "50088"
+7 = {HashMap$HashMapEntry@5584} "keyboardPwdType" -> "9"  - Это значение для циклических замков, выдаваемых по вторникам
+
+
+
+
+{"keyboardPwdId":501168,"keyboardPwd":"45866000"}
+
+при попытке отправить электронный ключ самому себе
+
+
+при попытке послать запрос на sergey.sap@rona.hr   https://api.sciener.cn/v3/key/send
+0 = ""
+1 = "7946f0d923934a61baefb3303de4d132"
+2 = "1494533281606"
+3 = "7c714894bea74accb1b98d028dbc8dd5"
+4 = "0"
+5 = "0"
+6 = "sergey.sap%40rona.hr"
+7 = "50088"
+names
+0 = "remarks"
+1 = "clientId"
+2 = "date"
+3 = "accessToken"
+4 = "startDate"
+5 = "endDate"
+6 = "receiverUsername"
+7 = "lockId"
+
+ответ {"errcode":0,"errmsg":"none error message or means yes","description":"表示成功或是"}
+
+
+==================///Запрос цифрового пароля keyboardPwd ====================
+http://api.domouprav.local/password
+ 'Authorization: Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-'
+{"door_lock_id":1, "booking_id":"2",  "keyboardPwdVersion":4,   "keyboardPwdType":2,   "startDate":0,   "endDate":0}
+keyboardPwdType - 1 -  разовый
+keyboardPwdType - 5 - циклический
+keyboardPwdType 3 - периодический
+keyboardPwdType 2 - постоянный
+"9"  - Это значение для циклических замков, выдаваемых по вторникам
+
+трансформируем в запрос для китайцев
+https://api.sciener.cn/v3/keyboardPwd/get
+"Content-Type: application/x-www-form-urlencoded"
+{"lockId":5088,  "keyboardPwdVersion":4,   "keyboardPwdType":2, "date": время текущее, "startDate": время текущее,   "endDate":0, "accessToken":7c714894bea74accb1b98d028dbc8dd5,
+"cleintId":"7946f0d923934a61baefb3303de4d132"}
+
+ответ {"keyboardPwdId":549253,"keyboardPwd":"81257390"}
+
+
+ответ наш {
+              "id": 3,
+              "start_date": "0",
+              "end_date": "0",
+              "booking_id": "1",
+              "door_lock_id": "1",
+              "value": "04360826",
+              "keyboard_pwd_type": "2",
+              "keyboard_pwd_version": "4",
+              "keyboard_pwd_id": 551193
+          }
+
+{"lastUpdateDate":1496231128826,
+"keyList":[{
+    "date":1495662149000,
+    "lockAlias":"M201T_780566",
+    "keyStatus":"110401",
+    "endDate":0,
+    "noKeyPwd":"1064267",
+    "keyId":396660,
+    "lockMac":"C0:DE:EE:66:05:78",
+    "deletePwd":"",
+    "timezoneRawOffset":7200000,
+    "lockId":50088,
+    "electricQuantity":100,
+    "adminPwd":"NDEsNDAsNDYsNDEsMzIsNDIsNDAsNDAsNDEsNDAsMTAz",
+    "lockFlagPos":0,
+    "aesKeyStr":"26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e",
+    "lockVersion":
+    {
+        "showAdminKbpwdFlag":true,
+        "groupId":1,"protocolVersion":3,
+        "protocolType":5,
+        "orgId":1,
+        "logoUrl":"",
+        "scene":2
+        },
+    "userType":"110301",
+    "lockKey":"OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA==",
+    "lockName":"M201T_780566",
+    "startDate":0,
+    "remarks":""}
+    ]}
+    username : domouprav
+    app_id：c26fd5b2161f45298a734648c6244c80
+    app_secret：f1964b5d3e7011fbfe96763225bea1b9
+    Creation Date: 2017-05-31 20:57
+    password : domouprav - md5 - 8b8762a748c0baf8ed51e425d64ebf60
+    password : protonproton - md5 - 3a7233a066a0fc917ec5cf057922d9ae
+
+    info@domouprav.hr password - domouprav
