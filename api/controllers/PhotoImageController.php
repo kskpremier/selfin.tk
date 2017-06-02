@@ -102,7 +102,7 @@ class PhotoImageController extends \yii\rest\ActiveController
 
         $headers = Yii::$app->request->headers;
 
-        if ( Yii::$app->request->headers->has('Authorization') ) {
+        if ( $headers->has('Authorization') ) {
             $user = \common\models\User::findIdentityByAccessToken($headers->get('Authorization'));
             Yii::$app->user->setIdentity($user);
             if (true) {

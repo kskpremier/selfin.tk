@@ -70,7 +70,7 @@ class DoorLockController extends Controller
     public function checkAccess($action, $model = null, $params = [])
     {
         if (in_array($action, ['update', 'delete','view','create'])) {
-            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
+            if (!Yii::$app->user->can('manageDoorLock', ['doorlock' => $model])) {
                 throw  new ForbiddenHttpException('Forbidden.');
             }
         }
@@ -92,7 +92,7 @@ class DoorLockController extends Controller
         $model = new DoorLock();
         // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-        if ($model->save()) {
+        if ($model->addNewDoorlock()) {
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));
@@ -150,7 +150,6 @@ class DoorLockController extends Controller
 
         $model = new GetKeyboardKey();
         $model->load(Yii::$app->request->getBodyParams(), '');
-        $model->getKeyboardPwd();
         $model->getKeyboardPwd();
 
         $key = new \backend\models\Key();

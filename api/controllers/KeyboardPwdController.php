@@ -12,9 +12,10 @@ use backend\models\KeyboardPwd;
 use backend\models\KeyboardPwdSearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
-
 use yii\rest\Controller;
-use yii\web\NotFoundHttpException;
+use yii\helpers\Url;
+use yii\web\ServerErrorHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 
 
@@ -70,9 +71,24 @@ class KeyboardPwdController extends Controller
 
     public function checkAccess($action, $model = null, $params = [])
     {
-        if (in_array($action, ['update', 'delete','view','create'])) {
-            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
-                throw  new ForbiddenHttpException('Forbidden.');
+        if (in_array($action, ['create'])) {
+            if (!Yii::$app->user->can('createKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['delete'])) {
+            if (!Yii::$app->user->can('deleteKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['view'])) {
+            if (!Yii::$app->user->can('viewKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['update'])) {
+            if (!Yii::$app->user->can('updateKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
     }
@@ -91,18 +107,16 @@ class KeyboardPwdController extends Controller
     public function actionCreate()
     {
         $model = new KeyboardPwd();
-        // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-        if ($model->sendKeyboardPwdRequest() && $model->save()) {
-            $response = Yii::$app->getResponse();
-            $response->setStatusCode(201);
-            $id = implode(',', array_values($model->getPrimaryKey(true)));
-            $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-
-        } elseif (!$model->hasErrors()) {
-            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
-        }
-        return $model;
+        //собственно само обращение к китайцам и получение ответа
+        $data = json_decode($model->getKeyboardPwdFromChina(), true);
+        if ($data['success']) {
+                $response = Yii::$app->getResponse();
+                $response->setStatusCode(201);
+                $id = implode(',', array_values($model->getPrimaryKey(true)));
+                $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
+                return $model;
+        } throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
     }
 
     /**

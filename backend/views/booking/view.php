@@ -32,9 +32,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'arrival_date',
             'depature_date',
-            'apartment_id',
-            'number_of_tourist',
+            ['attribute'=>'apartment_id',
+                'value'=>$model->apartment->name,
+                'label'=>'Apartment'],
+            ['attribute'=>'number_of_tourist',
+                'label'=> 'Number of guests'],
             ['attribute'=>'guest_id',
+              'label'=>'Guest list',
               'format'=>'raw',
               'value'=>function ($model) {
                     $guestList='';
@@ -46,19 +50,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $guestList;
                 },
             ],
-//            [   //'attribute'=>'keys',
-//                'label'=>'emission',
-//                'format'=>'raw',
-//                'value'=>function ($model) {
-//                    $keyList='';
-//                    foreach ($model->keys as $key){
-//                        $keyList .= '<p>'.Html::a($key,
-//                                ['key/view', 'id' => $key->id],
-//                                ['class' => '']). PHP_EOL.'</p>';
-//                    }
-//                    return $keyList;
-//                },
-//            ],
         ],
     ]);
 
@@ -70,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider,
     ]);
-
+    echo Html::a(Yii::t('app', 'Send E-Key'), ['key/create','booking_id'=>$model->id], ['class' => 'btn btn-success']);
     $searchModel = new \backend\models\KeyboardPwdSearch();
     $searchModel->booking_id = $model->id;
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -79,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider,
     ]);
-
+    echo Html::a(Yii::t('app', 'Get new password'), ['keyboard-pwd/create','booking_id'=>$model->id], ['class' => 'btn btn-success']);
     $searchModel = new \backend\models\PhotoImageSearch();
     $searchModel->booking_id = $model->id;
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

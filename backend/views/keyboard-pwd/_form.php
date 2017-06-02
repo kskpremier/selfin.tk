@@ -8,7 +8,7 @@ use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Key */
+/* @var $model backend\models\KeyboardPwd */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -64,11 +64,11 @@ use kartik\select2\Select2;
     ?>
     <?php
     if ($model->door_lock_id)
-        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true])->label('for Door lock #') ?>
+        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true])->label('for Door lock #'); ?>
 
-    <?php $model->keyboard_pwd_version = 4;
+    <?php $model->keyboard_pwd_version = 4; //по умолчанию , пока непонятно что в документации у китайцев
 
-    echo $form->field($model, 'keyboard_pwd_version')->textInput(['disabled'=>true]); ?>
+    echo $form->field($model, 'keyboard_pwd_version')->hiddenInput(); ?>
 
 
     <div class="form-group">

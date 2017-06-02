@@ -133,37 +133,39 @@ json:{"lastUpdateDate":1494533094128,"keyList":[{"date":1494449730000,
 
 
 при инициализации
-{"lastUpdateDate":1494532201960,"keyList":[{
-"date":1494449730000,
-"lockAlias":"M201T_780566",
-"keyStatus":"110401",
-"endDate":0,
-"noKeyPwd":"5145746",
-"keyId":367238,
-"lockMac":"C0:DE:EE:66:05:78",
-"deletePwd":"",
-"timezoneRawOffset":7200000,
-"lockId":50088,
-"electricQuantity":100,
-"adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
-"lockFlagPos":0,
-"aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
-"lockVersion":{
-    "showAdminKbpwdFlag":true,
-    "groupId":1,
-    "protocolVersion":3,
-    "protocolType":5,
-    "orgId":1,
-    "logoUrl":"",
-    "scene":2
-    },
-"userType":"110301",
-"lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
-"lockName":"M201T_780566",
-"startDate":0,
-"remarks":""
-}
-]
+{"lastUpdateDate":1494532201960,
+ "keyList": [
+            {
+            "date":1494449730000,
+            "lockAlias":"M201T_780566",
+            "keyStatus":"110401",
+            "endDate":0,
+            "noKeyPwd":"5145746",
+            "keyId":367238,
+            "lockMac":"C0:DE:EE:66:05:78",
+            "deletePwd":"",
+            "timezoneRawOffset":7200000,
+            "lockId":50088,
+            "electricQuantity":100,
+            "adminPwd":"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
+            "lockFlagPos":0,
+            "aesKeyStr":"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
+            "lockVersion":{
+                "showAdminKbpwdFlag":true,
+                "groupId":1,
+                "protocolVersion":3,
+                "protocolType":5,
+                "orgId":1,
+                "logoUrl":"",
+                "scene":2
+                },
+            "userType":"110301",
+            "lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+            "lockName":"M201T_780566",
+            "startDate":0,
+            "remarks":""
+        }
+    ]
 }
 при запросе пассворда
 
@@ -206,3 +208,75 @@ names
 7 = "lockId"
 
 ответ {"errcode":0,"errmsg":"none error message or means yes","description":"表示成功或是"}
+
+
+==================///Запрос цифрового пароля keyboardPwd ====================
+http://api.domouprav.local/password
+ 'Authorization: Bearer cWADri54WVNIs_ammPUDmwQSuuhDTw6-'
+{"door_lock_id":1, "booking_id":"2",  "keyboardPwdVersion":4,   "keyboardPwdType":2,   "startDate":0,   "endDate":0}
+keyboardPwdType - 1 -  разовый
+keyboardPwdType - 5 - циклический
+keyboardPwdType 3 - периодический
+keyboardPwdType 2 - постоянный
+"9"  - Это значение для циклических замков, выдаваемых по вторникам
+
+трансформируем в запрос для китайцев
+https://api.sciener.cn/v3/keyboardPwd/get
+"Content-Type: application/x-www-form-urlencoded"
+{"lockId":5088,  "keyboardPwdVersion":4,   "keyboardPwdType":2, "date": время текущее, "startDate": время текущее,   "endDate":0, "accessToken":7c714894bea74accb1b98d028dbc8dd5,
+"cleintId":"7946f0d923934a61baefb3303de4d132"}
+
+ответ {"keyboardPwdId":549253,"keyboardPwd":"81257390"}
+
+
+ответ наш {
+              "id": 3,
+              "start_date": "0",
+              "end_date": "0",
+              "booking_id": "1",
+              "door_lock_id": "1",
+              "value": "04360826",
+              "keyboard_pwd_type": "2",
+              "keyboard_pwd_version": "4",
+              "keyboard_pwd_id": 551193
+          }
+
+{"lastUpdateDate":1496231128826,
+"keyList":[{
+    "date":1495662149000,
+    "lockAlias":"M201T_780566",
+    "keyStatus":"110401",
+    "endDate":0,
+    "noKeyPwd":"1064267",
+    "keyId":396660,
+    "lockMac":"C0:DE:EE:66:05:78",
+    "deletePwd":"",
+    "timezoneRawOffset":7200000,
+    "lockId":50088,
+    "electricQuantity":100,
+    "adminPwd":"NDEsNDAsNDYsNDEsMzIsNDIsNDAsNDAsNDEsNDAsMTAz",
+    "lockFlagPos":0,
+    "aesKeyStr":"26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e",
+    "lockVersion":
+    {
+        "showAdminKbpwdFlag":true,
+        "groupId":1,"protocolVersion":3,
+        "protocolType":5,
+        "orgId":1,
+        "logoUrl":"",
+        "scene":2
+        },
+    "userType":"110301",
+    "lockKey":"OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA==",
+    "lockName":"M201T_780566",
+    "startDate":0,
+    "remarks":""}
+    ]}
+    username : domouprav
+    app_id：c26fd5b2161f45298a734648c6244c80
+    app_secret：f1964b5d3e7011fbfe96763225bea1b9
+    Creation Date: 2017-05-31 20:57
+    password : domouprav - md5 - 8b8762a748c0baf8ed51e425d64ebf60
+    password : protonproton - md5 - 3a7233a066a0fc917ec5cf057922d9ae
+
+    info@domouprav.hr password - domouprav

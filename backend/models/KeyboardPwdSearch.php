@@ -73,11 +73,11 @@ class KeyboardPwdSearch extends KeyboardPwd
             'door_lock_id' => $this->door_lock_id,
         ]);
 
-        $query->andFilterWhere(['like', 'start_day', $this->start_day])
-            ->andFilterWhere(['like', 'end_day', $this->end_day])
-            ->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
-            ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
-            ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);
+        $query->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
+              ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
+              ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);
+        $query->andFilterWhere(['>=', 'keyboard_pwd.start_day', $this->start_day ? strtotime($this->start_day . ' 00:00:00'):null])
+              ->andFilterWhere(['<=', 'keyboard_pwd.end_day', $this->end_day ? strtotime($this->end_day . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

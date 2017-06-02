@@ -34,11 +34,11 @@ class Guest extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['application_id', 'document_id'], 'integer'],
+            [['application_id'], 'integer'],
             [['first_name', 'second_name'], 'string', 'max' => 32],
             [['contact_email'], 'string', 'max' => 255],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Application::className(), 'targetAttribute' => ['application_id' => 'id']],
-            [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
+//            [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
         ];
     }
 

@@ -23,12 +23,12 @@ class KeyController extends Controller
     public function behaviors()
     {
         return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
+//            'verbs' => [
+//                'class' => VerbFilter::className(),
+//                'actions' => [
+//                    'delete' => ['POST'],
+//                ],
+//            ],
         ];
     }
 
@@ -69,34 +69,27 @@ class KeyController extends Controller
         $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
        if (isset($booking)) {
 
-            $model = new Key(['from' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
-                'till' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
+            $model = new Key(['start_day' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
+                'end_day' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
                 'booking_id' => $booking_id,
                 'door_lock_id'=> $booking->apartment->doorLock->id]);
        } else {
            $model = new Key();
            $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
        }
-//        $model->booking_id = (array_key_exists('booking_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['booking_id']:$model->booking_id;
-//        $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
-
         if ($model->load(Yii::$app->request->post()) ) {
-            $model->from = Yii::$app->formatter->asDateTime($model->from,'php:d-m-Y H:i:s');
-            $model->till = Yii::$app->formatter->asDateTime($model->till,'php:d-m-Y H:i:s');
-            $model->save();
-            if ($model->sendEKey()) {
-                Yii::$app->session->setFlash('success', 'Key is successfully generated');
-                $model->save();
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($response=$model->sendEKeyByLocal()) {
+                Yii::$app->session->setFlash('success', 'Key was successfully generated and sent by email');
+                return $this->redirect(['view', 'id' => $response]);
             }
             else {
-                $model->delete();
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
                 return $this->render('create', [
                     'model' => $model,
                 ]);
             }
-        } else {
+        }
+        else {
             return $this->render('create', [
                 'model' => $model,
             ]);

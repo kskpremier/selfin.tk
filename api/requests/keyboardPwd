@@ -1,51 +1,58 @@
 <RestClientRequest>
-    <option name="biscuits">
-        <list/>
-    </option>
-    <option name="httpMethod" value="POST"/>
-    <option name="urlBase" value="https://api.sciener.cn"/>
-    <option name="urlPath" value="/v3/keyboardPwd/get"/>
-    <option name="headers">
-        <list>
-
-        </list>
-    </option>
-    <option name="parameters">
-        <list>
-            <KeyValuePair>
-                <option name="key" value="accessToken"/>
-                <option name="value" value="7c714894bea74accb1b98d028dbc8dd5"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="client_id"/>
-                <option name="value" value="7946f0d923934a61baefb3303de4d132"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="date"/>
-                <option name="value" value="1494449894905"/>
-            </KeyValuePair>
-
-            <KeyValuePair>
-                <option name="key" value="startDate"/>
-                <option name="value" value="1494535130363"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="endDate"/>
-                <option name="value" value="1494536417166"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="lockId"/>
-                <option name="value" value="50088"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="keyboardPwdVersion"/>
-                <option name="value" value="4"/>
-            </KeyValuePair>
-            <KeyValuePair>
-                <option name="key" value="keyboardPwdType"/>
-                <option name="value" value="9"/>
-            </KeyValuePair>
-        </list>
-    </option>
-
+  <option name="biscuits">
+    <list />
+  </option>
+  <option name="httpMethod" value="POST" />
+  <option name="urlBase" value="https://api.sciener.cn" />
+  <option name="urlPath" value="/v3/keyboardPwd/get" />
+  <option name="headers">
+    <list>
+      <KeyValuePair>
+        <option name="key" value="Content-Type" />
+        <option name="value" value="application/x-www-form-urlencoded" />
+      </KeyValuePair>
+    </list>
+  </option>
+  <option name="parameters">
+    <list>
+      <KeyValuePair>
+        <option name="key" value="accessToken" />
+        <option name="value" value="7c714894bea74accb1b98d028dbc8dd5" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="clientId" />
+        <option name="value" value="7946f0d923934a61baefb3303de4d132" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="date" />
+        <option name="value" value="1495867767000" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="lockId" />
+        <option name="value" value="50088" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="keyboardPwdVersion" />
+        <option name="value" value="4" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="keyboardPwdType" />
+        <option name="value" value="2" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="startDate" />
+        <option name="value" value="1495867767000" />
+      </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="endDate" />
+        <option name="value" value="0" />
+      </KeyValuePair>
+    </list>
+  </option>
+  <option name="parametersEnabled" value="true" />
+  <option name="haveTextToSend" value="false" />
+  <option name="haveFileToSend" value="false" />
+  <option name="isFileUpload" value="false" />
+  <option name="textToSend" value="{&quot;door_lock_id&quot;:1, &quot;booking_id&quot;:&quot;2&quot;,  &quot;keyboardPwdVersion&quot;:4,   &quot;keyboardPwdType&quot;:2,   &quot;startDate&quot;:0,   &quot;endDate&quot;:0}" />
+  <option name="filesToSend" value="" />
 </RestClientRequest>

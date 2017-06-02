@@ -1,29 +1,63 @@
 @startuml
-|Rona Mobile APP|
+|E-visitor|
+|Myrent|
 start
-:Make PhotoOf DOC;
-:Make Selfy;
+:Make new confirmed booking;
+:Send request for keys
+(booking/create - guest_first_name, guest_second_name, e-mail
+booking_id, arrival_date, departure_date, apartment_id);
+
 |#AntiqueWhite|E-Reception|
-:Recognision Photo from DOC;
-:Compearing with selfy;
+:Create new booking(booking_id, arrival_date, departure_date, apartment_id);
+:Create new User (guest_first_name, guest_second_name, e-mail);
+:Send response to MyRent (password, start_day, end_day, password_id, password_type);
+:Send response to Guest by e-mail(link for installation Rona-mobile-App, user_name, user_password, text with Password(pin-code));
+|Rona Mobile APP|
+:Installation and signUp (user_name, user_password);
+|#AntiqueWhite|E-Reception|
+:Login by (user_name, user_password) as Tourist;
+:Send Response to Guest (access_Token);
+|Rona Mobile APP|
+:Accept access_Token;
+:Send request for E-key (access_token);
+|#AntiqueWhite|E-Reception|
+:Send E-key for Guest for 24 ours (start_day, end_day, type=period);
+|Rona Mobile APP|
+:Accept E-key;
+:USe E-key for opening Door_lock;
+|Door Lock|
+if (E-key is valid?)
+:Open the door lock;
+else
+:does't open the door lock;
+endif
+|Rona Mobile APP|
+:Registration of guests;
+:Filing the registration form for all guest OR;
+:Make PhotoOf DOC for all guest;
+:Make Selfy of all guest;
+:Send request for registration;
+|#AntiqueWhite|E-Reception|
+:Recognition Photo from DOC;
+:Comparing with Selfy;
 if (photos equals?)
 :Send Data with OK status;
 else
 :Send Data with not-OK status;
 endif
 |Myrent|
-:Registaration Tourists;
+:Registration Tourists;
 :Send Data;
-|#AntiqueWhite|E-visitor|
-:Send answear;
+|E-visitor|
+:Send answer;
 |Myrent|
 :Sending Confirmation Letter;
 :Request for E-key Generation for
-all period of Staying;
+all period of Staying(booking_id, arrival_date, departure_date);
 |E-Reception|
 :Generate E-key;
 :Sending Confirmation Letter and
-E-key to App;
+E-key to Rona Mobile APP;
 |Rona Mobile APP|
 :Notification;
 stop

@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Create Key'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?php //echo  Html::a(Yii::t('app', 'Create Key'), ['create'], ['class' => 'btn btn-success']); ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,19 +26,56 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'from',
-            'till',
-            'pin',
-            'e_key',
+            ['attribute'=>'start_day',
+                'value'=> function($model){
+                    return ($model->start_day == 0)? '-': date('Y-m-d H:i:s', $model->start_day);
+                }
+            ],
+            ['attribute'=>'end_day',
+                'value'=> function($model){
+                    return ($model->end_day == 0)? '-': date('Y-m-d H:i:s', $model->end_day);
+                },
+
+            ],
+//            'pin',
+//            'e_key',
+            ['attribute'=>'type',
+                'value'=>function($model){
+                    $value = '-';
+                    switch($model->type){
+                        case '2':  $value = 'Permanent';
+                            break;
+                        case '0': $value = 'Period';
+                            break;
+                    }
+                    return $value ;
+                }],
             [
                     'attribute'=>'booking_id',
                     'format'=>'raw',
                     'value'=> function($model) {
                                 return HTML::a($model->booking_id, Url::to(['booking/view', 'id'=>$model->booking_id]) );
                     } ,
-                ],
+            ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}{delete}',
+                'buttons' => [
+                    'view' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
+                            ['key/view', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                            ['key/delete', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>

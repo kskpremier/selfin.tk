@@ -14,7 +14,15 @@ return [
             'class'=>'api\controllers\UserController',
         ],
     ],
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        ['class' => 'yii\filters\ContentNegotiator',
+            'formats' => [
+                'application/json' => Response::FORMAT_JSON,
+                'application/xml' => Response::FORMAT_XML,
+            ],
+        ],
+    ],
     'modules' => [
         'yii2images' => [
             'class' => 'rico\yii2images\Module',
@@ -74,13 +82,13 @@ return [
 //                'PUT,POST update' => 'user/update',
 
 
-//                'GET user' => 'user/index',
+                'GET user' => 'user/index',
 
 //                'PATCH photoimage' => 'photo-image/update',
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-image',
 //                'GET photoimage' => 'photo-image/view',
-
+                'POST booking' => 'booking/create',
 
 //
 //               //crud  для замков
@@ -89,18 +97,26 @@ return [
 //                'GET door_lock' => 'door-lock/view',
 //                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
 //                //crud для электронных ключей
-                'POST e-key' => 'key/create-key',
+                'POST e-key' => 'key/create',
 //                'PUT,PATCH e-key' => 'key/update',
                 'GET e-key' => 'key/view',
 //                'PUT,PATCH e-key/delete' => 'key/delete',
 //                //curd для буквенно-цифрового ключа (pin)
-//                'POST password' => 'keyboard-pwd/create',
+                'POST password' => 'keyboard-pwd/create',
+                'request-password' => 'site/request-password',
 //                'PUT,PATCH password' => 'keyboard-pwd/update',
 //                'GET password' => 'keyboard-pwd/view',
 //                'PUT,PATCH password/delete' => 'keyboard-pwd/delete',
 
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'itemFile' => '@console/rbac/items.php',
+            'assignmentFile' => '@console/rbac/assignments.php',
+            'ruleFile' => '@console/rbac/rules.php',
+            'defaultRoles' => ['tourist'],
         ],
     ],
     'params' => $params,

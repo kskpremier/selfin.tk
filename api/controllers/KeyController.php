@@ -15,6 +15,7 @@ use yii\filters\auth\HttpBearerAuth;
 use backend\models\Booking;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 
@@ -69,14 +70,29 @@ class KeyController extends Controller
         return $actions;
     }
 
-//    public function checkAccess($action, $model = null, $params = [])
-//    {
-//        if (in_array($action, ['update', 'delete','view','create'])) {
-//            if (!Yii::$app->user->can(Rbac::MANAGE_DOORLOCK, ['doorlock' => $model])) {
-//                throw  new ForbiddenHttpException('Forbidden.');
-//            }
-//        }
-//    }
+    public function checkAccess($action, $model = null, $params = [])
+    {
+        if (in_array($action, ['create'])) {
+            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['delete'])) {
+            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['view'])) {
+            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['update'])) {
+            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+    }
 
     public function prepareDataProvider()
     {
@@ -89,23 +105,19 @@ class KeyController extends Controller
      * If creation is successful, return model
      * @return Active Record model
      */
-    public function actionCreateKey()
+    public function actionCreate()
     {
         $model = new Key();
-        // $model->user_id = Yii::$app->user->id;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-
-
-        $response = $model->getKeyValue();
-        if ( $model->save()) {
+        $data = json_decode( $model->sendEKeyValueFromChina() , true) ;
+        if ( $data['success']) {
             $response = Yii::$app->getResponse();
             $response->setStatusCode(201);
             $id = implode(',', array_values($model->getPrimaryKey(true)));
             $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-        } elseif (!$model->hasErrors()) {
-            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+            return  $model;
         }
-        return  $model;
+        throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
     }
 
     /**

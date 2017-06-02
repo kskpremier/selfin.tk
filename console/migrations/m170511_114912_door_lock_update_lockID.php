@@ -11,14 +11,14 @@ class m170511_114912_door_lock_update_lockID extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
-        $this->addColumn('{{%door_lock}}', 'lockId', $this->string());
+        $this->addColumn('{{%door_lock}}', 'lock_id', $this->string());
     }
 
     public function down()
     {
         echo "m170511_114912_door_lock_update_lockID cannot be reverted.\n";
 
-        $this->dropColumn('{{%door_lock}}', 'lockId', $this->string());
+        $this->dropColumn('{{%door_lock}}', 'lock_id', $this->string());
         return false;
     }
 

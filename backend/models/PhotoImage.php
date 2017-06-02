@@ -16,6 +16,11 @@ use Yii;
  * @property string $file_name
  * @property integer $booking_id
  * @property integer $user_id
+ * @property integer $size
+ * @property string $uploaded
+ * @property string $type
+ * @property string $dimensions
+ * @property string $facematika_id
  *
  * @property Album $album
  * @property PhotoRealFace[] $photoRealFaces
@@ -40,7 +45,8 @@ class PhotoImage extends \yii\db\ActiveRecord
         return [
             [['booking_id','album_id'], 'required'],
             [['date','file'], 'safe'],
-            [['camera_id', 'album_id','user_id','booking_id'], 'integer'],
+            [['dimensions','type','uploaded','facematika_id'],'string'],
+            [['camera_id', 'album_id','user_id','booking_id','size'], 'integer'],
             [['file_name'], 'string', 'max' => 255],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
         ];
@@ -98,6 +104,14 @@ class PhotoImage extends \yii\db\ActiveRecord
     public function getPhotoRealFaces()
     {
         return $this->hasMany(PhotoRealFace::className(), ['photo_image_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFaces()
+    {
+        return $this->hasMany(Face::className(), ['photo_image_id' => 'id']);
     }
 
     public function behaviors()

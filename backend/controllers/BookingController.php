@@ -65,8 +65,18 @@ class BookingController extends Controller
     {
         $model = new Booking();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post()) ) {
+            if ($response=$model->createBookingLocal()) {
+                Yii::$app->session->setFlash('success', 'Booking was successfully downloaded');
+                return $this->redirect(['view', 'id' => $response]);
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
+
         } else {
             return $this->render('create', [
                 'model' => $model,

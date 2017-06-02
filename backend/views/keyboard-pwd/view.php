@@ -29,13 +29,23 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'start_day',
-            'end_day',
+            'keyboard_pwd_id',
+            ['attribute'=>'start_day',
+                'value'=>function($model){
+                    return ($model->start_day)?date('Y-m-d H:i',$model->start_day):'-';
+            }],
+            ['attribute'=>'end_day',
+                'value'=>function($model) {
+                    return ($model->end_day) ? date('Y-m-d H:i', $model->end_day) : '-';
+                }],
             'value',
-            'keyboard_pwd_type',
-            'keyboard_pwd_version',
             'door_lock_id',
             'booking_id',
+            ['attribute'=>'keyboard_pwd_type',
+                'value'=>function($model){
+                    return ($model->keyboard_pwd_type == 2)? 'Permanent': 'Period';
+                }],
+            'keyboard_pwd_version',
         ],
     ]) ?>
 

@@ -29,11 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'from',
-            'till',
-            'pin',
-            'e_key',
+            ['attribute'=>'type',
+                'value'=>function($model){
+                    return ($model->type == '2')? 'Permanent': 'Period';
+                }],
+            ['attribute'=>'start_day',
+                'value'=>function($model){
+                    return ($model->start_day)?date('Y-m-d H:i',$model->start_day):'-';
+                }],
+            ['attribute'=>'end_day',
+                'value'=>function($model) {
+                    return ($model->end_day) ? date('Y-m-d H:i', $model->end_day) : '-';
+                }],
+//            'pin',
+//            'e_key',
             'booking_id',
+            'email',
         ],
     ]) ?>
 

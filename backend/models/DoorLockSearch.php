@@ -18,8 +18,8 @@ class DoorLockSearch extends DoorLock
     public function rules()
     {
         return [
-            [['id', 'admin_pin', 'apartment_id'], 'integer'],
-            [['type','lockId'], 'safe'],
+            [['id', 'admin_pin', 'apartment_id','lock_id'], 'integer'],
+            [['type','lock_id'], 'safe'],
         ];
     }
 
@@ -66,7 +66,7 @@ class DoorLockSearch extends DoorLock
         ]);
 
         $query->andFilterWhere(['like', 'type', $this->type]);
-        $query->andFilterWhere(['like', 'lockId', $this->lockId]);
+        $query->andFilterWhere(['like', 'lock_id', $this->lock_id]);
 
         return $dataProvider;
     }

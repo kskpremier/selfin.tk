@@ -32,7 +32,7 @@ class KeyboardPwdController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                   // 'delete' => ['POST'],
                 ],
             ],
         ];
@@ -87,12 +87,12 @@ class KeyboardPwdController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) ) {
-            $model->start_day = Yii::$app->formatter->asDateTime($model->start_day,'php:d-m-Y H:i:s');
-            $model->end_day = Yii::$app->formatter->asDateTime($model->end_day,'php:d-m-Y H:i:s');
-            if ($model->getKeyboardPwd()) {
-                Yii::$app->session->setFlash('success', 'Keyboard is successfully generated - '.$model->value );
-                $model->save();
-                return $this->redirect(['view', 'id' => $model->id]);
+            $model->start_day = Yii::$app->formatter->asDateTime($model->start_day,'php:d-m-Y H:i');
+            $model->end_day = Yii::$app->formatter->asDateTime($model->end_day,'php:d-m-Y H:i');
+            if ($response = $model->getKeyboardPwdLocal()) {
+
+                Yii::$app->session->setFlash('success', 'Keyboard password is successfully generated  ' );
+                return $this->redirect(['view', 'id' => $response]);
             }
             else {
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
@@ -136,7 +136,7 @@ class KeyboardPwdController extends Controller
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /**
