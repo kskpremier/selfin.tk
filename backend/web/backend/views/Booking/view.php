@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'arrival_date',
-            'depature_date',
+            'start_date',
+            'end_date',
             'apartment_id',
             'number_of_tourist',
             'guest_id',

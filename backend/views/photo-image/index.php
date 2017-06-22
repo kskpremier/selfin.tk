@@ -18,8 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Add New Image', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Add New Image via REST/API', ['create-rest'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Add New Image', ['photo-image/create'], ['class' => 'btn btn-success']) ?>
+
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -46,11 +46,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ]),
                 'format'=>'datetime'],
-            [
-                    'attribute'=>'camera_id',
-                    'label'=>'Type of camera',
-                    'value'=> 'camera.type'
+            [   'attribute'=>'status',
+                'value'=> function ($model) {
+    return ($model->status)? 'Recognized' : 'Raw'; },
+                'label'=>'Status'
             ],
+//            [
+//                    'attribute'=>'camera_id',
+//                    'label'=>'Type of camera',
+//                    'value'=> 'camera.type'
+//            ],
             [
                 'attribute'=>'booking_id',
                 'label'=>'Reservation',
@@ -61,11 +66,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'User',
                 'value'=> 'user.username'
             ],
-            [
-                'attribute'=>'album_id',
-                'label'=>'Album',
-                'value'=> 'album.name'
-            ],
+//            [
+//                'attribute'=>'album_id',
+//                'label'=>'Album',
+//                'value'=> 'album.name'
+//            ],
             [
                 'attribute'=>'file_name',
                 'label'=>'Image',
@@ -85,7 +90,30 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}{delete}',
+                'buttons' => [
+                    'view' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
+                            ['photo-image/view', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                            ['photo-image/delete', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'match' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                            ['face/compearing-face', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>

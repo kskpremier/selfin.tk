@@ -28,9 +28,9 @@ $model->e_key = md5(uniqid(rand(), true));
         'pluginOptions' => [],
     ])->label('E-Key type');?>
 
-    <?= $form->field($model, 'start_day')->widget(DateTimePicker::className(), [
+    <?= $form->field($model, 'start_date')->widget(DateTimePicker::className(), [
         //'model' => $model,
-        'value' => $model->start_day ,//date('M-d-Y, h:i'),
+        'value' => $model->start_date ,//date('M-d-Y, h:i'),
         //'attribute' => 'from',
         //'options' => ['placeholder' => 'from what moment'],
         'type' => DateTimePicker::TYPE_INPUT,
@@ -41,9 +41,9 @@ $model->e_key = md5(uniqid(rand(), true));
     ]);
     ?>
     <?=// $form->field($model, 'till')->textInput()
-    $form->field($model, 'end_day')->widget(DateTimePicker::className(), [
+    $form->field($model, 'end_date')->widget(DateTimePicker::className(), [
         //'model' => $model,
-        'value' => $model->end_day ,//date('M-d-Y, h:i'),
+        'value' => $model->end_date ,//date('M-d-Y, h:i'),
         //'attribute' => 'from',
         //'options' => ['placeholder' => 'from what moment'],
         'type' => DateTimePicker::TYPE_INPUT,

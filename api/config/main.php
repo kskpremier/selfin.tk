@@ -16,10 +16,11 @@ return [
     ],
     'bootstrap' => [
         'log',
-        ['class' => 'yii\filters\ContentNegotiator',
+        [
+            'class' => 'yii\filters\ContentNegotiator',
             'formats' => [
-                'application/json' => Response::FORMAT_JSON,
-                'application/xml' => Response::FORMAT_XML,
+                'application/json' => 'json',
+                'application/xml' => 'xml',
             ],
         ],
     ],
@@ -33,6 +34,23 @@ return [
             'graphicsLibrary' => 'GD', //but really its better to use 'Imagick'
 //            'placeHolderPath' => '@webroot/uploads/images/real_photos/real_2.jpg', // if you want to get placeholder when image not exists, string will be processed by Yii::getAlias
         ],
+        'oauth2' => [
+            'class' => 'filsh\yii2\oauth2server\Module',
+            'tokenParamName' => 'accessToken',
+            'tokenAccessLifetime' => 36000 * 24,
+            'storageMap' => [
+                'user_credentials' => 'common\auth\Identity',
+            ],
+            'grantTypes' => [
+                'user_credentials' => [
+                    'class' => 'OAuth2\GrantType\UserCredentials',
+                ],
+                'refresh_token' => [
+                    'class' => 'OAuth2\GrantType\RefreshToken',
+                    'always_issue_new_refresh_token' => true
+                ]
+            ]
+        ]
     ],
 
     'components' => [
@@ -59,7 +77,7 @@ return [
             ],
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\auth\Identity',
             'enableAutoLogin' => false,
             'enableSession' => false,
         ],
@@ -78,17 +96,21 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
-                'auth' => 'site/login',
-//                'PUT,POST update' => 'user/update',
-
-
-                'GET user' => 'user/index',
+//                'auth' => 'site/login', //старая версия логина
+                'POST auth'=>'oauth2/rest/token',
+                'POST oauth2/<action:\w+>' => 'oauth2/rest/<action>',
+                'GET profile' => 'profile/index',
+                'GET user' => 'profile/index',
 
 //                'PATCH photoimage' => 'photo-image/update',
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-image',
 //                'GET photoimage' => 'photo-image/view',
                 'POST booking' => 'booking/create',
+                'GET bookings' => 'booking/bookings',
+                'GET booking/view' => 'booking/view',
+                'GET booking/view-external' => 'booking/view-external',
+                'DELETE booking/delete' => 'booking/delete',
 
 //
 //               //crud  для замков
@@ -111,13 +133,34 @@ return [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
         ],
-        'authManager' => [
-            'class' => 'yii\rbac\PhpManager',
-            'itemFile' => '@console/rbac/items.php',
-            'assignmentFile' => '@console/rbac/assignments.php',
-            'ruleFile' => '@console/rbac/rules.php',
-            'defaultRoles' => ['tourist'],
+//        'authManager' => [
+//            'class' => 'yii\rbac\PhpManager',
+//            'itemFile' => '@console/rbac/items.php',
+//            'assignmentFile' => '@console/rbac/assignments.php',
+//            'ruleFile' => '@console/rbac/rules.php',
+//            'defaultRoles' => ['tourist'],
+//        ],
+    ],
+    'as authenticator' => [
+        'class' => 'filsh\yii2\oauth2server\filters\auth\CompositeAuth',
+        'except' => ['site/index', 'oauth2/rest/token','site/login'],
+        'authMethods' => [
+            ['class' => 'yii\filters\auth\HttpBearerAuth'],
+            ['class' => 'yii\filters\auth\QueryParamAuth', 'tokenParam' => 'accessToken'],
+        ]
+    ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'except' => ['site/index', 'oauth2/rest/token','site/login'],
+        'rules' => [
+            [
+                'allow' => true,
+                'roles' => ['@'],
+            ],
         ],
+    ],
+    'as exceptionFilter' => [
+        'class' => 'filsh\yii2\oauth2server\filters\ErrorToExceptionFilter',
     ],
     'params' => $params,
 ];

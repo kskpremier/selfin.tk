@@ -27,8 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
             [   'attribute'=>'id',
                 'label'=>'Number'
             ],
-            'arrival_date',
-            'depature_date',
+            'start_date',
+            'end_date',
             [   'attribute'=> 'apartment.name',
                 'label'=> 'Apartment'
             ],
@@ -74,13 +74,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
                             ['key/create', 'booking_id' => $model->id ],
-                            ['class' => '']
+                            ['class' => '',
+                                'title'=>'Send E-key for guest']
                         );
                     },
                     'pin' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th"></span>',
                             ['keyboard-pwd/create', 'booking_id' => $model->id ],
-                            ['class' => '']
+                            ['class' => '',
+                                'title'=>'Get Keyboard password']
                         );
                     },
                 ],

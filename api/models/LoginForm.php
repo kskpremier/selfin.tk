@@ -14,11 +14,24 @@ use yii\base\Model;
 
 /**
  * Login form
+ *
+ * @property string $username
+ * @property string $password
+ * @property string $client_id
+ * @property string $client_secret
+ * @property string $grant_type
  */
 class LoginForm extends Model
 {
+    /**
+     * @var
+     */
     public $username;
     public $password;
+    public $client_id = "testclient";
+    public $client_secret = "testpass";
+    public $grant_type = "password" ;
+
 
     private $_user;
     /**
@@ -29,6 +42,7 @@ class LoginForm extends Model
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
+            [['client_id','client_secret','grant_type'],'string'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
         ];
@@ -54,6 +68,7 @@ class LoginForm extends Model
      */
     public function auth()
     {
+
         if ($this->validate()) {
             // Chek if valid token exist
             $token = Token::find()

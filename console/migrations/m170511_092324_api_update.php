@@ -22,8 +22,8 @@ class m170511_092324_api_update extends Migration
         //таблица для хранения инфо о сгенерированных пинах
         $this->createTable('{{%keyboard_pwd}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'start_day'=> $this->dateTime(),
-            'end_day' => $this->dateTime(),
+            'start_date'=> $this->dateTime(),
+            'end_date' => $this->dateTime(),
             'value' => $this->integer(),
             'keyboard_pwd_type'=>$this->string(),
             'keyboard_pwd_version'=>$this->integer(),

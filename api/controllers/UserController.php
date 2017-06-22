@@ -8,7 +8,7 @@
 
 namespace api\controllers;
 
-use common\models\User;
+//use common\models\User;
 use Yii;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -19,11 +19,11 @@ class UserController extends Controller
 {
     public function behaviors()
     {
-        $behaviors = parent::behaviors();
-        $behaviors['authenticator']['authMethods'] = [
-            HttpBasicAuth::className(),
-            HttpBearerAuth::className(),
-        ];
+//        $behaviors = parent::behaviors();
+//        $behaviors['authenticator']['authMethods'] = [
+//            HttpBasicAuth::className(),
+//            HttpBearerAuth::className(),
+//        ];
 /*        $behaviors['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
@@ -33,8 +33,23 @@ class UserController extends Controller
                 ],
             ],
         ];
-*/        return $behaviors;
+*/  //      return $behaviors;
     }
+
+    /**
+     * @SWG\Get(
+     *     path="/user",
+     *     tags={"Profile"},
+     *     description="Returns profile info",
+     *     @SWG\Parameter( name = "Authorization", in="header", type = "string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Success response",
+     *         @SWG\Schema(ref="#/definitions/Profile")
+     *     ),
+     *     security={{"Bearer": {"c9c55a85ec7d672f3077aa4cfae7f9b655b016ac"}, "OAuth2": {}}}
+     * )
+     */
     public function actionIndex()
     {
         return User::findOne(\Yii::$app->user->id);

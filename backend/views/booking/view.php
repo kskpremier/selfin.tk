@@ -30,8 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'arrival_date',
-            'depature_date',
+            'start_date',
+            'end_date',
             ['attribute'=>'apartment_id',
                 'value'=>$model->apartment->name,
                 'label'=>'Apartment'],

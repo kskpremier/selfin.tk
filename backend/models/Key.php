@@ -11,8 +11,8 @@ use yii\httpclient\Client;
  * This is the model class for table "key".
  *
  * @property integer $id
- * @property string $start_day
- * @property string $end_day
+ * @property string $start_date
+ * @property string $end_date
  * @property string $type
  * @property integer $pin
  * @property string $e_key
@@ -50,7 +50,7 @@ class Key extends \yii\db\ActiveRecord
         return [
             [['pin', 'booking_id','door_lock_id','guest_id','key_id','open_id'], 'integer'],
             [['remarks'], 'string', 'max'=>100],
-            [['start_day', 'end_day'], 'safe'],
+            [['start_date', 'end_date'], 'safe'],
             [['e_key','last_update_date'], 'string', 'max' => 15],
             [[ 'email', 'key_status','type'], 'string', 'max' => 255],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
@@ -65,8 +65,8 @@ class Key extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'start_day' => Yii::t('app', 'start_day'),
-            'end_day' => Yii::t('app', 'end_day'),
+            'start_date' => Yii::t('app', 'start_date'),
+            'end_date' => Yii::t('app', 'end_date'),
             'pin' => Yii::t('app', 'Pin'),
             'e_key' => Yii::t('app', 'E Key'),
             'booking_id' => Yii::t('app', 'Booking ID'),
@@ -115,8 +115,8 @@ class Key extends \yii\db\ActiveRecord
                 'booking_id'=> $this->booking_id,
                 'guest_id' =>($this->guest_id),
                 'type'=>$this->type,
-                'start_day'=>($this->type == '2')?  '0' : strtotime($this->start_day),
-                'end_day'=>($this->type == '2')?  '0' : strtotime( $this->end_day), //2 - это на период, надеюсь
+                'start_date'=>($this->type == '2')?  '0' : strtotime($this->start_date),
+                'end_date'=>($this->type == '2')?  '0' : strtotime( $this->end_date), //2 - это на период, надеюсь
                 'email'=> 'svrybin@gmail.com',//$this->guest->contact_email,
                 'accessToken'=> DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN
             ])
@@ -136,8 +136,8 @@ class Key extends \yii\db\ActiveRecord
     public function sendEKeyValueFromChina() {
         $response = Key::SendPost(
             time(),
-            ($this->type == '2')?  0 : $this->start_day,
-            ($this->type == '2')?  0 : $this->end_day,
+            ($this->type == '2')?  0 : $this->start_date,
+            ($this->type == '2')?  0 : $this->end_date,
             $this->doorLock->lock_id,
             $this->email,
             TTL::TTL_CLIENT_ID,
@@ -147,8 +147,8 @@ class Key extends \yii\db\ActiveRecord
         if (is_array($data)) {
             if (array_key_exists('errcode', $data)) {
                 $this->e_key = ($data['errcode'] == 0) ? "1" : "0";
-                $this->start_day = ($this->type == '2')? 0: $this->start_day;
-                $this->end_day = ($this->type == '2')? 0: $this->end_day;
+                $this->start_date = ($this->type == '2')? 0: $this->start_date;
+                $this->end_date = ($this->type == '2')? 0: $this->end_date;
 
                 $data['success'] =  $this->save();
             } else $data['success'] = false;
@@ -193,8 +193,8 @@ class Key extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'id',
-            'start_day'=>'start_day',
-            'end_day'=>'end_day',
+            'start_date'=>'start_date',
+            'end_date'=>'end_date',
             'booking_id' => 'booking_id',
             'door_lock_id'=>'door_lock_id',
 //            'e_key'=>'e_key',

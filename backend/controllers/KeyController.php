@@ -69,8 +69,8 @@ class KeyController extends Controller
         $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
        if (isset($booking)) {
 
-            $model = new Key(['start_day' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
-                'end_day' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
+            $model = new Key(['start_date' => Yii::$app->formatter->asDateTime($booking->start_date, "php:D, d-M-Y H:i"),
+                'end_date' => Yii::$app->formatter->asDateTime($booking->end_date, "php:D, d-M-Y H:i"),
                 'booking_id' => $booking_id,
                 'door_lock_id'=> $booking->apartment->doorLock->id]);
        } else {

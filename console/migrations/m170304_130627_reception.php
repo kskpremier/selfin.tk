@@ -72,13 +72,13 @@ class m170304_130627_reception extends Migration
         //таблица для хранения установленных в апартаментах замков (предполагаем, что они могут менятся или их может быть несколько)
         $this->createTable('{{%door_lock}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'admin_pin' => $this->integer(),
+            'admin_pwd' => $this->integer(),
             'type' => $this->string(), //потом можно справочник
         ], $tableOptions);
         //таблица для хранения установленных в апартаментах камер видеонаблюдения(предполагаем, что они могут менятся или их может быть несколько)
         $this->createTable('{{%camera}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'admin_pin' => $this->integer(),
+            'admin_pwd' => $this->integer(),
             'ip' => $this->string(),//ip-адрес
             'type' => $this->string(),//какой-то тип
         ], $tableOptions);
@@ -136,8 +136,8 @@ class m170304_130627_reception extends Migration
         //таблица для хранения инфо о букировании
         $this->createTable('{{%booking}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'arrival_date' => $this->date()->notNull(),
-            'depature_date' => $this->date()->notNull(),
+            'start_date' => $this->date()->notNull(),
+            'end_date' => $this->date()->notNull(),
             'apartment_id' => $this->integer(),
             'number_of_tourist'=>$this->integer()->notNull()->defaultValue(1),
             'guest_id' => $this->integer()->notNull(),

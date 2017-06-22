@@ -17,9 +17,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'start_day') ?>
+    <?= $form->field($model, 'start_date') ?>
 
-    <?= $form->field($model, 'end_day') ?>
+    <?= $form->field($model, 'end_date') ?>
 
     <?= $form->field($model, 'value') ?>
 

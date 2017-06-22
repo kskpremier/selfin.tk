@@ -102,6 +102,26 @@ class DoorLockController extends Controller
         }
         return $model;
     }
+    /**
+     * Creates a new DoorLock model.
+     * If creation is successful, return model
+     * @return Active Record model
+     */
+    public function actionInit()
+    {
+        $model = new DoorLock();
+        // $model->user_id = Yii::$app->user->id;
+        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+        if ($model->addNewDoorlock()) {
+            $response = Yii::$app->getResponse();
+            $response->setStatusCode(201);
+            $id = implode(',', array_values($model->getPrimaryKey(true)));
+            $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
+        } elseif (!$model->hasErrors()) {
+            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+        }
+        return $model;
+    }
 
     /**
      * Displays a single DoorLock model.

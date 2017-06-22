@@ -19,6 +19,10 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0",
 
+        "webmozart/assert": "^1.2",
+        "la-haute-societe/yii2-save-relations-behavior": "*",
+        "yiisoft/yii2-authclient": "^2.1",
+
         "kartik-v/yii2-widget-datetimepicker": "*",
         "kartik-v/yii2-checkbox-x": "*",
         "kartik-v/yii2-datecontrol": "dev-master",
@@ -28,17 +32,30 @@
         "costa-rico/yii2-images": "dev-master",
         "yiisoft/yii2-httpclient": "*",
         "kartik-v/yii2-widget-datepicker": "@dev",
-        "kartik-v/yii2-field-range": "dev-master"
+        "kartik-v/yii2-field-range": "dev-master",
+        "filsh/yii2-oauth2-server": "^2.0",
+        "guzzlehttp/guzzle": "^6.2",
+        "flow/jsonpath": "^0.3.4",
+        "fishvision/yii2-migrate": "^1.0",
+
+
+        "drewm/mailchimp-api": "^2.4",
+        "yiisoft/yii2-redis": "^2.0",
+        "zhuravljov/yii2-queue": "^1.0",
+        "league/flysystem": "^1.0"
+
 
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "yiisoft/yii2-faker": "~2.0.0",
+
         "codeception/base": "^2.2.3",
         "codeception/verify": "~0.3.1",
-        "guzzlehttp/guzzle": "^6.2",
-        "flow/jsonpath": "^0.3.4"
+
+        "zircote/swagger-php": "^2.0"
+
     },
     "repositories": [
         {

@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use backend\models\Guest;
 use common\models\query\UserQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -32,7 +33,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return '{{%users}}';
     }
 
     /**
@@ -219,6 +220,13 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Token::className(), ['user_id' => 'id']);
     }
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGuest()
+    {
+        return $this->hasOne(Guest::className(), ['user_id' => 'id']);
+    }
+    /**
      * For REST/API controller
      * @return array
      */
@@ -228,6 +236,12 @@ class User extends ActiveRecord implements IdentityInterface
             'id' => 'id',
             'username' => 'username',
             'email' => 'email',
+            'role' => function(){
+                return json_encode(Yii::$app->authManager->getRolesByUser($this->id));
+            }
+//                //
+//                ];
+//    }
 
 //            'description' => 'description',
         ];
@@ -254,6 +268,12 @@ class User extends ActiveRecord implements IdentityInterface
         \Yii::$app->mailer->getView()->params['userName'] = null;
 
         return $result;
+    }
+    public function getNewReadablePassword(){
+        $password = Yii::$app->security->generateRandomString(7);
+        $this->setPassword($password);
+        $this->save();
+        return $password;
     }
 
 }

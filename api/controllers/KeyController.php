@@ -73,22 +73,22 @@ class KeyController extends Controller
     public function checkAccess($action, $model = null, $params = [])
     {
         if (in_array($action, ['create'])) {
-            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['delete'])) {
-            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['view'])) {
-            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['update'])) {
-            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }

@@ -21,9 +21,9 @@ use yii\web\ServerErrorHttpException;
  * This is the model class for table "keyboard_pwd".
  *
  * @property integer $id
- * @property string $start_day
- * @property string $end_day
- * @property integer $value
+ * @property string $start_date
+ * @property string $end_date
+ * @property string $value
  * @property string $keyboard_pwd_type
  * @property integer $keyboard_pwd_version
  * @property integer $door_lock_id
@@ -50,8 +50,9 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     {
         return [
             [['keyboard_pwd_version', 'booking_id','value','door_lock_id','keyboard_pwd_id'], 'integer'],
-            [['start_day', 'end_day'], 'safe'],
-            [['keyboard_pwd_type', 'value'], 'string', 'max' => 255],
+            [['start_date', 'end_date'], 'safe'],
+            [['keyboard_pwd_type'], 'integer'],
+            [['value'], 'string', 'max' => 20],
             [['booking_id','door_lock_id','keyboard_pwd_type','keyboard_pwd_version'], 'required'],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
@@ -105,8 +106,8 @@ class KeyboardPwd extends \yii\db\ActiveRecord
                 'booking_id'=>$this->booking_id,
                 'keyboard_pwd_version' => $this->keyboard_pwd_version,
                 'keyboard_pwd_type' => $this->keyboard_pwd_type ,
-                'start_day'=>  $this->start_day,
-                'end_day'=> ($this->keyboard_pwd_type == 2)?  0 : $this->end_day,
+                'start_date'=>  $this->start_date,
+                'end_date'=> ($this->keyboard_pwd_type == 2)?  0 : $this->end_date,
                 'accessToken'=>DOMOUPRAV:: DOMOUPRAV_ADMIN_TOKEN
             ])
             ->send();
@@ -132,8 +133,8 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     public function getKeyboardPwdFromChina(){
         $response = KeyboardPwd::SendPost(
             time(),
-            strtotime($this->start_day),
-            ($this->keyboard_pwd_type == 2)?  0 : strtotime($this->end_day),
+            strtotime($this->start_date),
+            ($this->keyboard_pwd_type == 2)?  0 : strtotime($this->end_date),
             $this->doorLock->lock_id ,//TTL::TTL_LOCKID,
             $this->keyboard_pwd_type,
             TTL::TTL_CLIENT_ID,
@@ -147,10 +148,11 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             if (array_key_exists('keyboardPwd', $data)) {
                 $this->value = $data['keyboardPwd'];
                 $this->keyboard_pwd_id = $data['keyboardPwdId'];
-                $this->start_day = strtotime($this->start_day);
-                $this->end_day = ($this->keyboard_pwd_type == 2)? 0: strtotime($this->end_day);
+                $this->start_date = strtotime($this->start_date);
+                $this->end_date = ($this->keyboard_pwd_type == 2)? 0: strtotime($this->end_date);
 
-                $data['success'] =  $this->save();
+
+                $this->validate(); $data['success'] =  $this->save(false);
             }
             else if (array_key_exists('errcode', $data) ) {
                 if ($data['errcode']!=0) $data['success'] = false;
@@ -194,8 +196,8 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'id',
-            'start_date'=>'start_day',
-            'end_date'=>'end_day',
+            'start_date'=>'start_date',
+            'end_date'=>'end_date',
             'booking_id' => 'booking_id',
             'door_lock_id'=>'door_lock_id',
             'value'=>'value',
@@ -205,4 +207,20 @@ class KeyboardPwd extends \yii\db\ActiveRecord
 
         ];
     }
+    /**
+     * For REST/API controller
+     * @return array
+     */
+    public function serializeKeyboardPwd()
+    {
+        return
+        [
+            'keyboardPwd_id' => $this->id,
+            'door_lock_id' => $this->door_lock_id,
+            'value' => $this->value,
+            'start_date' => date('Y-m-d H:i:s', $this->start_date),
+            'end_date' => ($this->keyboard_pwd_type == 2)? 0: date('Y-m-d H:i:s', $this->end_date),
+            'keyboardPwd_type' => \api\helpers\KeyboardPwdHelper::type($this->keyboard_pwd_type)
+        ];
+        }
 }

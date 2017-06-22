@@ -1,6 +1,7 @@
 <?php
 
 namespace backend\models;
+use yii\db\ActiveQuery;
 use yii\httpclient\Client;
 use common\models\User;
 
@@ -21,9 +22,11 @@ use Yii;
  * @property string $type
  * @property string $dimensions
  * @property string $facematika_id
+ * @property integer $status
  *
  * @property Album $album
  * @property PhotoRealFace[] $photoRealFaces
+ * @property Booking $booking
  */
 class PhotoImage extends \yii\db\ActiveRecord
 {
@@ -46,7 +49,7 @@ class PhotoImage extends \yii\db\ActiveRecord
             [['booking_id','album_id'], 'required'],
             [['date','file'], 'safe'],
             [['dimensions','type','uploaded','facematika_id'],'string'],
-            [['camera_id', 'album_id','user_id','booking_id','size'], 'integer'],
+            [['camera_id', 'album_id','user_id','booking_id','size','status'], 'integer'],
             [['file_name'], 'string', 'max' => 255],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
         ];

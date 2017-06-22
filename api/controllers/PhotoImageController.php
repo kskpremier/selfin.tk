@@ -44,7 +44,7 @@ class PhotoImageController extends \yii\rest\ActiveController
 //    public function checkAccess($action, $model = null, $params = [])
 //    {
 //        if (in_array($action, ['update', 'delete','view','create'])) {
-//            if (in_array($params,['start_day','end_day'])) {
+//            if (in_array($params,['start_date','end_date'])) {
 //
 //
 //                throw  new ForbiddenHttpException('Forbidden.');
@@ -106,7 +106,7 @@ class PhotoImageController extends \yii\rest\ActiveController
             $user = \common\models\User::findIdentityByAccessToken($headers->get('Authorization'));
             Yii::$app->user->setIdentity($user);
             if (true) {
-//            if (Yii::$app->user->can('createPhotoImage', ['arrival_date'=>$model->booking->arrival_date, 'depature_date'=>$model->booking->depature_date ])) {
+//            if (Yii::$app->user->can('createPhotoImage', ['start_date'=>$model->booking->start_date, 'end_date'=>$model->booking->end_date ])) {
                 //в массив надо передавать сроки пребывания туриста
                 $model->date = date('Y-m-d');
                 $model->user_id = ($user) ? $user->id : 1;

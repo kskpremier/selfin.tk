@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $location
  * @property string $name
+ * @property string $external_id
  *
  * @property Booking[] $bookings
  * @property Camera[] $cameras
@@ -32,6 +33,7 @@ class Apartment extends \yii\db\ActiveRecord
     {
         return [
             [['location', 'name'], 'string', 'max' => 200],
+            [['external_id'],'string', 'max' => 20]
         ];
     }
 
@@ -66,8 +68,8 @@ class Apartment extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDoorLock()
+    public function getDoorLocks()
     {
-        return $this->hasOne(DoorLock::className(), ['apartment_id' => 'id']);
+        return $this->hasMany(DoorLock::className(), ['apartment_id' => 'id']);
     }
 }

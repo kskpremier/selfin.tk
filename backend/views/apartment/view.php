@@ -31,6 +31,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'location',
             'name',
+            'external_id',
+            ['attribute'=>'doorLocks',
+                'label'=>'Door Lock on object',
+                'format'=>'raw',
+                'value'=> function ($model) {
+                    $doorLockList='';
+                    foreach ($model->doorLocks as $doorLock){
+                        $doorLockList .= '<p>'.Html::a($doorLock->id,
+                                ['door-lock/view', 'id' => $doorLock->id],
+                                ['class' => '']). PHP_EOL.'</p>';
+                    }
+                    return $doorLockList;
+                },]
+            
         ],
     ]) ?>
 

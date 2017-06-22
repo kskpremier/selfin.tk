@@ -20,7 +20,7 @@ class KeySearch extends \backend\models\Key
         return [
             [['id', 'pin', 'booking_id','door_lock_id'], 'integer'],
             [['type'],'string','max' => 15],
-            [['start_day', 'end_day', 'e_key'], 'safe'],
+            [['start_date', 'end_date', 'e_key'], 'safe'],
         ];
     }
 
@@ -68,8 +68,8 @@ class KeySearch extends \backend\models\Key
 
         $query ->andFilterWhere(['like', 'e_key', $this->e_key])
                ->andFilterWhere(['like', 'type', $this->type]);
-        $query->andFilterWhere(['>=', 'key.start_day', $this->start_day ? strtotime($this->start_day . ' 00:00:00'):null])
-               ->andFilterWhere(['<=', 'key.end_day', $this->end_day ? strtotime($this->end_day . ' 23:59:59'):null]);
+        $query->andFilterWhere(['>=', 'key.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
+               ->andFilterWhere(['<=', 'key.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

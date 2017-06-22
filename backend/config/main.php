@@ -58,7 +58,7 @@ return [
 //            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/document_photos/'
 //        ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\auth\Identity',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],

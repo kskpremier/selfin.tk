@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'admin_pin') ?>
+    <?= $form->field($model, 'admin_pwd') ?>
 
     <?= $form->field($model, 'ip') ?>
 

@@ -29,9 +29,9 @@ use kartik\select2\Select2;
         'pluginOptions' => [],
     ])->label('Keyboard Password Type');?>
 
-    <?= $form->field($model, 'start_day')->widget(DateTimePicker::className(), [
+    <?= $form->field($model, 'start_date')->widget(DateTimePicker::className(), [
         //'model' => $model,
-        'value' => $model->start_day ,//date('M-d-Y, h:i'),
+        'value' => $model->start_date ,//date('M-d-Y, h:i'),
 
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
@@ -43,8 +43,8 @@ use kartik\select2\Select2;
 
 
     <?=
-    $form->field($model, 'end_day')->widget(DateTimePicker::className(), [
-        'value' => $model->end_day ,//date('M-d-Y, h:i'),
+    $form->field($model, 'end_date')->widget(DateTimePicker::className(), [
+        'value' => $model->end_date ,//date('M-d-Y, h:i'),
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
             'format' => 'D, dd-M-yyyy, hh:ii',

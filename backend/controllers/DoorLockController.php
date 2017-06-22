@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use Yii;
 use backend\models\DoorLock;
+use backend\models\Apartment;
 use backend\models\DoorLockSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -70,6 +71,36 @@ class DoorLockController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Creates a new DoorLock model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionInstall($id=null, $apartmentId=null)
+    {
+        if ($id){
+            $doorLock = DoorLock::findOne($id);
+            if (!isset($doorLock)) $doorLock =  new DoorLock();
+        }
+        else $doorLock =  new DoorLock();
+
+        $doorLock->apartment_id = ($apartmentId) ? (integer) $apartmentId: $doorLock->apartment_id;
+
+        if ($doorLock->load(Yii::$app->request->post())) {
+            $model = $this->findModel((integer)$doorLock->id);
+            $model->apartment_id = (integer)$doorLock->apartment_id;
+            $flag = $model->validate();
+            if ($flag) $model->save(false);
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            $apartmentName = Apartment::find()->where(['id'=>$doorLock->apartment_id]);
+            return $this->render('install', [
+                'model' => $doorLock,
+                'apartmentName'=>$apartmentName
             ]);
         }
     }

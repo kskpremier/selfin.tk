@@ -29,9 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'admin_pin',
+            'admin_pwd',
             'type',
-            'apartment_id',
+            ['attribute'=>'apartment',
+                'label'=>'Installed in apartment',
+                'value'=>function($model){return $model->apartment->name;}],
+
         ],
     ]) ?>
 
