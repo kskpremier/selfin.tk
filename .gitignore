@@ -11,3 +11,4 @@ debugger.xml
 /api/config/params-local.php
 /api/config/main-local.php
 api/tests/
+vagrant
