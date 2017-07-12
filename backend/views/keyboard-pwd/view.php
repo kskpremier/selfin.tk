@@ -30,13 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'keyboard_pwd_id',
-            ['attribute'=>'start_day',
+            ['attribute'=>'start_date',
                 'value'=>function($model){
-                    return ($model->start_day)?date('Y-m-d H:i',$model->start_day):'-';
+                    return ($model->start_date)?date('Y-m-d H:i',$model->start_date):'-';
             }],
-            ['attribute'=>'end_day',
+            ['attribute'=>'end_date',
                 'value'=>function($model) {
-                    return ($model->end_day) ? date('Y-m-d H:i', $model->end_day) : '-';
+                    return ($model->end_date) ? date('Y-m-d H:i', $model->end_date) : '-';
                 }],
             'value',
             'door_lock_id',

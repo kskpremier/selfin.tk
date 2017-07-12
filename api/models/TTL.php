@@ -19,4 +19,6 @@ class TTL
 
  public const TTL_URL_TO_KEY_SEND = 'https://api.sciener.cn/v3/key/send';
  public const TTL_URL_TO_KEYBOARD_PWD_GET = 'https://api.sciener.cn/v3/keyboardPwd/get';
+    public const TTL_URL_TO_REFRESH_TOKEN = 'https://api.sciener.cn/v3/oauth2/token';
+    public const TTL_URL_TO_INIT_DOOR_LOCK = 'https://api.sciener.cn/v3/lock/init';
 }

@@ -25,24 +25,39 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'admin_pin',
-            'type',
-            'apartment_id',
+           'lock_name',
+           'lock_mac',
+           'lock_alias',
 
-            [
+           // 'type',
+            ['attribute'=>'apartment_id',
+                'label'=>'Apartment',
+                'value'=>'apartment.name'],
+
+
+            [   //'label'=>'Actions',
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {delete} {key} {pin}',
+                'template' => '{view} {update} {delete} {key} {pin} {install}',
                 'buttons' => [
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
-                            ['key/index', 'door_lock_id' => $model->id ],
-                            ['class' => '']
+                            ['key/create-for-door-lock', 'doorLockId' => $model->id ],
+                            ['class' => '',
+                                'title'=>'Send E-key for guest']
                         );
                     },
                     'pin' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th"></span>',
                             ['keyboard-pwd/create', 'booking_id' => $model->id ],
-                            ['class' => '']
+                            ['class' => '',
+                                'title'=>'Get Keyboard password']
+                        );
+                    },
+                    'install' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-home"></span>',
+                            ['door-lock/install', 'id' => $model->id ],
+                            ['class' => '',
+                                'title'=>'Install into Apartment']
                         );
                     },
                 ],

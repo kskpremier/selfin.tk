@@ -72,22 +72,22 @@ class KeyboardPwdController extends Controller
     public function checkAccess($action, $model = null, $params = [])
     {
         if (in_array($action, ['create'])) {
-            if (!Yii::$app->user->can('createKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('createKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['delete'])) {
-            if (!Yii::$app->user->can('deleteKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('deleteKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['view'])) {
-            if (!Yii::$app->user->can('viewKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('viewKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['update'])) {
-            if (!Yii::$app->user->can('updateKeyboardPwd',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('updateKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
@@ -173,3 +173,26 @@ class KeyboardPwdController extends Controller
         }
     }
 }
+
+/**
+ *  @SWG\Definition(
+ *     definition="KeyboardPassword",
+ *     type="object",
+ *     required= {
+ *              "door_lock_id",
+ *              "booking_id",
+ *              "keyboard_pwd_version",
+ *              "keyboard_pwd_type",
+ *              "start_date",
+ *              "end_date",
+ *              "accessToken"
+ *      },
+ *     @SWG\Property(property="door_lock_id", type="integer"),
+ *     @SWG\Property(property="booking_id", type="integer"),
+ *     @SWG\Property(property="keyboard_pwd_version", type="string"),
+ *     @SWG\Property(property="keyboard_pwd_type", type="integer"),
+ *     @SWG\Property(property="start_date", type="string"),
+ *     @SWG\Property(property="end_date", type="string"),
+ *     @SWG\Property(property="accessToken", type="string")
+ * )
+ */

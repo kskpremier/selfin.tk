@@ -26,7 +26,7 @@ class KeyboardPwdSearch extends KeyboardPwd
         return[
         [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
             [['keyboard_pwd_type'],'string','max' => 15],
-            [['start_day', 'end_day'], 'string', 'max' => 20],
+            [['start_date', 'end_date'], 'string', 'max' => 20],
 
     ];
     }
@@ -76,8 +76,8 @@ class KeyboardPwdSearch extends KeyboardPwd
         $query->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);
-        $query->andFilterWhere(['>=', 'keyboard_pwd.start_day', $this->start_day ? strtotime($this->start_day . ' 00:00:00'):null])
-              ->andFilterWhere(['<=', 'keyboard_pwd.end_day', $this->end_day ? strtotime($this->end_day . ' 23:59:59'):null]);
+        $query->andFilterWhere(['>=', 'keyboard_pwd.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
+              ->andFilterWhere(['<=', 'keyboard_pwd.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

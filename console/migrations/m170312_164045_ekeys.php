@@ -15,8 +15,8 @@ class m170312_164045_ekeys extends Migration
         //таблица для хранения инфо о выданных гостям ключах
         $this->createTable('{{%key}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'start_day'=> $this->integer(20),
-            'end_day' => $this->integer(20),
+            'start_date'=> $this->integer(20),
+            'end_date' => $this->integer(20),
             //'value' => $this->integer(),
             //'e_key'=>$this->string(15),
             'booking_id'=>$this->integer(),

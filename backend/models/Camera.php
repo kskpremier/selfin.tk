@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "camera".
  *
  * @property integer $id
- * @property integer $admin_pin
+ * @property integer $admin_pwd
  * @property string $ip
  * @property string $type
  * @property integer $apartment_id
@@ -32,7 +32,7 @@ class Camera extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['admin_pin', 'apartment_id'], 'integer'],
+            [['admin_pwd', 'apartment_id'], 'integer'],
             [['ip', 'type'], 'string', 'max' => 255],
             [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
         ];
@@ -45,7 +45,7 @@ class Camera extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'admin_pin' => Yii::t('app', 'Admin Pin'),
+            'admin_pwd' => Yii::t('app', 'Admin Pin'),
             'ip' => Yii::t('app', 'Ip'),
             'type' => Yii::t('app', 'Type'),
             'apartment_id' => Yii::t('app', 'Apartment ID'),

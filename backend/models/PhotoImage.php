@@ -1,6 +1,7 @@
 <?php
 
 namespace backend\models;
+use yii\db\ActiveQuery;
 use yii\httpclient\Client;
 use common\models\User;
 
@@ -21,9 +22,14 @@ use Yii;
  * @property string $type
  * @property string $dimensions
  * @property string $facematika_id
+ * @property integer $status
+ * @property double $altitude
+ * @property double $longitude
+ * @property double $latitude
  *
  * @property Album $album
  * @property PhotoRealFace[] $photoRealFaces
+ * @property Booking $booking
  */
 class PhotoImage extends \yii\db\ActiveRecord
 {
@@ -45,8 +51,9 @@ class PhotoImage extends \yii\db\ActiveRecord
         return [
             [['booking_id','album_id'], 'required'],
             [['date','file'], 'safe'],
+            [['altitude','longitude','latitude'],'double'],
             [['dimensions','type','uploaded','facematika_id'],'string'],
-            [['camera_id', 'album_id','user_id','booking_id','size'], 'integer'],
+            [['camera_id', 'album_id','user_id','booking_id','size','status'], 'integer'],
             [['file_name'], 'string', 'max' => 255],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
         ];
@@ -131,10 +138,11 @@ class PhotoImage extends \yii\db\ActiveRecord
         return [
             'id' => 'id',
             'file_name'=>'file_name',
-            'album' => 'album_id',
-            'date'=> 'date',
+            //'album' => 'album_id',
+            'upload'=> 'date',
             'booking'=>'booking_id',
-            'user'=>'user_id'
+//            'altitude','longitude','latitude'
+            //'user'=>'user_id'
         ];
     }
 
@@ -142,19 +150,20 @@ class PhotoImage extends \yii\db\ActiveRecord
 * Этот вызов будет дергать наш api контроллер и добавлять фотку
 * */
     public function postPhotoImage(){
-        //тут надо сформировать запрос и послать его на китайский рестапи
+        //тут надо сформировать запрос и послать его на наш рестапи
 
-        $imagePath = Yii::getAlias('@imagePath').'/'.$this->file_name;
+        $imagePathName = Yii::getAlias('@imagePath').'/'.$this->file_name;
         $client = $client = new Client();
         $response = $client->createRequest()
                             ->setMethod('post')
-                            ->setHeaders(['Authorization' => 'Bearer CWADri54WVNIs_ammPUDmwQSuuhDTw6G'])
+                            ->setHeaders(['Authorization' => 'Bearer e48e0bd5a3322f0d2aa815a16794be72274272a7'])
                             ->setUrl('http://api.domouprav.local/photoimage')
-                            ->setData(['user_id' => $this->user_id,
-                                'album_id' =>$this->album_id,
+                            ->setData([
+                                //'user_id' => $this->user_id,
+                                //'album_id' =>$this->album_id,
                                 'booking_id' =>$this->booking_id,
                                 'file_name'=>$this->file_name])
-                            ->addFile($this->file_name, $imagePath)
+                            ->addFile('file', $imagePathName)
                             ->send();
        return $response;
     }

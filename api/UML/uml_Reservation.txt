@@ -5,12 +5,12 @@ start
 :Make new confirmed booking;
 :Send request for keys
 (booking/create - guest_first_name, guest_second_name, e-mail
-booking_id, arrival_date, departure_date, apartment_id);
+booking_id, start_date, departure_date, apartment_id);
 
 |#AntiqueWhite|E-Reception|
-:Create new booking(booking_id, arrival_date, departure_date, apartment_id);
+:Create new booking(booking_id, start_date, departure_date, apartment_id);
 :Create new User (guest_first_name, guest_second_name, e-mail);
-:Send response to MyRent (password, start_day, end_day, password_id, password_type);
+:Send response to MyRent (password, start_date, end_date, password_id, password_type);
 :Send response to Guest by e-mail(link for installation Rona-mobile-App, user_name, user_password, text with Password(pin-code));
 |Rona Mobile APP|
 :Installation and signUp (user_name, user_password);
@@ -21,7 +21,7 @@ booking_id, arrival_date, departure_date, apartment_id);
 :Accept access_Token;
 :Send request for E-key (access_token);
 |#AntiqueWhite|E-Reception|
-:Send E-key for Guest for 24 ours (start_day, end_day, type=period);
+:Send E-key for Guest for 24 ours (start_date, end_date, type=period);
 |Rona Mobile APP|
 :Accept E-key;
 :USe E-key for opening Door_lock;
@@ -53,7 +53,7 @@ endif
 |Myrent|
 :Sending Confirmation Letter;
 :Request for E-key Generation for
-all period of Staying(booking_id, arrival_date, departure_date);
+all period of Staying(booking_id, start_date, departure_date);
 |E-Reception|
 :Generate E-key;
 :Sending Confirmation Letter and

@@ -17,6 +17,8 @@ use Yii;
  */
 class Album extends \yii\db\ActiveRecord
 {
+    public const ALBUM_DOCUMENTS = 1;
+    public const ALBUM_FACES = 3;
     /**
      * @inheritdoc
      */

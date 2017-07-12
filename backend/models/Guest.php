@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use common\models\User;
 use Yii;
 
 /**
@@ -12,6 +13,7 @@ use Yii;
  * @property string $second_name
  * @property string $contact_email
  * @property integer $application_id
+ * @property integer $user_id
  * @property integer $document_id
  *
  * @property Booking[] $bookings
@@ -34,7 +36,8 @@ class Guest extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['application_id'], 'integer'],
+            [['application_id','user_id'], 'integer'],
+
             [['first_name', 'second_name'], 'string', 'max' => 32],
             [['contact_email'], 'string', 'max' => 255],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Application::className(), 'targetAttribute' => ['application_id' => 'id']],
@@ -71,6 +74,14 @@ class Guest extends \yii\db\ActiveRecord
     public function getApplication()
     {
         return $this->hasOne(Application::className(), ['id' => 'application_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
     /**

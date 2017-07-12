@@ -58,7 +58,7 @@ return [
 //            'local_directory'=> dirname(__DIR__).'/../web/uploads/images/document_photos/'
 //        ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\auth\Identity',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],
@@ -93,6 +93,16 @@ return [
                 '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
             ],
          ],
+    ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'except' => ['site/index', 'site/login'],
+        'rules' => [
+            [
+                'allow' => true,
+                'roles' => ['@'],
+            ],
+        ],
     ],
 //    'request' => [
 //        'parsers' => [

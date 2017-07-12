@@ -33,13 +33,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($model){
                     return ($model->type == '2')? 'Permanent': 'Period';
                 }],
-            ['attribute'=>'start_day',
+            ['attribute'=>'start_date',
                 'value'=>function($model){
-                    return ($model->start_day)?date('Y-m-d H:i',$model->start_day):'-';
+                    return ($model->start_date)?date('Y-m-d H:i',$model->start_date):'-';
                 }],
-            ['attribute'=>'end_day',
+            ['attribute'=>'end_date',
                 'value'=>function($model) {
-                    return ($model->end_day) ? date('Y-m-d H:i', $model->end_day) : '-';
+                    return ($model->end_date) ? date('Y-m-d H:i', $model->end_date) : '-';
                 }],
 //            'pin',
 //            'e_key',

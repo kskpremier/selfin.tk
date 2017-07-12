@@ -25,8 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'arrival_date',
-            'depature_date',
+            'start_date',
+            'end_date',
             'apartment_id',
             'number_of_tourist',
             // 'guest_id',

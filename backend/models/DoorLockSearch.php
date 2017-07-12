@@ -18,7 +18,7 @@ class DoorLockSearch extends DoorLock
     public function rules()
     {
         return [
-            [['id', 'admin_pin', 'apartment_id','lock_id'], 'integer'],
+            [['id', 'admin_pwd', 'apartment_id','lock_id'], 'integer'],
             [['type','lock_id'], 'safe'],
         ];
     }
@@ -60,7 +60,7 @@ class DoorLockSearch extends DoorLock
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'admin_pin' => $this->admin_pin,
+            'admin_pwd' => $this->admin_pwd,
             'apartment_id' => $this->apartment_id,
 
         ]);

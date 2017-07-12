@@ -25,14 +25,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            ['attribute'=>'start_day',
+            ['attribute'=>'start_date',
                 'value'=> function($model){
-                    return ($model->start_day == 0)? '-': date('Y-m-d H:i:s', $model->start_day);
+                    return ($model->start_date == 0)? '-': date('Y-m-d H:i:s', $model->start_date);
                 }
             ],
-            ['attribute'=>'end_day',
+            ['attribute'=>'end_date',
                 'value'=> function($model){
-                    return ($model->end_day == 0)? '-': date('Y-m-d H:i:s', $model->end_day);
+                    return ($model->end_date == 0)? '-': date('Y-m-d H:i:s', $model->end_date);
                 },
 
             ],

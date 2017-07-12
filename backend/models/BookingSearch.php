@@ -19,7 +19,7 @@ class BookingSearch extends Booking
     {
         return [
             [['id', 'apartment_id', 'number_of_tourist', 'guest_id'], 'integer'],
-            [['arrival_date', 'depature_date'], 'safe'],
+            [['start_date', 'end_date'], 'safe'],
         ];
     }
 
@@ -65,8 +65,8 @@ class BookingSearch extends Booking
             'guest_id' => $this->guest_id,
         ]);
 
-        $query->andFilterWhere(['>=', 'booking.arrival_date', $this->arrival_date ? strtotime($this->arrival_date . ' 00:00:00'):null])
-        ->andFilterWhere(['<=', 'booking.depature_date', $this->depature_date ? strtotime($this->depature_date . ' 23:59:59'):null]);
+        $query->andFilterWhere(['>=', 'booking.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
+        ->andFilterWhere(['<=', 'booking.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);
 
         return $dataProvider;
     }

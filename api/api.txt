@@ -46,7 +46,7 @@ Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
 Ответ в формате json
 {
     "id": 1,
-    "admin_pin":0856378,
+    "admin_pwd":0856378,
     "apartment_id":32,
      "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
     =======надо вносить изменения в модель========
@@ -69,7 +69,7 @@ Autorization: Bearer jfuZelbb-9Sazow14yjgvaNWQoqCjIMa
 Ответ в формате json
 {
     "id": 1,
-    "admin_pin":0856378,
+    "admin_pwd":0856378,
     "apartment_id":32,
      "type" : "type", // наш внутренний тип (могут быть разные, пока не определился
     =======надо вносить изменения в модель========
@@ -167,6 +167,9 @@ json:{"lastUpdateDate":1494533094128,"keyList":[{"date":1494449730000,
         }
     ]
 }
+"lockKey":"OCw5LDEyLDE1LDE1LDE0LDAsMTMsMTUsMTEsNzA=",
+"lockId":50088,
+"keyId":367238,
 при запросе пассворда
 
 Request{method=POST, url=https://api.sciener.cn/v3/keyboardPwd/get, tag=null}
@@ -280,3 +283,105 @@ https://api.sciener.cn/v3/keyboardPwd/get
     password : protonproton - md5 - 3a7233a066a0fc917ec5cf057922d9ae
 
     info@domouprav.hr password - domouprav
+
+
+    ============= FACEMATIKA ============
+
+    запрос на /v1/face/list
+
+
+    {
+        "total-faces": 11,
+        "faces": [
+            {
+                "faceid": "face-kxvs6kxybs0gkgo",
+                "coordinates": {
+                    "y": 479.74395751953,
+                    "width": 78.818523129867,
+                    "angle": -0.033572399320766,
+                    "x": 839.80508422852
+                },
+                "timestamp": "2017-06-02T18:51:33+00:00",
+                "img": {
+                    "filename": "face_65_3.jpg",
+                    "id": "img-kxvlh8vpkj4o40s"
+                }
+            },
+            {
+                "faceid": "face-i97ab3qit80sk0s",
+                "coordinates": {
+                    "y": 1575.1213989258,
+                    "width": 468.15525247753,
+                    "angle": -0.0058144413029444,
+                    "x": 1114.0784301758
+                },
+                "timestamp": "2017-06-02T14:53:09+00:00",
+                "img": {
+                    "filename": "face_3_63.jpg",
+                    "id": "img-i96yzwciuvwwok0"
+                }
+            },
+            ....
+             }
+Запрос на api.facematica.vocord.ru/v1/face/face-kxvs6kxybs0gkgo/match
+
+POST /v1/face/face-kxvs6kxybs0gkgo/match
+Content-Type: application/json
+Authorization: bearer  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhcGkuZmFjZW1hdGljYS52b2NvcmQucnUiLCJpYXQiOjE0OTYzNTQ5ODUsImV4cCI6MTQ5Njk1OTc4NSwidXNlcmRhdGEiOnsiaWQiOiIxMTIwIn19.tLQfgLrfTNL94hXV33RQKW4kFNdhafmdg0_hcr1tpGI
+
+[   {"faceid": "face-i97ab3qit80sk0s"} ]
+
+Ответ :
+{
+    "result": [
+        {
+            "face-i97ab3qit80sk0s": 0.90932589769363
+        }
+    ],
+    "processing-time": 0.000169
+}
+
+Стаим лицо как образец для распознавания другого лица.
+
+http://api.domouprav.local/oauth2/token
+
+{
+    "access_token": "30cc1bbd0ef4a24f7420a88210f693e29f609d22",
+    "expires_in": 86400,
+    "token_type": "Bearer",
+    "scope": null,
+    "refresh_token": "7a44ecc6a80a6466347963625d4b045e679c7243"
+}
+
+{
+    "id": 10,
+    "name": "myRent",
+    "email": "sergey.sap@rona.hr",
+    "date": {
+        "created": "2017-06-14T23:14:23+02:00",
+        "updated": "2017-06-14T23:14:23+02:00"
+    },
+    "status": {
+        "code": 10,
+        "name": "Active"
+    }
+}
+Bearer d60fca2b2a2f9445bfc7860fa458a32ec28f1c05
+{
+  "external_apartment_id": "ID 45",
+  "external_id": "A 46",
+  "first_name": "Neven",
+  "second_name": "Gates",
+  "contact_email": "svrybin@gmail.com",
+  "start_date": "2017-06-31 12:00:00",
+  "end_date": "2017-07-05 14:00:00",
+  "number_of_tourist": "2",
+  "accessToken": "d60fca2b2a2f9445bfc7860fa458a32ec28f1c05"
+}
+
+как происходит инициализация замка?
+
+ 1. Замок включается
+ 2. Замок "спаривается с TTLockDemo"
+ 3. TTLockDemo получает от замка его установочные данные :
+    MAC,

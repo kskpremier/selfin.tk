@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'admin_pin')->textInput() ?>
+    <?= $form->field($model, 'admin_pwd')->textInput() ?>
 
     <?= $form->field($model, 'ip')->textInput(['maxlength' => true]) ?>
 

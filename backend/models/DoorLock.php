@@ -9,17 +9,17 @@ use Yii;
  * This is the model class for table "door_lock".
  *
  * @property integer $id
- * @property integer $admin_pin
+ * @property integer $admin_pwd
  * @property string $type
  * @property integer $apartment_id
  * @property integer $lock_id
  * @property string $lock_mac
- * @property string $lock-alias
+ * @property string $lock_alias
  * @property string $lock_name
  * @property integer $electric_quantity
  * @property string $last_update_date
  * @property $flag_pos integer
-
+ * @property $lock_version_id
  * @property $no_key_pwd string
  * @property $delete_pwd string
  * @property $pwd_info string
@@ -52,6 +52,7 @@ class DoorLock extends \yii\db\ActiveRecord
       public $startDay;
       public $remarks;
       public $aesKeyStr;
+      public $lockVersionString;
         //for keyboard password parameters
 
 
@@ -71,18 +72,18 @@ class DoorLock extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['admin_pin', 'apartment_id','lock_version_id'], 'integer'],
-            [['type', 'lock_mac', 'lock-alias', 'lock_name'], 'string', 'max' => 255],
-            [['apartment_id', 'lock_id', 'electric_quantity'], 'integer'],
+            [['admin_pwd', 'lock_version_id','id'], 'integer'],
+            [['type', 'lock_mac', 'lock_alias', 'lock_name'], 'string', 'max' => 255],
+            [['lock_id'], 'integer'],
             [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
-            [['no_key_pwd', 'delete_pwd', 'pwd_info','admin_pwd'],'string'],
-            [['timestamp'],'integer','max'=>15],
-            [['last_update_date'],'string','max'=>15],
-            [['special_value', 'timezone_raw_offset', 'flag_pos'],'integer'],
-            [['lockVersionString'],'string'],
+            [['no_key_pwd', 'delete_pwd', 'pwd_info','admin_pwd'],'safe'],
+            [['timestamp'],'safe'],
+            [['last_update_date'],'safe'],
+            [['special_value', 'timezone_raw_offset', 'flag_pos','electric_quantity'],'safe'],
+            [['lockVersionString'],'safe'],
             [['startDay'],'safe'],
-            [['keyStatus','keyId'],'integer'],
-            [['aesKeyStr','lockKey'],'string','max'=>50],
+            [['keyStatus','keyId'],'safe'],
+            [['aesKeyStr','lockKey'],'safe'],
         ];
     }
 
@@ -94,12 +95,12 @@ class DoorLock extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'lockId' => Yii::t('app', 'lockId'),
-            'admin_pin' => Yii::t('app', 'Admin Pin'),
+            'admin_pwd' => Yii::t('app', 'Admin Pin'),
             'type' => Yii::t('app', 'Type'),
             'apartment_id' => Yii::t('app', 'Apartment ID'),
             'lock_id' => Yii::t('app', 'Lock ID'),
             'lock_mac' => Yii::t('app', 'Lock Mac'),
-            'lock-alias' => Yii::t('app', 'Lock Alias'),
+            'lock_alias' => Yii::t('app', 'Lock Alias'),
             'lock_name' => Yii::t('app', 'Lock Name'),
             'electric_quantity' => Yii::t('app', 'Electric Quantity'),
             'flag_pos'=>Yii::t('app','Flag'),
@@ -162,16 +163,16 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'id',
-            'admin_pin'=>'admin_pwd',
+            'admin_pwd'=>'admin_pwd',
             'apartment_id'=>'apartment_id',
             'type' => 'type',
             'lock_id'=>'lock_id',
             'lock_mac' => 'lock_mac',
-            'lock-alias' => 'lock-alias',
+            'lock_alias' => 'lock_alias',
             'lock_name' => 'lock_name',
             'electric_quantity' => 'electric_quantity',
             'last_update_date' => 'last_update_date',
-            'lock_version'=>'LockVersion'
+            'lock_version'=>'lockVersion'
         ];
     }
     /*
@@ -210,7 +211,7 @@ class DoorLock extends \yii\db\ActiveRecord
                 "admin_pwd"=>"NDEsNDQsNDYsMzIsMzMsMzIsNDQsNDEsNDcsNDUsMTAz",
                 "lock_flag_pos"=>0,
                 "aesKeyStr"=>"e9,cd,f5,21,b5,63,fc,c3,96,b7,16,fe,d6,16,41,b0",
-                "lockVersion"=> json_encode(["showAdminKbpwdFlag"=>true,
+                "lockVersionString"=> json_encode(["showAdminKbpwdFlag"=>true,
                                             "group_id"=>1,
                                             "protocol_version"=>3,
                                             "protocol_type"=>5,
@@ -243,7 +244,7 @@ class DoorLock extends \yii\db\ActiveRecord
                 'value' => $this->adminPwd,
                 'key_id' => $this->keyId,
                 'lock_key' => $this->lockKey,
-                'start_day' => $this->startDay,
+                'start_date' => $this->startDay,
                 'remarks' => $this->remarks,
                 'aes_key_str' => $this->aesKeyStr,
                 'door_lock_id' => $this->id,

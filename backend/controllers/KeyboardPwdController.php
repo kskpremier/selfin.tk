@@ -75,8 +75,8 @@ class KeyboardPwdController extends Controller
         $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
 
         if (isset($booking)) {
-            $model = new KeyboardPwd(['start_day' => Yii::$app->formatter->asDateTime($booking->arrival_date, "php:D, d-M-Y H:i"),
-                'end_day' => Yii::$app->formatter->asDateTime($booking->depature_date, "php:D, d-M-Y H:i"),
+            $model = new KeyboardPwd(['start_date' => Yii::$app->formatter->asDateTime($booking->start_date, "php:D, d-M-Y H:i"),
+                'end_date' => Yii::$app->formatter->asDateTime($booking->end_date, "php:D, d-M-Y H:i"),
                 'booking_id' => $booking_id,
                 'door_lock_id'=> $booking->apartment->doorLock->id]);
         } else {
@@ -87,8 +87,8 @@ class KeyboardPwdController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) ) {
-            $model->start_day = Yii::$app->formatter->asDateTime($model->start_day,'php:d-m-Y H:i');
-            $model->end_day = Yii::$app->formatter->asDateTime($model->end_day,'php:d-m-Y H:i');
+            $model->start_date = Yii::$app->formatter->asDateTime($model->start_date,'php:d-m-Y H:i');
+            $model->end_date = Yii::$app->formatter->asDateTime($model->end_date,'php:d-m-Y H:i');
             if ($response = $model->getKeyboardPwdLocal()) {
 
                 Yii::$app->session->setFlash('success', 'Keyboard password is successfully generated  ' );

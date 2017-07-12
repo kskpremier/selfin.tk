@@ -18,7 +18,7 @@ class CameraSearch extends Camera
     public function rules()
     {
         return [
-            [['id', 'admin_pin', 'apartment_id'], 'integer'],
+            [['id', 'admin_pwd', 'apartment_id'], 'integer'],
             [['ip', 'type'], 'safe'],
         ];
     }
@@ -60,7 +60,7 @@ class CameraSearch extends Camera
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'admin_pin' => $this->admin_pin,
+            'admin_pwd' => $this->admin_pwd,
             'apartment_id' => $this->apartment_id,
         ]);
 

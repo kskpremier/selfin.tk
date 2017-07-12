@@ -33,7 +33,7 @@ class KeyController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','index'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
@@ -66,29 +66,34 @@ class KeyController extends Controller
     {
         $actions = parent::actions();
         unset($actions['create']);
-        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+       // $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
     }
 
     public function checkAccess($action, $model = null, $params = [])
     {
         if (in_array($action, ['create'])) {
-            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['delete'])) {
-            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['view'])) {
-            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
         if (in_array($action, ['update'])) {
-            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_day'=>$model->start_day,'end_day'=>$model->end_day])) {
+            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+            }
+        }
+        if (in_array($action, ['index'])) {
+            if (!Yii::$app->user->can('tourist',[])) {
                 throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
             }
         }
@@ -99,6 +104,57 @@ class KeyController extends Controller
         $searchModel = new KeySearch();
         return $searchModel->search(Yii::$app->request->queryParams);
     }
+
+    /**
+     * @SWG\Get(
+     *     path="/keys",
+     *     tags={"DoorLock"},
+     *     description="Return all existing keys for requested user(by token) or by other params",
+     *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Success response",
+     *         @SWG\Schema(ref="#/definitions/KeysInfo")
+     *     ),
+     *     security={{"Bearer": {}, "OAuth2": {}}}
+     * )
+     */
+    /**
+     *  @SWG\Definition(
+     *     definition="KeysInfo",
+     *     type="object",
+     *
+     *          @SWG\Property(property="lockName", type="string",description = "Lockname", example= "M201T_780566"),
+     *          @SWG\Property(property="unlockKey", type="string",description = "Critical information locked door, open the door of", example= "OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA=="),
+     *          @SWG\Property(property="lockFlagPos", type="integer",description = "Lock flag", example= "0"),
+     *          @SWG\Property(property="aesKeyStr", type="string",description = "Aes encryption and decryption Key", example= "26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e"),
+     *          @SWG\Property(property="timezoneOffset", type="double",description = "When the lock area where the number of poor and UTC time zone, the unit milliseconds, default (China time zone) 28,800,000", example= "7200000"),
+
+     *          @SWG\Property(property="lockVersion",  type="object",
+     *              @SWG\Property(property="protocolType", type="integer",description = "agreement type", example= "1"),
+     *              @SWG\Property(property="protocolVersion", type="integer",description = "Protocol Version", example= "3"),
+     *              @SWG\Property(property="scene", type="integer",description = "Scenes", example= "5"),
+     *              @SWG\Property(property="groupId", type="integer",description = "the company", example= "1"),
+     *              @SWG\Property(property="orgId", type="integer",description = "Application providers", example= "2")
+     *     ),
+     *          @SWG\Property(property="apartment",  type="object",
+     *              @SWG\Property(property="name", type="integer",description = "name of apartment or room", example= "Zizi")
+     * ),
+     *           @SWG\Property(property="booking_id",  type="string", description = "booking number from external systems", example= "R 2220/74"),
+     * )
+     */
+    public function actionIndex(){
+        $searchModel = new KeySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $models = $dataProvider->getModels();
+        foreach ($models as $model){
+            $result[]= $this->serializeKey($model);
+        }
+        return $result;
+    }
+
+
 
     /**
      * Creates a new DoorLock model.
@@ -172,5 +228,32 @@ class KeyController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function serializeKey($key): array
+    {
+        return [
+            'startDate'=>$key->start_date,
+            'endDate'=>$key->end_date,
+            'lockName'=>$key->doorLock->lock_name,
+            'lockMac'=>$key->doorLock->lock_mac,
+            'unlockKey'=>$key->doorLock->lock_key,
+            'lockFlagPos'=>$key->doorLock->flag_pos,
+            'aesKeyStr'=>$key->doorLock->aes_key_str,
+
+            'timezoneOffset'=>$key->doorLock->timezone_raw_offset,
+
+            'lockVersion'=>[
+                'groupId'=>$key->doorLock->getLockVersion()->one()->group_id,
+                'protocolVersion'=>$key->doorLock->getLockVersion()->one()->protocol_version,
+                'protocolType'=>$key->doorLock->getLockVersion()->one()->protocol_type,
+                'orgId'=>$key->doorLock->getLockVersion()->one()->org_id,
+                'scene'=>$key->doorLock->getLockVersion()->one()->scene
+            ],
+            'apartment'=>[
+                'name'=>($key->doorLock->apartment)?$key->doorLock->apartment->name:'not yet installed',
+            ],
+            'booking_id'=>$key->booking->external_id
+        ];
     }
 }
