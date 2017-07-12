@@ -34,19 +34,20 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'Apartments', 'url' => ['/apartment/index']],
-        ['label' => 'Booking', 'url' => ['/booking/index']],
-        ['label' => 'Faces', 'url' => ['/photo-image/index']],
-        ['label' => 'Documents', 'url' => ['/photo-document/index']],
-        ['label' => 'DoorLocks', 'url' => ['/door-lock/index']],
-        ['label' => 'Users', 'url' => ['/user/index']],
-        ['label' => 'Keys', 'url' => ['/key/index']],
-        ['label' => 'Passwords', 'url' => ['/keyboard-pwd/index']],
+    if (!Yii::$app->user->isGuest) {
+        $menuItems = [
+            ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Apartments', 'url' => ['/apartment/index']],
+            ['label' => 'Booking', 'url' => ['/booking/index']],
+            ['label' => 'Faces', 'url' => ['/photo-image/index']],
+            ['label' => 'Documents', 'url' => ['/photo-document/index']],
+            ['label' => 'DoorLocks', 'url' => ['/door-lock/index']],
+            ['label' => 'Users', 'url' => ['/user/index']],
+            ['label' => 'Keys', 'url' => ['/key/index']],
+            ['label' => 'Passwords', 'url' => ['/keyboard-pwd/index']],
 
-//        ['label' => 'Check-in', 'url' => ['/photo-document/index']],
-    ];
+        ];
+    }
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {

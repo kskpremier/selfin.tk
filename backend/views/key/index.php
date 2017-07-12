@@ -52,10 +52,33 @@ $this->params['breadcrumbs'][] = $this->title;
                 }],
             [
                     'attribute'=>'booking_id',
+                    'label'=>'Booking',
                     'format'=>'raw',
                     'value'=> function($model) {
-                                return HTML::a($model->booking_id, Url::to(['booking/view', 'id'=>$model->booking_id]) );
+                                if ($model->booking_id) {
+                                    return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
+                                }
+                                else return HTML::tag('span','not set',['class'=>'danger']);
                     } ,
+            ],
+            [
+                'attribute'=>'doorLockName',
+                'label'=>'Door lock',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                } ,
+            ],
+            [
+                'attribute'=>'username',
+                'label'=>'Guest/User',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->user_id) {
+                        return HTML::a($model->user->username, Url::to(['key/index', 'userId' => $model->user_id]));
+                    }
+                    else return HTML::tag('span','not set',['class'=>'danger']);
+                } ,
             ],
 
             [

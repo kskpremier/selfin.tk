@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use phpDocumentor\Reflection\Types\Null_;
 use Yii;
 use backend\models\PhotoImage;
 use backend\models\PhotoImageSearch;
@@ -24,7 +25,7 @@ class PhotoImageController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+//                    'delete' => ['POST',''],
                 ],
             ],
         ];
@@ -68,9 +69,16 @@ class PhotoImageController extends Controller
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->user_id = Yii::$app->getUser()->id;
+            $model->date = date('Y-m-d H:i:s');
             $model->save();
             $image = UploadedFile::getInstance($model,'file_name');
-            $imageName = 'face_'.$model->id.'_'.$model->user_id.'.'.$image->getExtension() ;
+            if ($model->album_id == \backend\models\Album::ALBUM_DOCUMENTS){
+                $imageName = 'doc_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
+            }
+            elseif($model->album_id == \backend\models\Album::ALBUM_FACES) {
+                $imageName = 'face_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
+            }
+            else $imageName = 'photo_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
             $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
             $model->file_name = $imageName;
             $model->save();
@@ -87,27 +95,36 @@ class PhotoImageController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreateRest()
+    public function actionCreateRest($bookingId=Null)
     {
         $model = new \backend\models\PhotoImage();
+        $model->booking_id = $bookingId;
 
         if ($model->load(Yii::$app->request->post()) ) {
+
             $model->user_id = Yii::$app->getUser()->id;
-            $model->date= date('Y-m-d');
+            $model->date = date('Y-m-d H:i:s');
             $image = UploadedFile::getInstance($model, 'file_name');
 
             $model->save();
-            $imageName = 'face_'.$model->booking_id.'_'.$model->id.'.'.$image->getExtension();
+            if ($model->album_id == \backend\models\Album::ALBUM_DOCUMENTS){
+                $imageName = 'doc_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
+            }
+            elseif($model->album_id == \backend\models\Album::ALBUM_FACES) {
+                $imageName = 'face_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
+            }
+            else $imageName = 'photo_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
             $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
             $model->file_name = $imageName;
             $model->save();
 
-            $response = $model->postPhotoImage(); 
+            $response = $model->postPhotoImage();
+
             if ($response->isOk) {
                 Yii::$app->session->setFlash('success', 'Photo was successfully uploaded - ' . $model->file_name);
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
-                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator : '. $response);
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administrator : '. $response);
                 return $this->render('create', [
                     'model' => $model,
                 ]);
@@ -147,9 +164,15 @@ class PhotoImageController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        //надо грохнуть этот файл с диска
+        if (unlink(Yii::getAlias('@imagePath').'/'.$model->file_name)) {
+            $model->delete();
+        }
+        else new NotFoundHttpException('The requested file does not exist.');
 
-        return $this->redirect(['index']);
+        Yii::$app->session->setFlash('success', 'Photo was successfully deleted');
+        return (!empty(Yii::$app->request->referrer)) ? Yii::$app->request->referrer : $this->redirect(['index']);
     }
 
     /**

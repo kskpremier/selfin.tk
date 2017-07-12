@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Add New Image', ['photo-image/create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Add New Image via RESTAPI', ['photo-image/create-rest','bookingId'=>function($model){return $model->id;}], ['class' => 'btn btn-success']) ?>
 
     </p>
     <?= GridView::widget([

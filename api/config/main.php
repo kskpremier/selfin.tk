@@ -57,8 +57,7 @@ return [
         'request' => [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
-                'multipart/form-data' =>//'yii\web\MultipartFormDataParser',
-
+                'multipart/form-data' =>
                     [
                     'class'=>'yii\web\MultipartFormDataParser',
                     'uploadFileMaxCount' => 10,
@@ -68,6 +67,17 @@ return [
             ],
         ],
         'response' => [
+            'class' => 'yii\web\Response',
+            'on beforeSend' => function ($event) {
+                $response = $event->sender;
+                if ($response->data !== null && Yii::$app->request->get('suppress_response_code')) {
+                    $response->data = [
+                        'success' => $response->isSuccessful,
+                        'data' => $response->data,
+                    ];
+                    $response->statusCode = 200;
+                }
+            },
             'formatters' => [
                 'json' => [
                     'class' => 'yii\web\JsonResponseFormatter',
@@ -114,12 +124,14 @@ return [
 
 //
 //               //crud  для замков
-//                'POST door_lock' => 'door-lock/create',
+                'POST lock/add' => 'door-lock/create',
 //                'PUT,PATCH door_lock' => 'door-lock/update',
-//                'GET door_lock' => 'door-lock/view',
+                'GET lock/view' => 'door-lock/view',
+                'GET lock/viewByMac' => 'door-lock/mac',
 //                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
 //                //crud для электронных ключей
                 'POST e-key' => 'key/create',
+                'GET keys' => 'key/index',
 //                'PUT,PATCH e-key' => 'key/update',
                 'GET e-key' => 'key/view',
 //                'PUT,PATCH e-key/delete' => 'key/delete',

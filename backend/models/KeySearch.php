@@ -10,17 +10,21 @@ use backend\models\Key;
 /**
  * KeySearch represents the model behind the search form about `backend\models\Key`.
  */
-class KeySearch extends \backend\models\Key
+class KeySearch extends Key
 {
+    public $userId;
+    public $doorLockName;
+    public $username;
     /**
      * @inheritdoc
      */
     public function rules()
     {
+
         return [
-            [['id', 'pin', 'booking_id','door_lock_id'], 'integer'],
+            [['id', 'booking_id','door_lock_id','userId'], 'integer'],
             [['type'],'string','max' => 15],
-            [['start_date', 'end_date', 'e_key'], 'safe'],
+            [['start_date', 'end_date','doorLockName','username'], 'safe'],
         ];
     }
 
@@ -43,34 +47,24 @@ class KeySearch extends \backend\models\Key
     public function search($params)
     {
         $query = Key::find();
-
-        // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
         $this->load($params);
-
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'pin' => $this->pin,
-            'booking_id' => $this->booking_id,
-            'door_lock_id' => $this->door_lock_id,
-        ]);
-
-        $query ->andFilterWhere(['like', 'e_key', $this->e_key])
-               ->andFilterWhere(['like', 'type', $this->type]);
+        $query->joinWith('user');
+        $query->joinWith('doorLock');
+        $query->joinWith('booking');
+        $query->andFilterWhere(['like', 'booking.id', $this->booking_id])
+              ->andFilterWhere(['like', 'door_lock.name', $this->doorLockName])
+              ->andFilterWhere(['like', 'users.id', $this->userId])
+              ->andFilterWhere(['like', 'users.username', $this->username]);
         $query->andFilterWhere(['>=', 'key.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
                ->andFilterWhere(['<=', 'key.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);
-
         return $dataProvider;
     }
 }

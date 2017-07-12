@@ -12,7 +12,7 @@ namespace backend\models;
 class DOMOUPRAV
 {
  public const DOMOUPRAV_TOKEN = "d60fca2b2a2f9445bfc7860fa458a32ec28f1c05";
- public const DOMOUPRAV_ADMIN_TOKEN = "30cc1bbd0ef4a24f7420a88210f693e29f609d22";
+ public const DOMOUPRAV_ADMIN_TOKEN = "e48e0bd5a3322f0d2aa815a16794be72274272a7";
  public const DOMOUPRAV_RECIEVE_USERNAME = "doorlockadmin@domouprav.hr";
 
     public const DOMOUPRAV_BASE_API_URL = 'http://api.domouprav.local';

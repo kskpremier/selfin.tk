@@ -15,7 +15,7 @@ use backend\models\Album;
 ?>
 
 <div class="photo-image-form">
-    <?php $model->date = date('Y-m-d');
+    <?php $model->date = date('Y-m-d H:i:s');
             $model->album_id = 1;
             $model-> camera_id = 1;
     ?>
@@ -28,7 +28,7 @@ use backend\models\Album;
         'options' => ['placeholder' => 'Creating date'],
         'type' => DatePicker::TYPE_INPUT ,
         'pluginOptions' => [
-            'format' => 'Y-m-d',
+            'format' => 'Y-m-d H:i:s',
             'autoclose' => true,]
     ]); ?>
 
@@ -41,7 +41,7 @@ use backend\models\Album;
     <?= $form->field($model, 'booking_id')->widget(Select2::classname(), [
         'data' => ArrayHelper::map(\backend\models\Booking::find()->all(),'id','id'),
         //'pluginOptions' => ['highlight' => true],
-        'options' => ['placeholder' => 'Enter reservation number ...'],
+        'options' => ['placeholder' => ($model->booking_id)?$model->booking_id:'Enter reservation number ...'],
     ]); ?>
 
     <?= $form->field($model, 'album_id')->widget(Select2::classname(), [

@@ -6,6 +6,8 @@ use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
+use kartik\checkbox\CheckboxX;
+use backend\models\Guest;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\Key */
@@ -53,29 +55,45 @@ $model->e_key = md5(uniqid(rand(), true));
         ]
     ]);?>
     <?= $form->field($model, 'guest_id')->widget(Select2::className(), [
-        'data'=>ArrayHelper::map($model->booking->guests,'id','contact_email'),//['1'=>'svrybin','4'=>'domouprav'],
+        'data'=>($model->booking)?ArrayHelper::map($model->booking->guests,'id','contact_email'): ArrayHelper::map(Guest::find()->all(),'id','contact_email'),//['1'=>'svrybin','4'=>'domouprav'],
         'value'=>0,
         'options' => ['placeholder' => 'Select a guest ...'],
         'pluginOptions' => [],
     ])->label('for Guest');?>
+    <?= CheckboxX::widget([
+        'name'=>'booking_connection',
+        'options'=>['id'=>'booking_connection'],
+        'pluginOptions'=>['threeState'=>false],
+        'pluginEvents' =>[
+            "change"=>'function() { var checked;
+            if (!checked)
+                { $("select#key-booking_id").prop( "disabled", false );
+                    checked = true;} 
+            else
+                { $("select#key-booking_id").prop( "disabled", true );
+                  checked = false;
+                 }
+            }'
+
+            // "reset"=>'function() { log("reset"); }',
+        ]
+    ]);
+    ?>
 
     <?php
+
     if ($model->booking_id)
         echo  $form->field($model, 'booking_id')->textInput(['disabled'=>true])->label('for Booking #');
     else echo $form->field($model, 'booking_id')->widget(Select2::className(), [
         'data'=> ArrayHelper::map(\backend\models\Booking::find()->all() ,'id','id'),
-        'options' => ['placeholder' => 'Select a booking ...'],
+        'options' => ['placeholder' => 'Select a booking ...',
+            'disabled'=>true ],
         'pluginOptions' => [],
     ])->label('for Booking #');
     ?>
     <?php
     if ($model->door_lock_id)
-        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true])->label('for Door lock #'); ?>
-
-    <?= $form->field($model, 'pin')->textInput(['disabled'=>true,'value'=>$model->pin]) ?>
-
-    <?= $form->field($model, 'e_key')->textInput(['maxlength' => true, 'disabled'=>true,'value'=>$model->e_key]) ?>
-
+        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true, 'value'=>$model->doorLock->lock_name])->label('for Door lock #'); ?>
 
 
 

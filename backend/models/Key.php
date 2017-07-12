@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use \backend\models\DOMOUPRAV;
+use reception\entities\User\User;
 use \api\models\TTL;
 use yii\httpclient\Client;
 
@@ -48,7 +49,7 @@ class Key extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pin', 'booking_id','door_lock_id','guest_id','key_id','open_id'], 'integer'],
+            [['pin', 'booking_id','door_lock_id','guest_id','key_id','open_id','user_id'], 'integer'],
             [['remarks'], 'string', 'max'=>100],
             [['start_date', 'end_date'], 'safe'],
             [['e_key','last_update_date'], 'string', 'max' => 15],
@@ -90,20 +91,27 @@ class Key extends \yii\db\ActiveRecord
     {
         return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
     /*
      * Этот вызов будет дергать наш api контроллер
      * */
 
     public function sendEKeyByLocal(){
-        //тут надо сформировать запрос и послать его на китайский рестапи
+        //тут надо сформировать запрос и послать его на наш сервер
         $client = $client = new Client([
             'baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,
-            'requestConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
-            'responseConfig' => [
-                'format' => Client::FORMAT_JSON
-            ],
+//            'requestConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
+//            'responseConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
         ]);
         $response = $client->createRequest()
             ->setMethod('post')
@@ -117,8 +125,8 @@ class Key extends \yii\db\ActiveRecord
                 'type'=>$this->type,
                 'start_date'=>($this->type == '2')?  '0' : strtotime($this->start_date),
                 'end_date'=>($this->type == '2')?  '0' : strtotime( $this->end_date), //2 - это на период, надеюсь
-                'email'=> 'svrybin@gmail.com',//$this->guest->contact_email,
-                'accessToken'=> DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN
+                'email'=> 'doorlockuser1@domouprav.hr',//$this->guest->contact_email,
+//                'accessToken'=> DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN
             ])
             ->send();
         if ($response->isOk) {
@@ -149,6 +157,7 @@ class Key extends \yii\db\ActiveRecord
                 $this->e_key = ($data['errcode'] == 0) ? "1" : "0";
                 $this->start_date = ($this->type == '2')? 0: $this->start_date;
                 $this->end_date = ($this->type == '2')? 0: $this->end_date;
+                $this->key_id = $data['keyId'];
 
                 $data['success'] =  $this->save();
             } else $data['success'] = false;

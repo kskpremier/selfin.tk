@@ -94,6 +94,16 @@ return [
             ],
          ],
     ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'except' => ['site/index', 'site/login'],
+        'rules' => [
+            [
+                'allow' => true,
+                'roles' => ['@'],
+            ],
+        ],
+    ],
 //    'request' => [
 //        'parsers' => [
 //            'application/json' => 'yii\web\JsonParser',

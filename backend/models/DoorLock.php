@@ -14,7 +14,7 @@ use Yii;
  * @property integer $apartment_id
  * @property integer $lock_id
  * @property string $lock_mac
- * @property string $lock-alias
+ * @property string $lock_alias
  * @property string $lock_name
  * @property integer $electric_quantity
  * @property string $last_update_date
@@ -73,7 +73,7 @@ class DoorLock extends \yii\db\ActiveRecord
     {
         return [
             [['admin_pwd', 'lock_version_id','id'], 'integer'],
-            [['type', 'lock_mac', 'lock-alias', 'lock_name'], 'string', 'max' => 255],
+            [['type', 'lock_mac', 'lock_alias', 'lock_name'], 'string', 'max' => 255],
             [['lock_id'], 'integer'],
             [['apartment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(), 'targetAttribute' => ['apartment_id' => 'id']],
             [['no_key_pwd', 'delete_pwd', 'pwd_info','admin_pwd'],'safe'],
@@ -100,7 +100,7 @@ class DoorLock extends \yii\db\ActiveRecord
             'apartment_id' => Yii::t('app', 'Apartment ID'),
             'lock_id' => Yii::t('app', 'Lock ID'),
             'lock_mac' => Yii::t('app', 'Lock Mac'),
-            'lock-alias' => Yii::t('app', 'Lock Alias'),
+            'lock_alias' => Yii::t('app', 'Lock Alias'),
             'lock_name' => Yii::t('app', 'Lock Name'),
             'electric_quantity' => Yii::t('app', 'Electric Quantity'),
             'flag_pos'=>Yii::t('app','Flag'),
@@ -168,11 +168,11 @@ class DoorLock extends \yii\db\ActiveRecord
             'type' => 'type',
             'lock_id'=>'lock_id',
             'lock_mac' => 'lock_mac',
-            'lock-alias' => 'lock-alias',
+            'lock_alias' => 'lock_alias',
             'lock_name' => 'lock_name',
             'electric_quantity' => 'electric_quantity',
             'last_update_date' => 'last_update_date',
-            'lock_version'=>'LockVersion'
+            'lock_version'=>'lockVersion'
         ];
     }
     /*

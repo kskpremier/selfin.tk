@@ -21,6 +21,7 @@ return [
             'itemChildTable' => '{{%auth_item_children}}',
             'assignmentTable' => '{{%auth_assignments}}',
             'ruleTable' => '{{%auth_rules}}',
+            'defaultRoles' => ['tourist']
         ],
 
     ],

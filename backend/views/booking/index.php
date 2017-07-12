@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
-                            ['key/create', 'booking_id' => $model->id ],
+                            ['key/create-for-booking', 'bookingId' => $model->id ],
                             ['class' => '',
                                 'title'=>'Send E-key for guest']
                         );

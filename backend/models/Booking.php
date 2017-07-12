@@ -5,6 +5,7 @@ namespace backend\models;
 
 use yii\web\BadRequestHttpException;
 use Yii;
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use \backend\models\DOMOUPRAV;
 use backend\models\BookingGuest;
 use \api\models\TTL;
@@ -26,7 +27,7 @@ use yii\httpclient\Client;
  * @property string $second_name
  * @property string $contact_email
  * @property integer $status
- *
+ * @property string $temporary_password
  * @property Apartment $apartment
  * @property Guest $author
  * @property KeyboardPwd [] $keyboardPwds
@@ -41,6 +42,7 @@ class Booking extends \yii\db\ActiveRecord
     public $first_name;
     public $second_name;
     public $contact_email;
+    public $temporary_password;
 //    public $external_booking_id;
     public $external_apartment_id;
 
@@ -176,9 +178,10 @@ class Booking extends \yii\db\ActiveRecord
 
     /**
      * Add new booking, guest, generate new user for App generate keyboardPwds return result
+     * @param booling $doWeNeedToSendLetter - if == true after addind new booking letter wil be send to tourist
      * @return Booking|null
      */
-    public function addNewBooking(){
+    public function addNewBooking($doWeNeedToSendLetter=false){
         $flag = true;
         if (Booking::isUnique($this)) {
 
@@ -192,11 +195,13 @@ class Booking extends \yii\db\ActiveRecord
                     $signUp->email = $this->contact_email;
                     $signUp->username = $this->second_name;
                     $signUp->password = Yii::$app->security->generateRandomString(7);
+                    $this->temporary_password=$signUp->password; //сохраним пароль
                     $user = $signUp->signup();
                 }
                 if (!$user) {
                     throw new BadRequestHttpException('Can not add user with this name/email combination.');
                 }
+
                 //Создать нового гостя, предварительно проверив, нет ли уже такого
                 $guest = \backend\models\Guest::find()->andWhere(['first_name' => $this->first_name, 'second_name' => $this->second_name, 'contact_email' => $this->contact_email])->one();
                 if ($guest === null) {
@@ -240,6 +245,9 @@ class Booking extends \yii\db\ActiveRecord
                         throw new BadRequestHttpException('Can not get keyboard password for this door lock identity: ' . $doorLock->id);
                     }
                 }
+                if ($doWeNeedToSendLetter) {
+                    $this->sendEmail($this->contact_email); //котыль работать будет, но криво, надо бы сначала поставить в очередь, а затем после коммита транзакции уже отправлять клиенту
+                }
                 if ($flag) {
                     $transaction->commit();
                     return $this;
@@ -271,9 +279,19 @@ class Booking extends \yii\db\ActiveRecord
             'apartment_id'=>'apartment_id',
             'apartment_name'=>function (){return $this->apartment->name;},
             'external_apartment_id' => function (){return $this->apartment->external_id;},
-            'guest'=>'author',
-           'username'=>function(){ return $this->author->user->username;},
+//            'guest'=>'author',
+//           'username'=>function(){ return $this->author->user->username;},
 //            'initial_login'=>'author.user.login',
+        ];
+    }
+    public function behaviors(): array
+    {
+        return [
+         //   MetaBehavior::className(),
+            [
+                'class' => SaveRelationsBehavior::className(),
+                'relations' => ['author','guests'],
+            ],
         ];
     }
 
@@ -283,18 +301,19 @@ class Booking extends \yii\db\ActiveRecord
      * @param string $email the target email address
      * @return bool whether the email was sent
      */
-    public static function sendEmail($email,$booking)
+    public function sendEmail($email)
     {
+        $booking = $this;
         //Костыль - пока не знаю как поступить с человекочитаемым паролем
         //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRent
         //Перезатирается пароль
-        $password = $booking->author->user->getNewReadablePassword();
+        $this->temporary_password = $booking->author->user->getNewReadablePassword();
 
         return Yii::$app->mailer->compose()
             ->setTo($email)
             ->setFrom(["info@domouprav.hr"=>'Rona mReception'])
             ->setSubject('Booking informantion - door lock password key')
-            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.$booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.$booking->author->first_name.' '.PHP_EOL.'Password : '.$password.PHP_EOL.'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
+            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.$booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.$booking->author->first_name.' '.PHP_EOL.'Password : '.$this->temporary_password.PHP_EOL.'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
             ->send();
     }
 

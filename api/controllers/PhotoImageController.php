@@ -15,29 +15,28 @@ use yii\helpers\Url;
 use yii\web\UploadedFile;
 
 
-class PhotoImageController extends \yii\rest\ActiveController
+class PhotoImageController extends ActiveController
 {
     public $modelClass = 'backend\models\PhotoImage';
 
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete'];
+        $behaviors['authenticator']['only'] = ['create-image'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-//        $behaviors['access'] = [
-//            'class' => AccessControl::className(),
-////            'only' => ['create-image', 'update', 'delete'],
-//            'rules' => [
-//                [
-//                    'allow' => true,
-//                    // ролей пока нет, поэтому я закоментировал
-//                     'roles' => ['@'],
-//                ],
-//            ],
-//        ];
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'only' => ['create-image'],
+            'rules' => [
+                [
+                    'allow' => true,
+                     'roles' => ['tourist','receptionist'],
+                ],
+            ],
+        ];
         return $behaviors;
     }
 
@@ -91,6 +90,45 @@ class PhotoImageController extends \yii\rest\ActiveController
  * }
  *
  **/
+    /**
+     * @SWG\Post(
+     *     path="/photoimage",
+     *     tags={"Faces"},
+     *     consumes={"multipart/form-data"},
+     *     produces={"application/json"},
+     *     description="Booking confirmation and door lock application init. Return parameters for booking confirmation (link to Application, user login/password, booking_id, keyboard password for door lock opening), as well send letter to tourist with those parameters",
+     *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Parameter( name = "img1", in="formData", required=true,  type="file", description = "Photoimage file to upload"),
+     *     @SWG\Parameter( name = "info", in="body", required=true, description = "New booking",  @SWG\Schema(ref="#/definitions/Info")),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Success response",
+     *         @SWG\Schema(ref="#/definitions/PhotoImageResponse")
+     *     ),
+     *     security={{"Bearer": {}, "OAuth2": {}}}
+     * )
+     */
+    /**
+     *  @SWG\Definition(
+     *     definition="Info",
+     *     type="object",
+     *     required= {
+     *          "booking_id",
+     *      },
+     *     @SWG\Property(property="booking_id", type="string", description = "Identity of booking in door lock management system", example= "45"),
+     * )
+     */
+    /**
+     *  @SWG\Definition(
+     *     definition="PhotoImageResponse",
+     *     type="object",
+     *     @SWG\Property(property="filename", type="string", description = "Name of photoImage file",example="45_59312a240c5d8.jpg"),
+     *     @SWG\Property(property="booking", type="string", description = "External booking identity",example="A 514"),
+     *     @SWG\Property(property="uploaded", type="string",example="2017-05-29 14:00:00"),
+     *     @SWG\Property(property="id", type="integer", description = "PhotoImage identity ",example="12"),
+     * )
+     */
+
 
     public function actionCreateImage()
     {
@@ -100,46 +138,49 @@ class PhotoImageController extends \yii\rest\ActiveController
 
         $model->load(Yii::$app->request->getBodyParams(), '');
 
-        $headers = Yii::$app->request->headers;
-
-        if ( $headers->has('Authorization') ) {
-            $user = \common\models\User::findIdentityByAccessToken($headers->get('Authorization'));
-            Yii::$app->user->setIdentity($user);
-            if (true) {
-//            if (Yii::$app->user->can('createPhotoImage', ['start_date'=>$model->booking->start_date, 'end_date'=>$model->booking->end_date ])) {
                 //в массив надо передавать сроки пребывания туриста
-                $model->date = date('Y-m-d');
-                $model->user_id = ($user) ? $user->id : 1;
+                $model->date = date('Y-m-d H:i:s');
+                $model->user_id = Yii::$app->user->id;
                 $model->album_id = ($model->album_id) ? $model->album_id : 1; //по дефолту 1 - нераспознаные
                 $model->camera_id=1;
-
-                if ($model->save()) {
-
-                    $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
-                    $extension = substr( $_FILES[ 'file' ][ 'name' ], strrpos( $_FILES[ 'file' ][ 'name' ], '.' ) );
-                    $filename =  $model->id.'_'. uniqid() . $extension;
-                    /* Open a file for writing */
-                    $fp = fopen( Yii::getAlias('@imagePath') . '/'.$filename, "w" );
-                    /* Read the data 1 KB at a time and write to the file */
-                    while( $data = fread( $postdata, 1024 ) )
-                        fwrite( $fp, $data );
-                    fclose( $fp );
-                    fclose( $postdata );
-                    $model->file_name = $filename;
-                    $model->save();
-                    $response = Yii::$app->getResponse();
-                    $response->setStatusCode(201);
-                    $id = implode(',', array_values($model->getPrimaryKey(true)));
-                    $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            if ($model->save()) {
+                if (isset($_FILES['file'])) {
+                    $postdata = fopen($_FILES['file']['tmp_name'], "r");
+                    $extension = substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.'));
                 }
-                elseif (!$model->hasErrors()) {
-                    throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+                else {
+                    throw new ServerErrorHttpException('Could not read file from request');
                 }
-                return  $model;
+                $filename = $model->id . '_' . uniqid() . $extension;
+                /* Open a file for writing */
+                $fp = fopen(Yii::getAlias('@imagePath') . '/' . $filename, "w");
+                /* Read the data 1 KB at a time and write to the file */
+                while ($data = fread($postdata, 1024))
+                    fwrite($fp, $data);
+                fclose($fp);
+                fclose($postdata);
+                $model->file_name = $filename;
+                $model->save();
+                $response = Yii::$app->getResponse();
+                $response->setStatusCode(201);
+                $id = implode(',', array_values($model->getPrimaryKey(true)));
+                $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
+            } elseif (!$model->hasErrors()) {
+                throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
             }
-            else throw new ForbiddenHttpException('You are not authorized for added photos');
+            $transaction->commit();
+            return $model;
         }
-        else  throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+        catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+
     }
 
 

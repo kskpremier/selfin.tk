@@ -14,7 +14,7 @@ use Yii;
  *
  * @property Booking[] $bookings
  * @property Camera[] $cameras
- * @property DoorLock[] $doorLocks
+ * @property DoorLock $doorLock
  */
 class Apartment extends \yii\db\ActiveRecord
 {
@@ -68,8 +68,19 @@ class Apartment extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getDoorLock()
+    {
+        //В будущем апартаменты смогут иметь более одного замка
+        //return $this->hasMany(DoorLock::className(), ['apartment_id' => 'id']);
+        return $this->hasOne(DoorLock::className(), ['apartment_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getDoorLocks()
     {
+        //В будущем апартаменты смогут иметь более одного замка
         return $this->hasMany(DoorLock::className(), ['apartment_id' => 'id']);
+       // return $this->hasOne(DoorLock::className(), ['apartment_id' => 'id']);
     }
 }

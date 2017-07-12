@@ -25,17 +25,23 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
+           'lock_name',
+           'lock_mac',
+           'lock_alias',
 
-            'type',
-            'apartment_id',
+           // 'type',
+            ['attribute'=>'apartment_id',
+                'label'=>'Apartment',
+                'value'=>'apartment.name'],
 
-            [
+
+            [   //'label'=>'Actions',
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{view} {update} {delete} {key} {pin} {install}',
                 'buttons' => [
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
-                            ['key/index', 'door_lock_id' => $model->id ],
+                            ['key/create-for-door-lock', 'doorLockId' => $model->id ],
                             ['class' => '',
                                 'title'=>'Send E-key for guest']
                         );
