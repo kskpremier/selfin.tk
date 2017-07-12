@@ -8,7 +8,7 @@
 
 namespace api\controllers;
 
-//use common\models\User;
+use reception\entities\User\User;
 use Yii;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
