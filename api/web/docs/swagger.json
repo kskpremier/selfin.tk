@@ -1,0 +1,1510 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Door lock management API",
+        "description": "HTTP JSON API",
+        "version": "1.0.0"
+    },
+    "host": "api.domouprav.local",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json",
+        "application/json"
+    ],
+    "produces": [
+        "application/json",
+        "application/json"
+    ],
+    "paths": {
+        "/booking": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Booking confirmation and door lock application init. Return parameters for booking confirmation (link to Application, user login/password, booking_id, keyboard password for door lock opening), as well send letter to tourist with those parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "booking",
+                        "in": "body",
+                        "description": "New booking",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/BookingNew"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Booking"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/bookings": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Return all bookings model for authorized user",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/BookingViewByUser"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/booking/view": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Return booking model finding by booking_id (internal door lock management system identity)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Identity of booking from internal systems",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/BookingView"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/booking/view-external": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Return booking model finding by external id (external identity, which was gotten when booking created)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "externalId",
+                        "in": "query",
+                        "description": "Identity of booking from external systems",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/BookingView"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/booking/update": {
+            "put": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Change model finding by external id (external identity, which was gotten when booking created)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "booking",
+                        "in": "body",
+                        "description": "Update booking data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/BookingUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/BookingView"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/booking/delete": {
+            "delete": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Delete booking with this externalId",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "externalId",
+                        "in": "query",
+                        "description": "Identity of booking from external systems",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/lock/add": {
+            "post": {
+                "tags": [
+                    "DoorLock"
+                ],
+                "description": "",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "doorlock",
+                        "in": "body",
+                        "description": "Init door lock data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DoorLockInit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/DoorLock"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/lock/view": {
+            "get": {
+                "tags": [
+                    "DoorLock"
+                ],
+                "description": "Return booking model finding by booking_id (internal door lock management system identity)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Identity of door lock from internal systems",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/DoorLock"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/lock/viewByMac": {
+            "get": {
+                "tags": [
+                    "DoorLock"
+                ],
+                "description": "Return booking model finding by booking_id (internal door lock management system identity)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "lockMac",
+                        "in": "query",
+                        "description": "Mac address of door lock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/DoorLock"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/keys": {
+            "get": {
+                "tags": [
+                    "DoorLock"
+                ],
+                "description": "Return all existing keys for requested user(by token) or by other params",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/KeysInfo"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/photoimage": {
+            "post": {
+                "tags": [
+                    "Faces"
+                ],
+                "description": "Booking confirmation and door lock application init. Return parameters for booking confirmation (link to Application, user login/password, booking_id, keyboard password for door lock opening), as well send letter to tourist with those parameters",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "img1",
+                        "in": "formData",
+                        "description": "Photoimage file to upload",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "name": "info",
+                        "in": "body",
+                        "description": "New booking",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Info"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/PhotoImageResponse"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Returns profile info",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Profile"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/": {
+            "get": {
+                "tags": [
+                    "Info"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API version",
+                        "schema": {
+                            "properties": {
+                                "version": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Authentification of user - by standard Oauth 2.0 approach",
+                "parameters": [
+                    {
+                        "name": "Request for token",
+                        "in": "body",
+                        "description": "User data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Valid access token data",
+                        "schema": {
+                            "$ref": "#/definitions/TokenData"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "description": "Returns profile info",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Profile"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [
+                            "c9c55a85ec7d672f3077aa4cfae7f9b655b016ac"
+                        ],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "ErrorModel": {
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Booking": {
+            "properties": {
+                "booking_id": {
+                    "description": "Internal booking identity",
+                    "type": "integer",
+                    "example": "12"
+                },
+                "apartment_id": {
+                    "description": "Internal apartment identity",
+                    "type": "integer",
+                    "example": "1"
+                },
+                "apartment_name": {
+                    "description": "External apartment name",
+                    "type": "string",
+                    "example": "Zizi"
+                },
+                "external_apartment_id": {
+                    "description": "External apartment identity",
+                    "type": "string",
+                    "example": "ID 45"
+                },
+                "username": {
+                    "description": "Login username for DoorLock Mobile App",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "password": {
+                    "description": "Login password for DoorLock Mobile App",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "keyboardPwds": {
+                    "description": "Array of keyborad passwords for opening door locks (usually only one)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KeyboardPwd"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "Guest": {
+            "properties": {
+                "id": {
+                    "description": "Internal guest identity",
+                    "type": "integer",
+                    "example": "12"
+                },
+                "first_name": {
+                    "description": "Guest's first name",
+                    "type": "string"
+                },
+                "second_name": {
+                    "description": "Guest's second name",
+                    "type": "string"
+                },
+                "contact_email": {
+                    "description": "Guest's e-mail, using for Mobile App username",
+                    "type": "string",
+                    "example": "example@exa.com"
+                },
+                "user_id": {
+                    "description": "Mobile User id",
+                    "type": "integer",
+                    "example": "2"
+                }
+            },
+            "type": "object"
+        },
+        "KeyboardPwd": {
+            "properties": {
+                "door_lock_id": {
+                    "description": "Internal booking door lock identity",
+                    "type": "integer",
+                    "example": "46"
+                },
+                "password_id": {
+                    "description": "Internal booking keyboard password identity",
+                    "type": "integer",
+                    "example": "345"
+                },
+                "password_type": {
+                    "description": "Could be Permanent, Period, Cycle, Single",
+                    "type": "string",
+                    "example": "Permanent"
+                },
+                "password": {
+                    "description": "Digital code for opening the door lock",
+                    "type": "string",
+                    "example": "73429034"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2017-05-29 14:00:00"
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2017-06-01 12:30:00"
+                }
+            },
+            "type": "object"
+        },
+        "BookingNew": {
+            "required": [
+                "external_booking_id",
+                "apartment_id",
+                "first_name",
+                "second_name",
+                "contact_email",
+                "start_date",
+                "end_date",
+                "number_of_tourist"
+            ],
+            "properties": {
+                "external_apartment_id": {
+                    "description": "Identity of booking from external systems",
+                    "type": "integer",
+                    "example": "ID 5"
+                },
+                "external_id": {
+                    "description": "Identity of booking from external systems",
+                    "type": "string",
+                    "example": "A 45"
+                },
+                "first_name": {
+                    "description": "Guest's first name",
+                    "type": "string"
+                },
+                "second_name": {
+                    "description": "Guest's second name",
+                    "type": "string"
+                },
+                "contact_email": {
+                    "description": "Guest's e-mail, using for Mobile App username",
+                    "type": "string",
+                    "example": "example@exa.com"
+                },
+                "start_date": {
+                    "description": "Guest's second name",
+                    "type": "string",
+                    "example": "2017-05-29 12:00:00"
+                },
+                "end_date": {
+                    "description": "Guest's second name",
+                    "type": "string",
+                    "example": "2017-06-05 14:00:00"
+                },
+                "number_of_tourist": {
+                    "description": "Total number of tourist in booking",
+                    "type": "integer",
+                    "example": "3"
+                }
+            },
+            "type": "object"
+        },
+        "BookingUpdate": {
+            "required": [
+                "external_id"
+            ],
+            "properties": {
+                "external_id": {
+                    "description": "External booking identity",
+                    "type": "string",
+                    "example": "A 514"
+                }
+            },
+            "type": "object"
+        },
+        "View": {
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "1"
+                }
+            },
+            "type": "object"
+        },
+        "BookingView": {
+            "properties": {
+                "id": {
+                    "description": "Internal booking identity",
+                    "type": "integer",
+                    "example": "12"
+                },
+                "external_id": {
+                    "description": "External booking identity",
+                    "type": "string",
+                    "example": "A 514"
+                },
+                "external_apartment_id": {
+                    "description": "External apartment identity",
+                    "type": "string",
+                    "example": "ID 45"
+                },
+                "apartment_name": {
+                    "description": "External apartment name",
+                    "type": "string",
+                    "example": "Zizi"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2017-05-29 14:00:00"
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2017-06-01 12:30:00"
+                }
+            },
+            "type": "object"
+        },
+        "BookingViewByUser": {
+            "type": "array",
+            "items": {
+                "description": "Booking details",
+                "$ref": "#/definitions/BookingView"
+            }
+        },
+        "DoorLockInit": {
+            "required": [
+                "date",
+                "lockName",
+                "lockAlias",
+                "lockMac",
+                "lockKey",
+                "lockFlagPos",
+                "aesKeyStr",
+                "lockVersion",
+                "adminPwd",
+                "noKeyPwd",
+                "deletePwd",
+                "pwdInfo",
+                "timestamp",
+                "specialValue",
+                "timezoneRawOffset",
+                "modelNumber",
+                "hardwareRevision",
+                "firmwareRevision",
+                "electricQuantity"
+            ],
+            "properties": {
+                "lockName": {
+                    "description": "Lockname",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
+                "lockAlias": {
+                    "description": "\tLock alias",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
+                "lockMac": {
+                    "description": "Lock mac address",
+                    "type": "string",
+                    "example": "C0:DE:EE:66:05:78"
+                },
+                "lockKey": {
+                    "description": "Critical information locked door, open the door of",
+                    "type": "string",
+                    "example": "OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA=="
+                },
+                "modelNumber": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "hardwareRevision": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "firmwareRevision": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "electricQuantity": {
+                    "description": "% in charging battery level",
+                    "type": "integer",
+                    "example": "90"
+                },
+                "lockFlagPos": {
+                    "description": "Lock flag",
+                    "type": "integer",
+                    "example": "0"
+                },
+                "aesKeyStr": {
+                    "description": "Aes encryption and decryption Key",
+                    "type": "string",
+                    "example": "26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e"
+                },
+                "adminPwd": {
+                    "description": "The administrator password lock, lock management related operations required to carry, check administrator privileges",
+                    "type": "string",
+                    "example": "NDEsNDAsNDYsNDEsMzIsNDIsNDAsNDAsNDEsNDAsMTAz"
+                },
+                "noKeyPwd": {
+                    "description": "Keyboard administrator password, administrator password to open the door with the",
+                    "type": "string",
+                    "example": "1064267"
+                },
+                "deletePwd": {
+                    "description": "Clear codes, passwords for emptying locked",
+                    "type": "string",
+                    "example": "0"
+                },
+                "pwdInfo": {
+                    "description": "\tPassword data, for generating the password, the SDK provides",
+                    "type": "string",
+                    "example": "0"
+                },
+                "timestamp": {
+                    "description": "Time stamp, used to initialize the password data, SDK provided",
+                    "type": "string",
+                    "example": "1497475863"
+                },
+                "specialValue": {
+                    "description": "Lock feature value that indicates the function of the lock support",
+                    "type": "integer",
+                    "example": "0"
+                },
+                "timezoneRawOffset": {
+                    "description": "When the lock area where the number of poor and UTC time zone, the unit milliseconds, default (China time zone) 28,800,000",
+                    "type": "double",
+                    "example": "7200000"
+                },
+                "date": {
+                    "description": "Current time (milliseconds)",
+                    "type": "double",
+                    "example": "1495662149000"
+                },
+                "lockVersion": {
+                    "properties": {
+                        "protocolType": {
+                            "description": "agreement type",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "protocolVersion": {
+                            "description": "Protocol Version",
+                            "type": "integer",
+                            "example": "3"
+                        },
+                        "scene": {
+                            "description": "Scenes",
+                            "type": "integer",
+                            "example": "5"
+                        },
+                        "groupId": {
+                            "description": "the company",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "orgId": {
+                            "description": "Application providers",
+                            "type": "integer",
+                            "example": "2"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "LockVersion": {
+            "required": [
+                "groupId",
+                "protocolVersion",
+                "protocolType",
+                "orgId",
+                "scene"
+            ],
+            "properties": {
+                "protocolType": {
+                    "description": "agreement type",
+                    "type": "integer",
+                    "example": "1"
+                },
+                "protocolVersion": {
+                    "description": "Protocol Version",
+                    "type": "integer",
+                    "example": "3"
+                },
+                "scene": {
+                    "description": "Scenes",
+                    "type": "integer",
+                    "example": "5"
+                },
+                "groupId": {
+                    "description": "the company",
+                    "type": "integer",
+                    "example": "1"
+                },
+                "orgId": {
+                    "description": "Application providers",
+                    "type": "integer",
+                    "example": "2"
+                }
+            },
+            "type": "object"
+        },
+        "DoorLock": {
+            "properties": {
+                "lockName": {
+                    "description": "Lockname",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
+                "lockAlias": {
+                    "description": "\tLock alias",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
+                "lockMac": {
+                    "description": "Lock mac address",
+                    "type": "string",
+                    "example": "C0:DE:EE:66:05:78"
+                },
+                "lockKey": {
+                    "description": "Critical information locked door, open the door of",
+                    "type": "string",
+                    "example": "OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA=="
+                },
+                "lockFlagPos": {
+                    "description": "Lock flag",
+                    "type": "integer",
+                    "example": "0"
+                },
+                "aesKeyStr": {
+                    "description": "Aes encryption and decryption Key",
+                    "type": "string",
+                    "example": "26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e"
+                },
+                "adminPwd": {
+                    "description": "The administrator password lock, lock management related operations required to carry, check administrator privileges",
+                    "type": "string",
+                    "example": "NDEsNDAsNDYsNDEsMzIsNDIsNDAsNDAsNDEsNDAsMTAz"
+                },
+                "noKeyPwd": {
+                    "description": "Keyboard administrator password, administrator password to open the door with the",
+                    "type": "string",
+                    "example": "1064267"
+                },
+                "deletePwd": {
+                    "description": "Clear codes, passwords for emptying locked",
+                    "type": "string",
+                    "example": "0"
+                },
+                "pwdInfo": {
+                    "description": "\tPassword data, for generating the password, the SDK provides",
+                    "type": "string",
+                    "example": "0"
+                },
+                "timestamp": {
+                    "description": "Time stamp, used to initialize the password data, SDK provided",
+                    "type": "string",
+                    "example": "1497475863"
+                },
+                "modelNumber": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "hardwareRevision": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "firmwareRevision": {
+                    "description": "",
+                    "type": "string",
+                    "example": "???"
+                },
+                "electricQuantity": {
+                    "description": "% in charging battery level",
+                    "type": "integer",
+                    "example": "90"
+                },
+                "specialValue": {
+                    "description": "Lock feature value that indicates the function of the lock support",
+                    "type": "integer",
+                    "example": "0"
+                },
+                "timezoneRawOffset": {
+                    "description": "When the lock area where the number of poor and UTC time zone, the unit milliseconds, default (China time zone) 28,800,000",
+                    "type": "double",
+                    "example": "7200000"
+                },
+                "date": {
+                    "description": "Current time (milliseconds)",
+                    "type": "double",
+                    "example": "1495662149000"
+                },
+                "lockId": {
+                    "description": "Lock id",
+                    "type": "integer",
+                    "example": "50088"
+                },
+                "keyId": {
+                    "description": "Administrator key id",
+                    "type": "integer",
+                    "example": "367238"
+                },
+                "lockVersion": {
+                    "properties": {
+                        "protocolType": {
+                            "description": "agreement type",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "protocolVersion": {
+                            "description": "Protocol Version",
+                            "type": "integer",
+                            "example": "3"
+                        },
+                        "scene": {
+                            "description": "Scenes",
+                            "type": "integer",
+                            "example": "5"
+                        },
+                        "groupId": {
+                            "description": "the company",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "orgId": {
+                            "description": "Application providers",
+                            "type": "integer",
+                            "example": "2"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "KeysInfo": {
+            "properties": {
+                "lockName": {
+                    "description": "Lockname",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
+                "unlockKey": {
+                    "description": "Critical information locked door, open the door of",
+                    "type": "string",
+                    "example": "OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA=="
+                },
+                "lockFlagPos": {
+                    "description": "Lock flag",
+                    "type": "integer",
+                    "example": "0"
+                },
+                "aesKeyStr": {
+                    "description": "Aes encryption and decryption Key",
+                    "type": "string",
+                    "example": "26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e"
+                },
+                "timezoneOffset": {
+                    "description": "When the lock area where the number of poor and UTC time zone, the unit milliseconds, default (China time zone) 28,800,000",
+                    "type": "double",
+                    "example": "7200000"
+                },
+                "lockVersion": {
+                    "properties": {
+                        "protocolType": {
+                            "description": "agreement type",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "protocolVersion": {
+                            "description": "Protocol Version",
+                            "type": "integer",
+                            "example": "3"
+                        },
+                        "scene": {
+                            "description": "Scenes",
+                            "type": "integer",
+                            "example": "5"
+                        },
+                        "groupId": {
+                            "description": "the company",
+                            "type": "integer",
+                            "example": "1"
+                        },
+                        "orgId": {
+                            "description": "Application providers",
+                            "type": "integer",
+                            "example": "2"
+                        }
+                    },
+                    "type": "object"
+                },
+                "apartment": {
+                    "properties": {
+                        "name": {
+                            "description": "name of apartment or room",
+                            "type": "integer",
+                            "example": "Zizi"
+                        }
+                    },
+                    "type": "object"
+                },
+                "booking_id": {
+                    "description": "booking number from external systems",
+                    "type": "string",
+                    "example": "R 2220/74"
+                }
+            },
+            "type": "object"
+        },
+        "KeyboardPassword": {
+            "required": [
+                "door_lock_id",
+                "booking_id",
+                "keyboard_pwd_version",
+                "keyboard_pwd_type",
+                "start_date",
+                "end_date",
+                "accessToken"
+            ],
+            "properties": {
+                "door_lock_id": {
+                    "type": "integer"
+                },
+                "booking_id": {
+                    "type": "integer"
+                },
+                "keyboard_pwd_version": {
+                    "type": "string"
+                },
+                "keyboard_pwd_type": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "accessToken": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Info": {
+            "required": [
+                "booking_id"
+            ],
+            "properties": {
+                "booking_id": {
+                    "description": "Identity of booking in door lock management system",
+                    "type": "string",
+                    "example": "45"
+                }
+            },
+            "type": "object"
+        },
+        "PhotoImageResponse": {
+            "properties": {
+                "filename": {
+                    "description": "Name of photoImage file",
+                    "type": "string",
+                    "example": "45_59312a240c5d8.jpg"
+                },
+                "booking": {
+                    "description": "External booking identity",
+                    "type": "string",
+                    "example": "A 514"
+                },
+                "uploaded": {
+                    "type": "string",
+                    "example": "2017-05-29 14:00:00"
+                },
+                "id": {
+                    "description": "PhotoImage identity ",
+                    "type": "integer",
+                    "example": "12"
+                }
+            },
+            "type": "object"
+        },
+        "Profile": {
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "10"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "myRent"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "example@exam.hr"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "example": "receptionist"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "ProfileOLD": {
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "10"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "myRent"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "example@exam.hr"
+                },
+                "date": {
+                    "properties": {
+                        "created": {
+                            "type": "string",
+                            "example": "2017-06-14T23:14:23+02:00"
+                        },
+                        "updated": {
+                            "type": "string",
+                            "example": "2017-06-14T23:14:23+02:00"
+                        }
+                    },
+                    "type": "object"
+                },
+                "status": {
+                    "properties": {
+                        "code": {
+                            "type": "integer",
+                            "example": "10"
+                        },
+                        "name": {
+                            "type": "string",
+                            "example": "Active"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "Date": {
+            "properties": {
+                "created": {
+                    "type": "string",
+                    "example": "2017-06-14T23:14:23+02:00"
+                },
+                "updated": {
+                    "type": "string",
+                    "example": "2017-06-14T23:14:23+02:00"
+                }
+            },
+            "type": "object"
+        },
+        "Status": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": "10"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Active"
+                }
+            },
+            "type": "object"
+        },
+        "Authorization": {
+            "required": [
+                "accessToken"
+            ],
+            "properties": {
+                "Authorization": {
+                    "description": "Access Token",
+                    "type": "string",
+                    "example": "Bearer b0939c1f6094a0480fc81d20b1fb6fc10553da56"
+                }
+            },
+            "type": "object"
+        },
+        "accessToken": {
+            "required": [
+                "accessToken"
+            ],
+            "properties": {
+                "accessToken": {
+                    "description": "Access Token",
+                    "type": "string",
+                    "example": "b0939c1f6094a0480fc81d20b1fb6fc10553da56"
+                }
+            },
+            "type": "object"
+        },
+        "Token": {
+            "required": [
+                "username",
+                "password",
+                "grant_type",
+                "client_id",
+                "client_secret"
+            ],
+            "properties": {
+                "grant_type": {
+                    "description": "Type of auth - password or token",
+                    "type": "string",
+                    "example": "password"
+                },
+                "username": {
+                    "description": "Login username for DoorLock management system",
+                    "type": "string",
+                    "example": "myRent"
+                },
+                "password": {
+                    "description": "Password for DoorLock management system",
+                    "type": "string",
+                    "example": "myRentmyRent"
+                },
+                "client_id": {
+                    "description": "right now could be equal default value",
+                    "type": "string",
+                    "example": "myRent"
+                },
+                "client_secret": {
+                    "description": "External booking identity",
+                    "type": "string",
+                    "example": "testpass"
+                }
+            },
+            "type": "object"
+        },
+        "TokenData": {
+            "required": [],
+            "properties": {
+                "access_token": {
+                    "description": "Internal booking door lock identity",
+                    "type": "integer",
+                    "example": "bsAo_jbsPUPCpibo3mxx3m-sFYzjIGsI"
+                },
+                "token_type": {
+                    "description": "Type of token",
+                    "type": "integer",
+                    "example": "Bearer"
+                },
+                "refresh_token": {
+                    "description": "Token for refreshing expired one",
+                    "type": "integer",
+                    "example": "ohWo1ohr"
+                },
+                "expires_in": {
+                    "description": "Digital code for opening the door lock",
+                    "type": "integer",
+                    "example": "86400"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "OAuth2": {
+            "type": "oauth2",
+            "flow": "password",
+            "tokenUrl": "http://restapi.domouprav.hr/oauth2/token"
+        },
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
