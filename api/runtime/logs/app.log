@@ -30581,3 +30581,150 @@ $_SERVER = [
     'REQUEST_TIME_FLOAT' => 1499726398.962
     'REQUEST_TIME' => 1499726398
 ]
+2017-07-12 22:40:30 [127.0.0.1][-][-][error][yii\web\HttpException:401] yii\web\UnauthorizedHttpException: Your request was made with invalid credentials. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php:91
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/HttpBearerAuth.php(46): yii\filters\auth\AuthMethod->handleFailure(Object(yii\web\Response))
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(73): yii\filters\auth\HttpBearerAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php(59): yii\filters\auth\CompositeAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(57): yii\filters\auth\AuthMethod->beforeAction(Object(yii\base\InlineAction))
+#4 /Users/SAS/Sites/E-reception/vendor/filsh/yii2-oauth2-server/filters/auth/CompositeAuth.php(17): yii\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#5 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/ActionFilter.php(75): filsh\yii2\oauth2server\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#6 [internal function]: yii\base\ActionFilter->beforeFilter(Object(yii\base\ActionEvent))
+#7 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Component.php(545): call_user_func(Array, Object(yii\base\ActionEvent))
+#8 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(676): yii\base\Component->trigger('beforeAction', Object(yii\base\ActionEvent))
+#9 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(144): yii\base\Module->beforeAction(Object(yii\base\InlineAction))
+#10 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction('index', Array)
+#11 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction('profile/index', Array)
+#12 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#13 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#14 {main}
+2017-07-12 22:40:29 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '64949'
+    'REDIRECT_URL' => '/user'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/user'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1499892029.654
+    'REQUEST_TIME' => 1499892029
+]
+2017-07-12 22:51:40 [127.0.0.1][-][-][error][yii\web\HttpException:401] yii\web\UnauthorizedHttpException: Your request was made with invalid credentials. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php:91
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/HttpBearerAuth.php(46): yii\filters\auth\AuthMethod->handleFailure(Object(yii\web\Response))
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(73): yii\filters\auth\HttpBearerAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php(59): yii\filters\auth\CompositeAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(57): yii\filters\auth\AuthMethod->beforeAction(Object(yii\base\InlineAction))
+#4 /Users/SAS/Sites/E-reception/vendor/filsh/yii2-oauth2-server/filters/auth/CompositeAuth.php(17): yii\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#5 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/ActionFilter.php(75): filsh\yii2\oauth2server\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#6 [internal function]: yii\base\ActionFilter->beforeFilter(Object(yii\base\ActionEvent))
+#7 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Component.php(545): call_user_func(Array, Object(yii\base\ActionEvent))
+#8 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(676): yii\base\Component->trigger('beforeAction', Object(yii\base\ActionEvent))
+#9 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(144): yii\base\Module->beforeAction(Object(yii\base\InlineAction))
+#10 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction('index', Array)
+#11 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction('profile/index', Array)
+#12 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#13 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#14 {main}
+2017-07-12 22:51:40 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '65007'
+    'REDIRECT_URL' => '/user'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/user'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1499892700.701
+    'REQUEST_TIME' => 1499892700
+]
+2017-07-12 23:10:29 [127.0.0.1][-][-][error][yii\web\HttpException:401] yii\web\UnauthorizedHttpException: Your request was made with invalid credentials. in /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php:91
+Stack trace:
+#0 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/HttpBearerAuth.php(46): yii\filters\auth\AuthMethod->handleFailure(Object(yii\web\Response))
+#1 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(73): yii\filters\auth\HttpBearerAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#2 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/AuthMethod.php(59): yii\filters\auth\CompositeAuth->authenticate(Object(yii\web\User), Object(yii\web\Request), Object(yii\web\Response))
+#3 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/filters/auth/CompositeAuth.php(57): yii\filters\auth\AuthMethod->beforeAction(Object(yii\base\InlineAction))
+#4 /Users/SAS/Sites/E-reception/vendor/filsh/yii2-oauth2-server/filters/auth/CompositeAuth.php(17): yii\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#5 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/ActionFilter.php(75): filsh\yii2\oauth2server\filters\auth\CompositeAuth->beforeAction(Object(yii\base\InlineAction))
+#6 [internal function]: yii\base\ActionFilter->beforeFilter(Object(yii\base\ActionEvent))
+#7 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Component.php(545): call_user_func(Array, Object(yii\base\ActionEvent))
+#8 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(676): yii\base\Component->trigger('beforeAction', Object(yii\base\ActionEvent))
+#9 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Controller.php(144): yii\base\Module->beforeAction(Object(yii\base\InlineAction))
+#10 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Module.php(523): yii\base\Controller->runAction('index', Array)
+#11 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/web/Application.php(102): yii\base\Module->runAction('key/index', Array)
+#12 /Users/SAS/Sites/E-reception/vendor/yiisoft/yii2/base/Application.php(380): yii\web\Application->handleRequest(Object(yii\web\Request))
+#13 /Users/SAS/Sites/E-reception/api/web/index.php(17): yii\base\Application->run()
+#14 {main}
+2017-07-12 23:10:29 [127.0.0.1][-][-][info][application] $_SERVER = [
+    'REDIRECT_STATUS' => '200'
+    'CONTENT_TYPE' => 'application/json'
+    'HTTP_HOST' => 'api.domouprav.local'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_USER_AGENT' => 'Apache-HttpClient/4.5.2 (Java/1.8.0_112-release)'
+    'HTTP_ACCEPT_ENCODING' => 'gzip,deflate'
+    'PATH' => '/usr/bin:/bin:/usr/sbin:/sbin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.23 (Unix) PHP/7.1.0'
+    'SERVER_NAME' => 'api.domouprav.local'
+    'SERVER_ADDR' => '127.0.0.1'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/Users/SAS/Sites/E-reception/api/web/'
+    'SERVER_ADMIN' => 'you@example.com'
+    'SCRIPT_FILENAME' => '/Users/SAS/Sites/E-reception/api/web/index.php'
+    'REMOTE_PORT' => '65110'
+    'REDIRECT_URL' => '/keys'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/keys'
+    'SCRIPT_NAME' => '/index.php'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1499893829.037
+    'REQUEST_TIME' => 1499893829
+]
