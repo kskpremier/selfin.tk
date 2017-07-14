@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\DoorLockSearch */
@@ -30,9 +31,17 @@ $this->params['breadcrumbs'][] = $this->title;
            'lock_alias',
 
            // 'type',
-            ['attribute'=>'apartment_id',
+            ['attribute'=>'apartmentName',
                 'label'=>'Apartment',
-                'value'=>'apartment.name'],
+
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->apartment_id) {
+                        return HTML::a($model->apartment->name, Url::to(['apartment/view', 'id' => $model->apartment_id]));
+                    }
+                    else return HTML::tag('span','-',['class'=>'danger']);
+                } ,
+                ],
 
 
             [   //'label'=>'Actions',

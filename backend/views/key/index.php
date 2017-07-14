@@ -1,8 +1,11 @@
 <?php
 
 use yii\helpers\Html;
+use reception\helpers\TTLHelper;
+use kartik\select2\Select2;
 use yii\helpers\Url;
 use yii\grid\GridView;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\KeySearch */
@@ -27,29 +30,63 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             ['attribute'=>'start_date',
+                'label'=>'From',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'start_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                    },
+                   // 'attribute2' => 'date_to',
+                    'type' => DatePicker::TYPE_INPUT,
+                    //'separator' => '-',
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->start_date == 0)? '-': date('Y-m-d H:i:s', $model->start_date);
+                    return ($model->start_date == 0)? '': date('d-m-Y h:i', $model->start_date);
                 }
             ],
             ['attribute'=>'end_date',
+                'label'=>'To',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'end_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                    },
+                    // 'attribute2' => 'date_to',
+                    'type' => DatePicker::TYPE_INPUT,
+                    //'separator' => '-',
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->end_date == 0)? '-': date('Y-m-d H:i:s', $model->end_date);
+                    return ($model->end_date == 0)? '': date('d-m-Y h:i', $model->end_date);
                 },
 
             ],
-//            'pin',
-//            'e_key',
             ['attribute'=>'type',
-                'value'=>function($model){
-                    $value = '-';
-                    switch($model->type){
-                        case '2':  $value = 'Permanent';
-                            break;
-                        case '0': $value = 'Period';
-                            break;
-                    }
-                    return $value ;
-                }],
+                'filter' => Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'type',
+                    'data'=>TTLHelper::getKeyTypeList(),
+                    'value'=> function($model){
+                        return TTLHelper::getKeyTypeName($model->type);
+                    },
+                ]),
+                'value'=> function($model){
+                    return TTLHelper::getKeyTypeName($model->type);
+                }
+            ],
             [
                     'attribute'=>'booking_id',
                     'label'=>'Booking',
@@ -58,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if ($model->booking_id) {
                                     return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
                                 }
-                                else return HTML::tag('span','not set',['class'=>'danger']);
+                                else return HTML::tag('span','-',['class'=>'danger']);
                     } ,
             ],
             [
@@ -71,7 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute'=>'username',
-                'label'=>'Guest/User',
+                'label'=>'Guest/Username',
                 'format'=>'raw',
                 'value'=> function($model) {
                     if ($model->user_id) {

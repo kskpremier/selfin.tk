@@ -12,6 +12,8 @@ use backend\models\DoorLock;
  */
 class DoorLockSearch extends DoorLock
 {
+    public $apartmentName;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +21,7 @@ class DoorLockSearch extends DoorLock
     {
         return [
             [['id', 'admin_pwd', 'apartment_id','lock_id'], 'integer'],
-            [['type','lock_id'], 'safe'],
+            [['type','lock_id','lock_mac','lock_name','lock_alias','apartmentName'], 'safe'],
         ];
     }
 
@@ -56,17 +58,13 @@ class DoorLockSearch extends DoorLock
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        $query->joinWith('apartment');
         // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'admin_pwd' => $this->admin_pwd,
-            'apartment_id' => $this->apartment_id,
-
-        ]);
-
-        $query->andFilterWhere(['like', 'type', $this->type]);
-        $query->andFilterWhere(['like', 'lock_id', $this->lock_id]);
+        $query->andFilterWhere(['id' => $this->id,]);
+        $query->andFilterWhere(['like', 'lock_name', $this->lock_name]);
+        $query->andFilterWhere(['like', 'lock_alias', $this->lock_alias]);
+        $query->andFilterWhere(['like', 'apartment.name', $this->apartmentName]);
+        $query->andFilterWhere(['like', 'lock_mac', $this->lock_mac]);
 
         return $dataProvider;
     }

@@ -9,7 +9,11 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\KeyboardPwd;
+use reception\entities\DoorLock\KeyboardPwd;
+use reception\forms\KeyboardPwdForm;
+use reception\forms\KeyboardPwdEditForm;
+use reception\repositories\DoorLock\KeyboardPwdRepository;
+use reception\useCases\manage\DoorLock\KeyboardPwdManageService;
 use backend\models\KeyboardPwdSearch;
 use backend\models\Booking;
 use yii\web\Controller;
@@ -23,6 +27,16 @@ use yii\filters\VerbFilter;
  */
 class KeyboardPwdController extends Controller
 {
+    private $keyboardPwdRepository;
+    private $service;
+
+    public function __construct($id, $module, KeyboardPwdManageService $service, KeyboardPwdRepository $keyboardPwdRepository, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->keyboardPwdRepository = $keyboardPwdRepository;
+        $this->service = $service;
+    }
+
     /**
      * @inheritdoc
      */
@@ -70,7 +84,7 @@ class KeyboardPwdController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($booking_id  = null)
+    public function actionCreateOld($booking_id  = null)
     {
         $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
 
@@ -107,8 +121,31 @@ class KeyboardPwdController extends Controller
         }
     }
 
+    public function actionCreate($booking_id  = null)
+    {
+        $model = new KeyboardPwdForm(['bookingId'=>$booking_id]);
+        if ($model->load(Yii::$app->request->post() ) && $model->validate() ) {
+            $keyboardPwd =  $this->service->create($model);
+            if ($response = $this->service->getKeyboardPwdValueFromChina($keyboardPwd)) {
+                Yii::$app->session->setFlash('success', 'E-Key was successfully generated and sent by email');
+                return $this->redirect(['view', 'id' => $response]);
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
+        }
+        else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+
     /**
-     * Updates an existing Key model.
+     * Updates an existing KeyboardPwd model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -127,7 +164,7 @@ class KeyboardPwdController extends Controller
     }
 
     /**
-     * Deletes an existing Key model.
+     * Deletes an existing KeyboardPwd model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -140,7 +177,7 @@ class KeyboardPwdController extends Controller
     }
 
     /**
-     * Finds the Key model based on its primary key value.
+     * Finds the KeyboardPwd model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return Key the loaded model

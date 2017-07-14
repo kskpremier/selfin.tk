@@ -11,13 +11,14 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\KeyboardPwd;
+use reception\entities\DoorLock\KeyboardPwd;
 
 /**
  * KeySearch represents the model behind the search form about `backend\models\Key`.
  */
 class KeyboardPwdSearch extends KeyboardPwd
 {
+    public $doorLockName;
     /**
      * @inheritdoc
      */
@@ -26,7 +27,7 @@ class KeyboardPwdSearch extends KeyboardPwd
         return[
         [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
             [['keyboard_pwd_type'],'string','max' => 15],
-            [['start_date', 'end_date'], 'string', 'max' => 20],
+            [['start_date', 'end_date','doorLockName'], 'safe'],
 
     ];
     }
@@ -64,15 +65,15 @@ class KeyboardPwdSearch extends KeyboardPwd
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        $query->joinWith(['doorLock']);
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'value' => $this->value,
             'booking_id' => $this->booking_id,
             'door_lock_id' => $this->door_lock_id,
         ]);
-
+        $query->andFilterWhere(['like', 'value', $this->value]);
+        $query->andFilterWhere(['like', 'door_lock.lock_name', $this->doorLockName]);
         $query->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);

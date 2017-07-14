@@ -125,6 +125,8 @@ class KeyController extends Controller
      *     type="object",
      *
      *          @SWG\Property(property="lockName", type="string",description = "Lockname", example= "M201T_780566"),
+     *      @SWG\Property(property="lockMac", type="string",description = "MAC number of door lock", example= "C0:DE:EE:66:05:79"),
+     *      @SWG\Property(property="lockAliases", type="string",description = "Alias of door lock", example= "M201T_780566"),
      *          @SWG\Property(property="unlockKey", type="string",description = "Critical information locked door, open the door of", example= "OCwxLDAsMTAsMTMsMSw4LDEzLDksOSw3MA=="),
      *          @SWG\Property(property="lockFlagPos", type="integer",description = "Lock flag", example= "0"),
      *          @SWG\Property(property="aesKeyStr", type="string",description = "Aes encryption and decryption Key", example= "26,1f,cf,3a,fc,43,bd,41,d9,bb,c9,cc,34,0d,50,4e"),
@@ -236,6 +238,7 @@ class KeyController extends Controller
             'startDate'=>$key->start_date,
             'endDate'=>$key->end_date,
             'lockName'=>$key->doorLock->lock_name,
+            'lockAlias'=>$key->doorLock->lock_alias,
             'lockMac'=>$key->doorLock->lock_mac,
             'unlockKey'=>$key->doorLock->lock_key,
             'lockFlagPos'=>$key->doorLock->flag_pos,

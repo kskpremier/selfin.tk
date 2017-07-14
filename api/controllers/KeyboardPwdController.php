@@ -8,7 +8,7 @@
 namespace api\controllers;
 
 use Yii;
-use backend\models\KeyboardPwd;
+use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\KeyboardPwdSearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;

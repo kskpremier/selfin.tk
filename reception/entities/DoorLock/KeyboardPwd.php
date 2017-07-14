@@ -6,10 +6,11 @@
  * Time: 12:28
  */
 
-namespace backend\models;
+namespace reception\entities\DoorLock;
 
 use Yii;
 use \backend\models\DOMOUPRAV;
+use backend\models\Booking;
 use yii\httpclient\Client;
 use api\models\test\BodyPost;
 use api\models\test\oFile;
@@ -53,7 +54,7 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             [['start_date', 'end_date'], 'safe'],
             [['keyboard_pwd_type'], 'integer'],
             [['value'], 'string', 'max' => 20],
-            [['booking_id','door_lock_id','keyboard_pwd_type','keyboard_pwd_version'], 'required'],
+            [['door_lock_id','keyboard_pwd_type','keyboard_pwd_version'], 'required'],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];

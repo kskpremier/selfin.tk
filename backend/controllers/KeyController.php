@@ -128,7 +128,7 @@ class KeyController extends Controller
         }
         $form = new KeyForm(['doorLockId'=>$doorLockId]);
         if ($form->load(Yii::$app->request->post())&& $form->validate() ) {
-            $key = $this->service->create ($form);
+            $key = $this->service->generate ($form);
             Yii::$app->session->setFlash('success', 'E-Key was successfully generated');
             return $this->redirect(['view', 'id' => $key->id]);
         }
