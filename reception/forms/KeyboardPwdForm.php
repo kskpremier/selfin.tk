@@ -57,7 +57,7 @@ class KeyboardPwdForm extends Model
     }
     public function getKeyboardTypeList()
     {
-        return TTLHelper::getTypeList();
+        return TTLHelper::getKeyboardPwdTypeNameList();
     }
 
     public function validateDates(){

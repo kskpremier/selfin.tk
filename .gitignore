@@ -27,3 +27,20 @@ yii_test.bat
 /api/runtime/
 /backend/runtime/
 /frontend/runtime/
+.gitignore
+Description
+UML/end-to-end
+config/params-local-for-hosting.php
+controllers/1.php
+models/test/
+requests/1.html
+requests/HTTP photoimage
+requests/auth for local domouprav
+requests/china auth
+requests/china_pwd
+requests/curl
+requests/http with headers()
+requests/photoimage
+requests/photoimage_short
+requests/sync Data from admin
+requests/test.html
