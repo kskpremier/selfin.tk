@@ -52,8 +52,10 @@ class KeyEditForm extends Model
     {
         return [
             [['type','startDate', 'endDate','keyStatus'],'string', 'max' => 255],
+            [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
+            [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
             [['remarks','lastUpdateDate'],'safe'],
-            [['doorLockId'],'required'],
+            [['doorLockId','type'],'required'],
             [['doorLockId', 'bookingId','userId','keyId'],'integer'],
         ];
     }

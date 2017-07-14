@@ -235,8 +235,8 @@ class KeyController extends Controller
     public function serializeKey($key): array
     {
         return [
-            'startDate'=>$key->start_date*1000,
-            'endDate'=>$key->end_date*1000,
+            'startDate'=>$key->start_date*1000-7200000,
+            'endDate'=>$key->end_date*1000-7200000,
             'lockName'=>$key->doorLock->lock_name,
             'lockAlias'=>$key->doorLock->lock_alias,
             'lockMac'=>$key->doorLock->lock_mac,

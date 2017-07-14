@@ -37,7 +37,9 @@ class KeyForm extends Model
         return [
             [['type','startDate', 'endDate'],'string', 'max' => 255],
             [['remarks'],'safe'],
-            [['doorLockId'],'required'],
+            [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
+            [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
+            [['doorLockId','type'],'required'],
             [['doorLockId', 'bookingId','userId'],'integer'],
         ];
     }
@@ -59,6 +61,17 @@ class KeyForm extends Model
     public function getDoorLockName()
     {
         return DoorLock::findOne(['id'=>$this->doorLockId])->lock_name;
+    }
+
+    public function validateDates(){
+        if ($this->type != "2"){
+            if (strtotime($this->startDate) < (time()-60) ){
+                $this->addError('Start Date must be bigger then current time');
+            }
+            if (strtotime($this->endDate) < strtotime($this->startDate) ){
+                $this->addError( 'End Date must be bigger then Start Date');
+            }
+        }
     }
 
 }

@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Door lock',
                 'format'=>'raw',
                 'value'=> function($model) {
-                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                    return HTML::a($model->doorLock->lock_alias, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
                 } ,
             ],
 

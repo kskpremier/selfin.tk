@@ -73,7 +73,7 @@ class KeyboardPwdSearch extends KeyboardPwd
             'door_lock_id' => $this->door_lock_id,
         ]);
         $query->andFilterWhere(['like', 'value', $this->value]);
-        $query->andFilterWhere(['like', 'door_lock.lock_name', $this->doorLockName]);
+        $query->andFilterWhere(['like', 'door_lock.lock_alias', $this->doorLockName]);
         $query->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);

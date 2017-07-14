@@ -36,8 +36,9 @@ class KeyboardPwdForm extends Model
     {
         return [
             [['type','startDate', 'endDate'],'string', 'max' => 255],
-            [['startDate','endDate'],'validateDates'],
-            [['doorLockId','keyboardPwdVersion'],'required'],
+            [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
+            [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
+            [['doorLockId','keyboardPwdVersion','type'],'required'],
             [['doorLockId', 'bookingId','keyboardPwdVersion'],'integer'],
         ];
     }
