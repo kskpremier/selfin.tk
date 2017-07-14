@@ -13,3 +13,17 @@ debugger.xml
 
 /api/tests/
 
+Registration diagramma.png
+backend/config/bootstrap.php
+frontend/config/bootstrap.php
+init.bat
+yii_test
+yii_test.bat
+
+/api/web
+/backend/web/
+/frontend/web/
+
+/api/runtime/
+/backend/runtime/
+/frontend/runtime/
