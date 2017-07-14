@@ -138,7 +138,7 @@ class KeyboardPwdController extends Controller
             }
         }
         else {
-            return $this->render('create', [
+            return $this->render('_create', [
                 'model' => $model,
             ]);
         }
