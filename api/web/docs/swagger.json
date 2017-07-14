@@ -1166,6 +1166,16 @@
                     "type": "string",
                     "example": "M201T_780566"
                 },
+                "lockMac": {
+                    "description": "MAC number of door lock",
+                    "type": "string",
+                    "example": "C0:DE:EE:66:05:79"
+                },
+                "lockAliases": {
+                    "description": "Alias of door lock",
+                    "type": "string",
+                    "example": "M201T_780566"
+                },
                 "unlockKey": {
                     "description": "Critical information locked door, open the door of",
                     "type": "string",

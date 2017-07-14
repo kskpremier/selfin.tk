@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model backend\models\KeyboardPwd */
 
@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+            //'id',
             'keyboard_pwd_id',
             ['attribute'=>'start_date',
                 'value'=>function($model){
@@ -39,8 +39,25 @@ $this->params['breadcrumbs'][] = $this->title;
                     return ($model->end_date) ? date('Y-m-d H:i', $model->end_date) : '-';
                 }],
             'value',
-            'door_lock_id',
-            'booking_id',
+            [
+                'attribute'=>'doorLockName',
+                'label'=>'Door lock',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                } ,
+            ],
+            [
+                'attribute'=>'booking_id',
+                'label'=>'Booking',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->booking_id) {
+                        return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
+                    }
+                    else return HTML::tag('span','-',['class'=>'danger']);
+                } ,
+            ],
             ['attribute'=>'keyboard_pwd_type',
                 'value'=>function($model){
                     return ($model->keyboard_pwd_type == 2)? 'Permanent': 'Period';

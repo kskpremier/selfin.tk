@@ -1,7 +1,11 @@
 <?php
 
 use yii\helpers\Html;
+use reception\helpers\TTLHelper;
+use kartik\select2\Select2;
+use yii\helpers\Url;
 use yii\grid\GridView;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\KeyboardPwdSearch */
@@ -26,39 +30,86 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             ['attribute'=>'start_date',
+                'label'=>'From',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'start_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                    },
+                    // 'attribute2' => 'date_to',
+                    'type' => DatePicker::TYPE_INPUT,
+                    //'separator' => '-',
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->start_date == 0)? '-': date('Y-m-d H:i:s', $model->start_date);
+                    return ($model->start_date == 0)? '': date('d-m-Y h:i', $model->start_date);
                 }
             ],
             ['attribute'=>'end_date',
+                'label'=>'To',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'end_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                    },
+                    // 'attribute2' => 'date_to',
+                    'type' => DatePicker::TYPE_INPUT,
+                    //'separator' => '-',
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->end_date == 0)? '-': date('Y-m-d H:i:s', $model->end_date);
+                    return ($model->end_date == 0)? '': date('d-m-Y h:i', $model->end_date);
                 },
 
             ],
-
-            'value',
             ['attribute'=>'keyboard_pwd_type',
-                'value'=>function($model){
-                    $value = '-';
-                    switch($model->keyboard_pwd_type){
-                        case 2:  $value = 'Permanent';
-                            break;
-                        case 1: $value = 'One-time';
-                            break;
-                        case 3: $value = 'Period';
-                            break;
-                        case 5: $value = 'Cycle';
-                            break;
-                    }
-                    return $value ;
-                }],
-
-
+                'label'=>'Type',
+                'filter' => Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'keyboard_pwd_type',
+                    'data'=>TTLHelper::getKeyboardPwdTypeNameList(),
+                    'value'=> function($model){
+                        return TTLHelper::getKeyboardPwdTypeName($model->keyboard_pwd_type);
+                    },
+                ]),
+                'value'=> function($model){
+                    return TTLHelper::getKeyboardPwdTypeName($model->keyboard_pwd_type);
+                }
+            ],
+            'value',
 
             // 'keyboard_pwd_version',
-             'door_lock_id',
-             'booking_id',
+            [
+                'attribute'=>'booking_id',
+                'label'=>'Booking',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->booking_id) {
+                        return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
+                    }
+                    else return HTML::tag('span','-',['class'=>'danger']);
+                } ,
+            ],
+            [
+                'attribute'=>'doorLockName',
+                'label'=>'Door lock',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                } ,
+            ],
 
             [
                 'class' => 'yii\grid\ActionColumn',

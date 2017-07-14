@@ -9,7 +9,7 @@ use kartik\checkbox\CheckboxX;
 use backend\models\Guest;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Key */
+/* @var $model reception\forms\KeyEditForm */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->title = 'Editing data elecronical Key '. ($model->bookingId)? 'for booking #'.$model->bookingId :

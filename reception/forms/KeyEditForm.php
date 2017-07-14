@@ -33,8 +33,9 @@ class KeyEditForm extends Model
 
     public function __construct(Key $key, array $config = [])
     {
-        $this->startDate=date('Y-m-d H:i:s',$key->start_date);
-        $this->endDate=date('Y-m-d H:i:s',$key->end_date);
+
+        $this->startDate=(!$key->start_date)?'':date('Y-m-d H:i:s',$key->start_date);
+        $this->endDate=(!$key->end_date)?'':date('Y-m-d H:i:s',$key->end_date);
         $this->remarks=$key->remarks;
         $this->userId=$key->user_id;
         $this->doorLockId=$key->door_lock_id;

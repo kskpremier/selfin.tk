@@ -60,7 +60,7 @@ class KeySearch extends Key
         $query->joinWith('doorLock');
         $query->joinWith('booking');
         $query->andFilterWhere(['like', 'booking.id', $this->booking_id])
-              ->andFilterWhere(['like', 'door_lock.name', $this->doorLockName])
+              ->andFilterWhere(['like', 'door_lock.lock_name', $this->doorLockName])
               ->andFilterWhere(['like', 'users.id', $this->userId])
               ->andFilterWhere(['like', 'users.username', $this->username]);
         $query->andFilterWhere(['>=', 'key.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])

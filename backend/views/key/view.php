@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\helpers\Url;
+use reception\helpers\TTLHelper;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\Key */
@@ -31,7 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             ['attribute'=>'type',
                 'value'=>function($model){
-                    return ($model->type == '2')? 'Permanent': 'Period';
+//                    return ($model->type == '2')? 'Permanent': 'Period';
+                    return TTLHelper::getKeyTypeName($model->type);
                 }],
             ['attribute'=>'start_date',
                 'value'=>function($model){
@@ -41,11 +44,37 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($model) {
                     return ($model->end_date) ? date('Y-m-d H:i', $model->end_date) : '-';
                 }],
-//            'pin',
-//            'e_key',
-            'booking_id',
-            'email',
+            [
+                'attribute'=>'booking_id',
+                'label'=>'Booking',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->booking_id) {
+                        return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
+                    }
+                    else return HTML::tag('span','-',['class'=>'danger']);
+                } ,
+            ],
+            [
+                'attribute'=>'doorLockName',
+                'label'=>'Door lock',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                } ,
+            ],
+            ['attribute'=>'username',
+            'label'=>'Guest/User',
+            'format'=>'raw',
+            'value'=> function($model) {
+                if ($model->user_id) {
+                    return HTML::a($model->user->username, Url::to(['key/index', 'userId' => $model->user_id]));
+                }
+                else return HTML::tag('span','not set',['class'=>'danger']);
+            } ,
+                ]
         ],
-    ]) ?>
+
+    ]); ?>
 
 </div>
