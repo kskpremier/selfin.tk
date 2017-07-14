@@ -37,6 +37,7 @@ class DoorLockForm extends CompositeForm
     public $hardwareRevision;//String	N	The administrator password lock, lock management related operations required to carry, check administrator privileges
     public $firmwareRevision;//String	N	Keyboard administrator password, administrator password to open the door with the
     public $electricQuantity;//String	N	Keyboard administrator password, administrator password to open the door with the
+
     //for keyboard password parameters
 
     public function __construct(array $config = [])
@@ -53,7 +54,7 @@ class DoorLockForm extends CompositeForm
             [['lockName', 'lockAlias','lockMac','lockKey','aesKeyStr','adminPwd','noKeyPwd'
                 ,'modelNumber','hardwareRevision','firmwareRevision'],
                 'string', 'max' => 255],
-            [['pwdInfo','deletePwd','timestamp'],'safe'],
+            [['pwdInfo','deletePwd','timestamp','date'],'safe'],
             [['lockFlagPos', 'specialValue','electricQuantity'],'integer'],
             [['date', 'timezoneRawOffset'], 'double'],
             [['lockName', 'lockMac','aesKeyStr','lockFlagPos','date','lockKey'], 'required'],

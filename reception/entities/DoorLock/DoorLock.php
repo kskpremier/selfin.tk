@@ -33,6 +33,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property String $hardware_revision
  * @property String  $firmware_revision
  * @property String $model_number
+ * @property int $date
  *
  * @property LockVersion $lockVersion
  * @property Apartment $apartment
@@ -46,7 +47,7 @@ class DoorLock extends ActiveRecord
                                   $deletePwd, $pwdInfo, $timestamp, $specialValue,
                                   $timezoneRawOffset,
                                    $lockVersion, $modelNumber,
-                                   $hardwareRevision, $firmwareRevision, $electricQuantity) :self
+                                   $hardwareRevision, $firmwareRevision, $electricQuantity, $date) :self
     {
         $doorLock = new static();
         $doorLock->lock_name = $lockName;
@@ -67,6 +68,7 @@ class DoorLock extends ActiveRecord
         $doorLock->hardware_revision = $hardwareRevision;
         $doorLock->firmware_revision = $firmwareRevision;
         $doorLock->electric_quantity = $electricQuantity;
+        $doorLock->date = $date;
 
 
         return $doorLock;

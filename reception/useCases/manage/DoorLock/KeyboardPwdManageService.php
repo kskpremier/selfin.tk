@@ -14,6 +14,8 @@ use reception\useCases\manage\TTL\TTL;
 use reception\forms\KeyboardPwdForm;
 use reception\repositories\DoorLock\KeyboardPwdRepository;
 use yii\httpclient\Client;
+use reception\entities\User\User;
+use yii\web\ServerErrorHttpException;
 
 
 class KeyboardPwdManageService
@@ -32,6 +34,7 @@ class KeyboardPwdManageService
             strtotime($form->startDate),
             strtotime($form->endDate),
             $form->type,
+            $form->keyboardPwdVersion,
             $form->bookingId,
             $form->doorLockId
         );
@@ -90,7 +93,7 @@ class KeyboardPwdManageService
      * @return string json like {"keyboardPwdId":501168,"keyboardPwd":"45866000","success":"true"}
      * */
 
-    public function getKeyboardPwdValueFromChina($keyboardPwd) : string
+    public function getKeyboardPwdValueFromChina($keyboardPwd) : array
     {
         $client = $client = new Client([
             'baseUrl' => TTL::TTL_URL_TO_KEYBOARD_PWD_GET,
@@ -104,19 +107,19 @@ class KeyboardPwdManageService
             ->setData([
                 'clientId'=>TTL::TTL_CLIENT_ID,
                 'date'=> 1000 * time(),
-                'accessToken'=>$accessToken,
-                'startDate'=> strtotime($keyboardPwd->start_date)*1000,
-                'endDate'=> ($keyboardPwd->keyboard_pwd_type == 2)?  0 : strtotime($keyboardPwd->end_date)*1000,//китайцы добавляют милисекунды
+                'accessToken'=>$accessToken->access_token,
+                'startDate'=> $keyboardPwd->start_date*1000,
+                'endDate'=> ($keyboardPwd->keyboard_pwd_type == 2)?  0 : $keyboardPwd->end_date*1000,//китайцы добавляют милисекунды
                 'keyboardPwdVersion'=>$keyboardPwd->keyboard_pwd_version,
                 'lockId'=>$keyboardPwd->doorLock->lock_id,
                 'keyboardPwdType'=>$keyboardPwd->keyboard_pwd_type
             ])
             ->send();
-        $data = json_decode($response,true);
+        $data = $response->data;
         //в китайском ответе должно быть поле keyboardPwd
         if (is_array($data)) {
             if (array_key_exists('keyboardPwd', $data)) {
-                return $data['keyboardPwd'];
+                return $data;
             } else if (array_key_exists('errcode', $data)) {
                 throw new ServerErrorHttpException('Response from TTL consider error :  code ' . $data['errcode']);
             }

@@ -57,7 +57,8 @@ class DoorLockManageService
             $form->modelNumber,
             $form->hardwareRevision,
             $form->firmwareRevision,
-            $form->electricQuantity
+            $form->electricQuantity,
+            $form->date
         );
 
         $this->doorLockRepository->save($doorLock);
@@ -90,7 +91,7 @@ class DoorLockManageService
                 'specialValue'=> $doorLock->special_value,
                 'timezoneRawOffset'=> $doorLock->timezone_raw_offset,
                 'lockVersion'=> $doorLock->lockVersion->lockVersionJson(),
-                'date'=>time()*1000
+                'date'=>$doorLock->date//time()*1000
                 ])
             ->send();
         $data = json_decode($response->getContent(),true);

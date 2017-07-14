@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'pin' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th"></span>',
-                            ['keyboard-pwd/create', 'booking_id' => $model->id ],
+                            ['keyboard-pwd/create', 'doorLockId' => $model->id ],
                             ['class' => '',
                                 'title'=>'Get Keyboard password']
                         );

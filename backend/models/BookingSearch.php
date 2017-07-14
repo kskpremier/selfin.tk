@@ -12,6 +12,9 @@ use backend\models\Booking;
  */
 class BookingSearch extends Booking
 {
+    public $apartmentName;
+    public $guestName;
+    public $author;
     /**
      * @inheritdoc
      */
@@ -19,7 +22,7 @@ class BookingSearch extends Booking
     {
         return [
             [['id', 'apartment_id', 'number_of_tourist', 'guest_id'], 'integer'],
-            [['start_date', 'end_date'], 'safe'],
+            [['start_date', 'end_date','apartmentName','guestName','author'], 'safe'],
         ];
     }
 
@@ -56,14 +59,22 @@ class BookingSearch extends Booking
             // $query->where('0=1');
             return $dataProvider;
         }
+        $query->joinWith('apartment');
+        //$query->joinWith('guests');
+        $query->joinWith('author');
+        $query->joinWith('keys');
+        $query->joinWith('keyboardPwds');
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'apartment_id' => $this->apartment_id,
             'number_of_tourist' => $this->number_of_tourist,
-            'guest_id' => $this->guest_id,
         ]);
+        $query->andFilterWhere(['like', 'apartment.name', $this->apartmentName]);
+        //$query->andFilterWhere(['like', 'guest.name', $this->guestName]);
+        $query->andFilterWhere(['like', 'guest.name', $this->author]);
+
+
 
         $query->andFilterWhere(['>=', 'booking.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
         ->andFilterWhere(['<=', 'booking.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);

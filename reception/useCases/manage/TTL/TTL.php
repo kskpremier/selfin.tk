@@ -21,6 +21,7 @@ class TTL extends ActiveRecord {
     public const TTL_URL_TO_INIT_DOOR_LOCK = 'https://api.sciener.cn/v3/lock/init';
     public const TTL_DOOR_LOCK_ADMIN_USERNAME = "admin";
     public const TTL_DOOR_LOCK_USERNAME = "doorlockuser1";
+    public const TTL_CLIENT_ID = "7946f0d923934a61baefb3303de4d132";
 
     public static function getToken($userId){
 

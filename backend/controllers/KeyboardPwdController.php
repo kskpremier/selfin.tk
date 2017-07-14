@@ -121,14 +121,17 @@ class KeyboardPwdController extends Controller
         }
     }
 
-    public function actionCreate($booking_id  = null)
+    public function actionCreate($booking_id  = null, $doorLockId = null)
     {
-        $model = new KeyboardPwdForm(['bookingId'=>$booking_id]);
+        $model = new KeyboardPwdForm(['bookingId'=>$booking_id,'doorLockId'=>$doorLockId]);
         if ($model->load(Yii::$app->request->post() ) && $model->validate() ) {
-            $keyboardPwd =  $this->service->create($model);
+            $keyboardPwd =  $this->service->generate($model);
             if ($response = $this->service->getKeyboardPwdValueFromChina($keyboardPwd)) {
-                Yii::$app->session->setFlash('success', 'E-Key was successfully generated and sent by email');
-                return $this->redirect(['view', 'id' => $response]);
+                $keyboardPwd->value = $response['keyboardPwd'];
+                $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
+                $this->keyboardPwdRepository->save($keyboardPwd);
+                Yii::$app->session->setFlash('success', 'Password was successfully generated');
+                return $this->redirect(['view', 'id' => $keyboardPwd->id]);
             }
             else {
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');

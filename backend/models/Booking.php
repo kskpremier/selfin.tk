@@ -6,9 +6,9 @@ namespace backend\models;
 use yii\web\BadRequestHttpException;
 use Yii;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use \backend\models\DOMOUPRAV;
+use reception\entities\DoorLock\Key;
+use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\BookingGuest;
-use \api\models\TTL;
 use yii\httpclient\Client;
 
 /**

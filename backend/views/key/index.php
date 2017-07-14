@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'format' => 'dd-M-yyyy',
                     ],
                 ]),
-                'format' => 'datetime',
+                //'format' => 'datetime',
                 'value'=> function($model){
                     return ($model->start_date == 0)? '': date('d-m-Y h:i', $model->start_date);
                 }
@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'format' => 'dd-M-yyyy',
                     ],
                 ]),
-                'format' => 'datetime',
+               // 'format' => 'datetime',
                 'value'=> function($model){
                     return ($model->end_date == 0)? '': date('d-m-Y h:i', $model->end_date);
                 },

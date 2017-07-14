@@ -55,6 +55,10 @@ class KeyboardPwdForm extends Model
     {
         return DoorLock::findOne(['id'=>$this->doorLockId])->lock_name;
     }
+
+    public function getAllBookings(){
+        return Booking::find()->where(['>=', 'start_date',  time()])->all();
+    }
     public function getKeyboardTypeList()
     {
         return TTLHelper::getKeyboardPwdTypeNameList();

@@ -58,7 +58,7 @@ use kartik\select2\Select2;
     if ($model->bookingId)
         echo  $form->field($model, 'bookingId')->textInput(['disabled'=>true])->label('for Booking #');
     else echo $form->field($model, 'bookingId')->widget(Select2::className(), [
-        'data'=> $model->getBookingList($model->bookingId),
+        'data'=> $model->getAllBookings(),
         'options' => ['placeholder' => 'Select a booking ...'],
         'pluginOptions' => [],
     ])->label('for Booking #');

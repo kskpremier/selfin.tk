@@ -44,6 +44,37 @@ class KeyboardPwd extends \yii\db\ActiveRecord
         return 'keyboard_pwd';
     }
 
+    public static function create( $start_date, $end_date, $type, $keyboardPwdVersion, $booking_id,
+                                   $door_lock_id) :self
+    {
+        $key = new static();
+        $key->start_date = $start_date;
+        $key->end_date = $end_date;
+        $key->keyboard_pwd_type = $type;
+        $key->keyboard_pwd_version = $keyboardPwdVersion;
+        $key->booking_id = $booking_id;
+        $key->door_lock_id = $door_lock_id;
+
+        return $key;
+    }
+
+    public function edit( $start_date, $end_date, $type, $booking_id,
+                          $door_lock_id, $user_id,$remarks, $last_update_date,$key_status,$key_id
+    )
+    {
+        $this->start_date = $start_date;
+        $this->end_date = $end_date;
+        $this->type = $type;
+        $this->booking_id = $booking_id;
+        $this->door_lock_id = $door_lock_id;
+        $this->user_id = $user_id;
+        $this->last_update_date = $last_update_date;
+        $this->remarks = $remarks;
+        $this->key_status = $key_status;
+        $this->key_id = $key_id;
+    }
+
+
     /**
      * @inheritdoc
      */

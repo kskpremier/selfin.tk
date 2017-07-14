@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\BookingSearch */
@@ -27,10 +28,50 @@ $this->params['breadcrumbs'][] = $this->title;
             [   'attribute'=>'id',
                 'label'=>'Number'
             ],
-            'start_date',
-            'end_date',
-            [   'attribute'=> 'apartment.name',
-                'label'=> 'Apartment'
+            ['attribute'=>'start_date',
+                'label'=>'From',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'start_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '':  $model->start_date;
+                    },
+                    'type' => DatePicker::TYPE_INPUT,
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                //'format' => 'datetime',
+                'value'=> function($model){
+                    return ($model->start_date == 0)? '':  $model->start_date;
+                }
+            ],
+            ['attribute'=>'end_date',
+                'label'=>'To',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'end_date',
+                    'value'=> function($model){
+                        return ($model->start_date == 0)? '':  $model->start_date;
+                    },
+                    'type' => DatePicker::TYPE_INPUT,
+                    'pluginOptions' => [
+                        'todayHighlight' => true,
+                        'autoclose'=>true,
+                        'format' => 'dd-M-yyyy',
+                    ],
+                ]),
+                // 'format' => 'datetime',
+                'value'=> function($model){
+                    return ($model->end_date == 0)? '':  $model->end_date;
+                },
+
+            ],
+            [   'attribute'=> 'apartmentName',
+                'label'=> 'Apartment',
+                'value'=> 'apartment.name'
             ],
             [   'attribute'=>'Guests',
                 'value'=>function($model){
@@ -57,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
-                'attribute'=>'author.second_name',
+                'attribute'=>'author',
                 'format' => 'raw',
                 'value'=> function($guest){
                     return Html::a($guest->author->second_name. ' '. $guest->author->first_name,
