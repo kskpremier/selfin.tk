@@ -256,7 +256,7 @@ class KeyController extends Controller
             'apartment'=>[
                 'name'=>($key->doorLock->apartment)?$key->doorLock->apartment->name:'not yet installed',
             ],
-            'booking_id'=>$key->booking->external_id
+            'booking_id'=>($key->booking_id)?$key->booking->external_id:'not match with any booking'
         ];
     }
 }
