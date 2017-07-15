@@ -9,8 +9,11 @@
 namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\DoorLock\Key;
+use backend\models\Booking;
 use reception\forms\KeyForm;
+use reception\forms\KeyForBookingForm;
 use reception\repositories\DoorLock\KeyRepository;
+use reception\useCases\BusinessException;
 
 
 class KeyManageService
@@ -51,5 +54,24 @@ class KeyManageService
             $form->keyId
         );
         $this->keyRepository->save($key);
+    }
+    public function generateForBooking(KeyForBookingForm $form): array
+    {   $booking = Booking::findOne(['external_id'=>$form->bookingId]);
+        if (!isset($booking))
+            throw new BusinessException("Not found any booking with such Id");
+        foreach($booking->apartment->doorLocks as $doorLock) {
+            $key = Key::create(
+                ($form->startDate) ? strtotime($form->startDate) : strtotime($booking->start_date),
+                ($form->endDate) ? strtotime($form->endDate) : strtotime($booking->end_date),
+                ($form->type) ? $form->type : 0,
+                $booking->id,
+                $doorLock->id,
+                $booking->author->user->id,
+                $form->remarks
+            );
+            $this->keyRepository->save($key);
+            $result[]=$key->id;
+        }
+        return $result;
     }
 }

@@ -137,6 +137,7 @@ return [
 //                'PUT,PATCH e-key/delete' => 'key/delete',
 //                //curd для буквенно-цифрового ключа (pin)
                 'POST password' => 'keyboard-pwd/create',
+                'POST key/generate' => 'key/create-for-booking',
                 'request-password' => 'site/request-password',
 //                'PUT,PATCH password' => 'keyboard-pwd/update',
 //                'GET password' => 'keyboard-pwd/view',

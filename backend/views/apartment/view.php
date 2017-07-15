@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=> function ($model) {
                     $doorLockList='';
                     foreach ($model->doorLocks as $doorLock){
-                        $doorLockList .= '<p>'.Html::a($doorLock->id,
+                        $doorLockList .= '<p>'.Html::a($doorLock->lock_alias,
                                 ['door-lock/view', 'id' => $doorLock->id],
                                 ['class' => '']). PHP_EOL.'</p>';
                     }

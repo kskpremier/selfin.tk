@@ -231,9 +231,6 @@ class DoorLockController extends Controller
     public function actionCreate()
     {
         $form = new DoorLockForm();
-        // $model->user_id = Yii::$app->user->id;
-        $form->load(Yii::$app->getRequest()->getBodyParams(), '');
-        $form->validate();
         if ($form->load(Yii::$app->getRequest()->getBodyParams(), '') && $form->validate()) {
             try {
                 $doorLock = $this->service->init($form,Yii::$app->user->id);

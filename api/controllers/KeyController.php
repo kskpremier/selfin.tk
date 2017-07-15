@@ -7,6 +7,10 @@
  * */
 namespace api\controllers;
 
+use reception\forms\KeyForm;
+use reception\repositories\DoorLock\KeyRepository;
+use reception\useCases\manage\DoorLock\KeyManageService;
+use reception\forms\KeyForBookingForm;
 use Yii;
 use backend\models\Key;
 use backend\models\KeySearch;
@@ -26,6 +30,18 @@ use yii\helpers\Url;
  */
 class KeyController extends Controller
 {
+    private $key;
+    private $service;
+
+
+    public function __construct($id, $module, KeyManageService $service, KeyRepository $key, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->key = $key;
+        $this->service = $service;
+
+    }
+
     /**
      * @inheritdoc
      */
@@ -109,14 +125,32 @@ class KeyController extends Controller
      * @SWG\Get(
      *     path="/keys",
      *     tags={"DoorLock"},
-     *     description="Return all existing keys for requested user(by token) or by other params",
+     *     description="Return all existing keys for requested user(by token) or by other params. Parameters info is nessesary for generating E-key for the author of booking, appointed when booking was added. Type of th E-key could be 0 or 2. 0 - E-key for period from startDate untill endDate.
+     *          By Default E-key will be generated from current moment until the departure date of booking.",
+     *
      *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Parameter( name = "key", in="body", required=true, description = "Key parameters",  @SWG\Schema(ref="#/definitions/KeyNew")),
      *     @SWG\Response(
      *         response=200,
      *         description="Success response",
      *         @SWG\Schema(ref="#/definitions/KeysInfo")
      *     ),
      *     security={{"Bearer": {}, "OAuth2": {}}}
+     * )
+     */
+    /**
+     *  @SWG\Definition(
+     *     definition="KeyNew",
+     *
+     *     type="object",
+     *     required= {
+     *          "bookingId"
+     *      },
+     *     @SWG\Property(property="bookingId", type="string",description = "Identity of booking from external systems", example= "ID 5"),
+     *     @SWG\Property(property="remarks", type="string", description = "Guest's second name"),
+     *     @SWG\Property(property="startDate", type="string", description = "Date and time from which key will be valid. For type=2 this field could be empty. If this field is empty, then startDate/endDate will be set for all booking period",example="12-09-2017 12:00:00"),
+     *     @SWG\Property(property="endDate", type="string", description = "Date and time from which key will be invalid.", example="10-10-2017 14:00:00"),
+     *     @SWG\Property(property="type", type="integer", description = "Type of E-key (could be 0 for Periodic or 2 for Permanent", example="0"),
      * )
      */
     /**
@@ -157,9 +191,25 @@ class KeyController extends Controller
     }
 
 
-
     /**
-     * Creates a new DoorLock model.
+     * @SWG\Post(
+     *     path="/key/generate",
+     *     tags={"DoorLock"},
+     *     description="Generate E-key(s) for the author of existing booking, that was uploaded before, for all door locks for booking apartment. Supposed that every booking has only one apartment, but apartment can have several door locks",
+     *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="Success response",
+     *          @SWG\Property(property="Response",  type="object",
+     *              @SWG\Property(property="success", type="string",description = "Success", example= "ok"),
+     *              @SWG\Property(property="keysId", type="array",description = "List of Keys that were generated", example= "[11,12]")
+     *              )
+     *     ),
+     *     security={{"Bearer": {}, "OAuth2": {}}}
+     * )
+     */
+    /**
+     * Creates a new Key model.
      * If creation is successful, return model
      * @return Active Record model
      */
@@ -179,7 +229,31 @@ class KeyController extends Controller
     }
 
     /**
-     * Displays a single DoorLock model.
+     * Creates a new Key model for author of booking
+     * If creation is successful, return json with id keys
+     * @return string
+     */
+    public function actionCreateForBooking()
+    {
+        $form = new KeyForBookingForm();
+        if ($form->load(Yii::$app->request->getBodyParams(), '') && $form->validate()) {
+            try {
+                $key = $this->service->generateForBooking($form);
+                if ($key) {
+                    $response = Yii::$app->getResponse();
+                    $response->setStatusCode(201);
+                    $response->data['success']="ok";
+                    $response->data['keysId']=$key;
+                }
+            } catch (\DomainException $e) {
+                throw new BadRequestHttpException($e->getMessage(), null, $e);
+            }
+        }
+
+    }
+
+    /**
+     * Displays a single Key model.
      * @param integer $id
      * @return mixed
      */
@@ -189,7 +263,7 @@ class KeyController extends Controller
     }
 
     /**
-     * Updates an existing DoorLock model.
+     * Updates an existing Key model.
      * If update is successful, return model
      * @param integer $id
      * @return mixed
@@ -206,7 +280,7 @@ class KeyController extends Controller
     }
 
     /**
-     * Deletes an existing DoorLock model.
+     * Deletes an existing Key model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
