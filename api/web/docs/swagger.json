@@ -5,7 +5,7 @@
         "description": "HTTP JSON API",
         "version": "1.0.0"
     },
-    "host": "api.domouprav.local",
+    "host": "restapi.domouprav.hr",
     "basePath": "/",
     "schemes": [
         "http"
@@ -442,7 +442,7 @@
         "/key/generate": {
             "post": {
                 "tags": [
-                    "DoorLock"
+                    "Booking"
                 ],
                 "description": "Generate E-key(s) for the author of existing booking, that was uploaded before, for all door locks for booking apartment. Supposed that every booking has only one apartment, but apartment can have several door locks",
                 "parameters": [
@@ -455,6 +455,15 @@
                             "$ref": "#/definitions/Authorization"
                         },
                         "type": "string"
+                    },
+                    {
+                        "name": "KeyInfo",
+                        "in": "body",
+                        "description": "New booking",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/KeyNew"
+                        }
                     }
                 ],
                 "responses": {
@@ -475,6 +484,49 @@
                                 }
                             },
                             "type": "object"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/password/create": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Generate digital keyboard password(s) for existing booking, that was uploaded before, for all door locks for booking apartment. Supposed that every booking has only one apartment, but apartment can have several door locks",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "key",
+                        "in": "body",
+                        "description": "Key parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/KeyboardPwdNew"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/KeybpardPwdsInfo"
                         }
                     }
                 },
@@ -1328,6 +1380,71 @@
                     "description": "booking number from external systems",
                     "type": "string",
                     "example": "R 2220/74"
+                }
+            },
+            "type": "object"
+        },
+        "KeyboardPwdNew": {
+            "required": [
+                "bookingId"
+            ],
+            "properties": {
+                "bookingId": {
+                    "description": "Identity of booking from external systems",
+                    "type": "string",
+                    "example": "ID 5"
+                },
+                "startDate": {
+                    "description": "Date and time from which keyboard password will be valid. For type=2 this field could be empty. If this field is empty, then startDate/endDate will be set for all booking period",
+                    "type": "string",
+                    "example": "12-09-2017 12:00:00"
+                },
+                "endDate": {
+                    "description": "Date and time from which keyboard password will be invalid.",
+                    "type": "string",
+                    "example": "10-10-2017 14:00:00"
+                },
+                "type": {
+                    "description": "Type of keyboard password (could be 0 for Periodic or 2 for Permanent",
+                    "type": "integer",
+                    "example": "0"
+                }
+            },
+            "type": "object"
+        },
+        "KeybpardPwdsInfo": {
+            "properties": {
+                "success": {
+                    "description": "Success",
+                    "type": "string",
+                    "example": "ok"
+                },
+                "passwords": {
+                    "description": "List of password values for all door locks",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Password"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "Password": {
+            "properties": {
+                "id": {
+                    "description": "Identity",
+                    "type": "inteher",
+                    "example": "45"
+                },
+                "lock_name": {
+                    "description": "Door Lock name",
+                    "type": "string",
+                    "example": "Zizi entrance door"
+                },
+                "password": {
+                    "description": "Value od digital password",
+                    "type": "string",
+                    "example": "2367880"
                 }
             },
             "type": "object"

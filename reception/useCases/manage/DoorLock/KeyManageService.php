@@ -12,6 +12,7 @@ use reception\entities\DoorLock\Key;
 use backend\models\Booking;
 use reception\forms\KeyForm;
 use reception\forms\KeyForBookingForm;
+use reception\helpers\TTLHelper;
 use reception\repositories\DoorLock\KeyRepository;
 use reception\useCases\BusinessException;
 
@@ -63,7 +64,7 @@ class KeyManageService
             $key = Key::create(
                 ($form->startDate) ? strtotime($form->startDate) : strtotime($booking->start_date),
                 ($form->endDate) ? strtotime($form->endDate) : strtotime($booking->end_date),
-                ($form->type) ? $form->type : 0,
+                ($form->type) ? $form->type : TTLHelper::TTL_KEY_PERIOD_TYPE,
                 $booking->id,
                 $doorLock->id,
                 $booking->author->user->id,

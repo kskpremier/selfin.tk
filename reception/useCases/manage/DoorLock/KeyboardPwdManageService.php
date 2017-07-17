@@ -10,8 +10,10 @@
 namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\DoorLock\KeyboardPwd;
+use backend\models\Booking;
+use reception\helpers\TTLHelper;
 use reception\useCases\manage\TTL\TTL;
-use reception\forms\KeyboardPwdForm;
+use reception\forms\KeyboardPwdForBookingForm;
 use reception\repositories\DoorLock\KeyboardPwdRepository;
 use yii\httpclient\Client;
 use reception\entities\User\User;
@@ -41,6 +43,30 @@ class KeyboardPwdManageService
 
         $this->KeyboardPwdRepository->save($KeyboardPwd);
         return $KeyboardPwd;
+    }
+    public function generateForBooking(KeyboardPwdForBookingForm $form): array
+    {
+        $booking = Booking::findOne(['external_id'=>$form->bookingId]);
+        if (!isset($booking))
+            throw new BusinessException("Not found any booking with such Id");
+        foreach($booking->apartment->doorLocks as $doorLock) {
+            $keyboardPwd = KeyboardPwd::create(
+                ($form->startDate) ? strtotime($form->startDate) : strtotime($booking->start_date),
+                ($form->endDate) ? strtotime($form->endDate) : strtotime($booking->end_date),
+                ($form->type) ? $form->type : TTLHelper::TTL_KEYBOARD_PERIOD_TYPE,
+                $form->keyboardPwdVersion,
+                $booking->id,
+                $doorLock->id
+            );
+            $this->KeyboardPwdRepository->save($keyboardPwd);
+            if ($response = $this->getKeyboardPwdValueFromChina($keyboardPwd)) {
+                $keyboardPwd->value = $response['keyboardPwd'];
+                $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
+                $this->KeyboardPwdRepository->save($keyboardPwd);
+                $result[] = ['id'=>$keyboardPwd->id,'lock_name' => $doorLock->lock_alias, 'password' => $keyboardPwd->value];
+            } else throw new BusinessException("Problems with getting password. Error 22.");
+        }
+        return $result;
     }
 
     public function edit(KeyboardPwdEditForm $form): void

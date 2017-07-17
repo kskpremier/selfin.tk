@@ -8,6 +8,9 @@
 namespace api\controllers;
 
 use Yii;
+use reception\repositories\DoorLock\KeyboardPwdRepository;
+use reception\useCases\manage\DoorLock\KeyboardPwdManageService;
+use reception\forms\KeyboardPwdForBookingForm;
 use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\KeyboardPwdSearch;
 use yii\filters\auth\HttpBasicAuth;
@@ -17,6 +20,7 @@ use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 
 
@@ -25,6 +29,18 @@ use yii\filters\VerbFilter;
  */
 class KeyboardPwdController extends Controller
 {
+    private $keyboardPwd;
+    private $service;
+
+
+    public function __construct($id, $module, KeyboardPwdManageService $service, KeyboardPwdRepository $keyboardPwd, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->keyboardPwd = $keyboardPwd;
+        $this->service = $service;
+
+    }
+
     /**
      * @inheritdoc
      */
@@ -37,17 +53,17 @@ class KeyboardPwdController extends Controller
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-//        $behaviors['access'] = [
-//            'class' => AccessControl::className(),
-//            'only' => ['create', 'update', 'delete'],
-//            'rules' => [
-//                [
-//                    'allow' => true,
-//                    // ролей пока нет, поэтому я закоментировал
-//                    'roles' => ['@'],
-//                ],
-//            ],
-//        ];
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'only' => ['create', 'update', 'delete','create-for-booking'],
+            'rules' => [
+                [
+                    'allow' => true,
+                    // ролей пока нет, поэтому я закоментировал
+                    'roles' => ['admin','receptionist'],
+                ],
+            ],
+        ];
 
         return $behaviors;
     }
@@ -117,6 +133,78 @@ class KeyboardPwdController extends Controller
                 $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
                 return $model;
         } throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+    }
+    /**
+     * @SWG\Post(
+     *     path="/password/create",
+     *     tags={"Booking"},
+     *     description="Generate digital keyboard password(s) for existing booking, that was uploaded before, for all door locks for booking apartment. Supposed that every booking has only one apartment, but apartment can have several door locks",
+     *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *     @SWG\Parameter( name = "key", in="body", required=true, description = "Key parameters",  @SWG\Schema(ref="#/definitions/KeyboardPwdNew")),
+     *     @SWG\Response(
+     *         response=201,
+     *         description="Success response",
+     *      @SWG\Schema(ref="#/definitions/KeybpardPwdsInfo")
+     *              ),
+     *
+     *     security={{"Bearer": {}, "OAuth2": {}}}
+     * )
+     */
+    /**
+     *  @SWG\Definition(
+     *     definition="KeyboardPwdNew",
+     *
+     *     type="object",
+     *     required= {
+     *          "bookingId"
+     *      },
+     *     @SWG\Property(property="bookingId", type="string",description = "Identity of booking from external systems", example= "ID 5"),
+     *     @SWG\Property(property="startDate", type="string", description = "Date and time from which keyboard password will be valid. For type=2 this field could be empty. If this field is empty, then startDate/endDate will be set for all booking period",example="12-09-2017 12:00:00"),
+     *     @SWG\Property(property="endDate", type="string", description = "Date and time from which keyboard password will be invalid.", example="10-10-2017 14:00:00"),
+     *     @SWG\Property(property="type", type="integer", description = "Type of keyboard password (could be 0 for Periodic or 2 for Permanent", example="0"),
+     * )
+     */
+    /**
+     * @SWG\Definition(
+     *     definition="KeybpardPwdsInfo",
+     *     type="object",
+     *       @SWG\Property(property="success", type="string", description = "Success", example= "ok"),
+     *       @SWG\Property(property="passwords", type="array",  @SWG\Items(ref="#/definitions/Password"), description ="List of password values for all door locks")
+     * )
+     */
+
+    /**
+     * *  @SWG\Definition(
+     *     definition="Password",
+     *     type="object",
+     *          @SWG\Property(property="id", type="inteher", description = "Identity", example= "45"),
+     *          @SWG\Property(property="lock_name", type="string", description = "Door Lock name", example= "Zizi entrance door"),
+     *          @SWG\Property(property="password", type="string", description = "Value od digital password", example= "2367880")
+     * )
+     */
+    /**
+     * Creates a new KeyboardPwd model for author of booking
+     * If creation is successful, return json with id keyboardPwds
+     * @return string
+     */
+    public function actionCreateForBooking()
+    {
+        $form = new KeyboardPwdForBookingForm();
+        if ($form->load(Yii::$app->request->getBodyParams(), '') && $form->validate()) {
+            try {
+                $keyboards = $this->service->generateForBooking($form);
+                if ($keyboards) {
+                    $response = Yii::$app->getResponse();
+                    $response->setStatusCode(201);
+                    $response->data['success']="ok";
+
+                    $response->data['passwords']=$keyboards;
+                }
+            } catch (\DomainException $e) {
+                throw new BadRequestHttpException($e->getMessage(), null, $e);
+            }
+        }
+
     }
 
     /**

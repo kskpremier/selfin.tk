@@ -5,7 +5,7 @@ namespace api\controllers;
 /**
  * @SWG\Swagger(
  *     basePath="/",
- *     host="api.domouprav.local",
+ *     host="restapi.domouprav.hr",
  *     schemes={"http"},
  *     produces={"application/json","application/json"},
  *     consumes={"application/json","application/json"},

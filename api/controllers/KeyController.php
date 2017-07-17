@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
+use yii\filters\AccessControl;
 
 
 
@@ -54,17 +55,17 @@ class KeyController extends Controller
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
-//        $behaviors['access'] = [
-//            'class' => AccessControl::className(),
-//            'only' => ['create', 'update', 'delete'],
-//            'rules' => [
-//                [
-//                    'allow' => true,
-//                    // ролей пока нет, поэтому я закоментировал
-//                    'roles' => ['@'],
-//                ],
-//            ],
-//        ];
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'only' => ['create', 'update', 'delete','create-for-booking'],
+            'rules' => [
+                [
+                    'allow' => true,
+                    // ролей пока нет, поэтому я закоментировал
+                    'roles' => ['admin','receptionist'],
+                ],
+            ],
+        ];
 
         return $behaviors;
     }
@@ -194,9 +195,10 @@ class KeyController extends Controller
     /**
      * @SWG\Post(
      *     path="/key/generate",
-     *     tags={"DoorLock"},
+     *     tags={"Booking"},
      *     description="Generate E-key(s) for the author of existing booking, that was uploaded before, for all door locks for booking apartment. Supposed that every booking has only one apartment, but apartment can have several door locks",
      *     @SWG\Parameter( name = "Authorization", in="header", type="string", required=true, description = "Access token",  @SWG\Schema(ref="#/definitions/Authorization")),
+     *      *     @SWG\Parameter( name = "KeyInfo", in="body", required=true, description = "New booking",  @SWG\Schema(ref="#/definitions/KeyNew")),
      *     @SWG\Response(
      *         response=201,
      *         description="Success response",

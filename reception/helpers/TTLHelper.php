@@ -12,6 +12,8 @@ class TTLHelper{
 // the time granularity is valid only accurate to the hour,
 // that is only the start time and end time is the whole point;
 // maximum time span in which the deadline password can not exceed one year.
+    public const TTL_KEY_PERIOD_TYPE = 0;
+    public const TTL_KEYBOARD_PERIOD_TYPE = 3;
 
     public static function getKeyboardPwdTypeName($type) : string
     {

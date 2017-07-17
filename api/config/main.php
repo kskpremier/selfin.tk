@@ -138,6 +138,7 @@ return [
 //                //curd для буквенно-цифрового ключа (pin)
                 'POST password' => 'keyboard-pwd/create',
                 'POST key/generate' => 'key/create-for-booking',
+                'POST password/create' => 'keyboard-pwd/create-for-booking',
                 'request-password' => 'site/request-password',
 //                'PUT,PATCH password' => 'keyboard-pwd/update',
 //                'GET password' => 'keyboard-pwd/view',
