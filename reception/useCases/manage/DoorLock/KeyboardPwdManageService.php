@@ -11,6 +11,7 @@ namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\Booking;
+use reception\useCases\BusinessException;
 use reception\helpers\TTLHelper;
 use reception\useCases\manage\TTL\TTL;
 use reception\forms\KeyboardPwdForBookingForm;
@@ -46,7 +47,7 @@ class KeyboardPwdManageService
     }
     public function generateForBooking(KeyboardPwdForBookingForm $form): array
     {
-        $booking = Booking::findOne(['external_id'=>$form->bookingId]);
+        $booking = Booking::find()->where(['external_id'=>$form->bookingId])->one();
         if (!isset($booking))
             throw new BusinessException("Not found any booking with such Id");
         foreach($booking->apartment->doorLocks as $doorLock) {

@@ -19,6 +19,7 @@ use yii\rest\Controller;
 use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\BadRequestHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
