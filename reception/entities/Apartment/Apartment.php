@@ -8,6 +8,8 @@
 
 namespace reception\entities\Apartment;
 
+use reception\entities\Booking\Booking;
+use reception\entities\DoorLock\DoorLock;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 

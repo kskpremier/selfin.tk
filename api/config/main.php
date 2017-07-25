@@ -116,6 +116,7 @@ return [
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-image',
 //                'GET photoimage' => 'photo-image/view',
+                'POST booking-old' => 'booking/create-old',
                 'POST booking' => 'booking/create',
                 'GET bookings' => 'booking/bookings',
                 'GET booking/view' => 'booking/view',

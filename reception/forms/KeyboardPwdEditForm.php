@@ -8,18 +8,16 @@
 namespace reception\forms;
 
 use reception\entities\DoorLock\DoorLock;
-use backend\models\Booking;
 use yii\helpers\ArrayHelper;
-use yii\base\Model;
-use yii\web\ServerErrorHttpException;
+use reception\forms\FormWithDates;
+
 
 /**
  * @property LockVersionForm $lockVersion
  */
-class KeyboardPwdEditForm extends Model
+class KeyboardPwdEditForm extends FormWithDates
 {
-    public $startDate;
-    public $endDate;
+
     public $doorLockId;
     public $bookingId;
     public $type;
@@ -39,6 +37,7 @@ class KeyboardPwdEditForm extends Model
     {
         return [
             [['type','startDate', 'endDate','value','keyboardPwdId'],'string', 'max' => 255],
+            [['startDateTimestamp','endDateTimestamp'],'integer'],
             [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
             [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
             [['doorLockId','type','keyboardPwdVersion'],'required'],
@@ -54,14 +53,5 @@ class KeyboardPwdEditForm extends Model
     {
         return DoorLock::findOne(['id'=>$this->doorLockId])->lock_name;
     }
-    public function validateDates(){
-        if ($this->type != "2"){
-            if (strtotime($this->startDate) < (time()-60) ){
-                $this->addError('Start Date must be bigger then current time');
-            }
-            if (strtotime($this->endDate) < strtotime($this->startDate) ){
-                $this->addError( 'End Date must be bigger then Start Date');
-            }
-        }
-    }
+
 }

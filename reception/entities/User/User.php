@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $temporaryPassword
  * @property string $password write-only password
  *
  * @property Network[] $networks
@@ -31,16 +32,24 @@ class User extends ActiveRecord
     const STATUS_WAIT = 0;
     const STATUS_ACTIVE = 10;
 
+    private $temporaryPassword = null;
+
     public static function create(string $username, string $email, string $password): self
     {
-        $user = new User();
-        $user->username = $username;
-        $user->email = $email;
-        $user->setPassword(!empty($password) ? $password : Yii::$app->security->generateRandomString());
-        $user->created_at = time();
-        $user->status = self::STATUS_ACTIVE;
-        $user->auth_key = Yii::$app->security->generateRandomString();
-        return $user;
+        $user = User::find()->where(['username'=>$username,'email'=>$email])->one();
+        if ($user)
+            return $user;
+        else {
+            $user = new User();
+            $user->username = $username;
+            $user->email = $email;
+            $user->setPassword(!empty($password) ? $password : Yii::$app->security->generateRandomString());
+            $user->created_at = time();
+            $user->status = self::STATUS_ACTIVE;
+            $user->auth_key = Yii::$app->security->generateRandomString();
+            $user->temporaryPassword =$password;
+            return $user;
+        }
     }
 
     public function edit(string $username, string $email): void
@@ -166,6 +175,16 @@ class User extends ActiveRecord
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
     }
+    /**
+     * Finds user by email
+     *
+     * @param string $email
+     * @return static|null
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+    }
 
     /**
      * Finds user by password reset token
@@ -229,5 +248,22 @@ class User extends ActiveRecord
     private function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
+    }
+    /**
+     * Generates password string from password and sets it to the model
+     *
+     * @param integer $length by dafault=8
+     *
+     * @return string password
+     */
+    public static function generatePassword($length = 8) :string
+    {
+        $chars = 'abdefhiknrstyzABDEFGHKNQRSTYZ23456789';
+        $numChars = strlen($chars);
+        $string = '';
+        for ($i = 0; $i < $length; $i++) {
+            $string .= substr($chars, rand(1, $numChars) - 1, 1);
+        }
+        return $string;
     }
 }

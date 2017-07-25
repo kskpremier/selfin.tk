@@ -9,6 +9,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\DoorLock\Key;
 use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\BookingGuest;
+use reception\entities\User\User;
 use yii\httpclient\Client;
 
 /**
@@ -18,6 +19,8 @@ use yii\httpclient\Client;
  * @property string $external_id
  * @property string $start_date
  * @property string $end_date
+ * @property integer $start_date_timestamp
+ * @property string $end_date_timestamp
  * @property integer $apartment_id
  * @property string $external_apartment_id
  * @property integer $number_of_tourist
@@ -45,6 +48,8 @@ class Booking extends \yii\db\ActiveRecord
     public $temporary_password;
 //    public $external_booking_id;
     public $external_apartment_id;
+    public $start_date_timestamp;
+    public $end_date_timestamp;
 
 
     /**
@@ -61,7 +66,8 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['start_date', 'end_date'], 'required'],
+            [['start_date', 'end_date'], 'safe'],
+            [['start_date_timestamp','end_date_timestamp'],'integer'],
             [['first_name', 'second_name'], 'string', 'max'=>50],
             [['contact_email'],'email'],
             [['external_apartment_id','external_id'],'string', 'max'=>20],
@@ -183,13 +189,14 @@ class Booking extends \yii\db\ActiveRecord
      */
     public function addNewBooking($doWeNeedToSendLetter=false){
         $flag = true;
+        $this->convertDates(); // преобразуем даты
         if (Booking::isUnique($this)) {
 
             $transaction = \Yii::$app->db->beginTransaction();
             try {
 
                 //создать нового User, предварительно проверив наличие такого юзера по почтовому ящику
-                $user = \common\models\User::findByUserEmail($this->contact_email);
+                $user = User::findByUserEmail($this->contact_email);
                 if (!$user) {
                     $signUp = new \frontend\models\SignupForm();
                     $signUp->email = $this->contact_email;
@@ -203,9 +210,9 @@ class Booking extends \yii\db\ActiveRecord
                 }
 
                 //Создать нового гостя, предварительно проверив, нет ли уже такого
-                $guest = \backend\models\Guest::find()->andWhere(['first_name' => $this->first_name, 'second_name' => $this->second_name, 'contact_email' => $this->contact_email])->one();
+                $guest = Guest::find()->andWhere(['first_name' => $this->first_name, 'second_name' => $this->second_name, 'contact_email' => $this->contact_email])->one();
                 if ($guest === null) {
-                    $guest = new \backend\models\Guest(['user_id' => $user->id, 'first_name' => $this->first_name,
+                    $guest = new Guest(['user_id' => $user->id, 'first_name' => $this->first_name,
                         'second_name' => $this->second_name, 'contact_email' => $this->contact_email,
                         'application_id' => '1']); //заглушка
                     $guest->save();
@@ -235,8 +242,9 @@ class Booking extends \yii\db\ActiveRecord
                         'booking_id' => $this->id,
                         'keyboard_pwd_version' => 4, //пока так, потом из модели $doorLock->keyboard_pwd_version,
                         'keyboard_pwd_type' => 3, //период
-                        'start_date' => $this->start_date,
-                        'end_date' => date('Y-m-d H:i:s', strtotime($this->start_date . " + 1 day")) //на 1 день
+                        'start_date' => ($this->start_date_timestamp)?$this->start_date_timestamp:$this->start_date,
+                        'end_date'=> ($this->start_date_timestamp)?$this->start_date_timestamp+24*60*60:date('Y-m-d H:i:s', strtotime($this->start_date)+ 24*60*60) // ключ на 1 сутки
+                        //'end_date' => date('Y-m-d H:i:s', strtotime($this->start_date . " + 1 day")) //на 1 день
                     ]);
                     //получаем значение с китайского сервера для этого замка
                     $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
@@ -328,5 +336,12 @@ class Booking extends \yii\db\ActiveRecord
         return true;
     }
 
-
+    private function convertDates(){
+        if ($this->start_date_timestamp && gettype($this->start_date_timestamp)=='integer'){
+            $this->start_date = date('Y-m-d H:i:s',$this->start_date_timestamp);
+        }
+        if ($this->end_date_timestamp && gettype($this->end_date_timestamp)=='integer'){
+            $this->end_date = date('Y-m-d H:i:s', $this->end_date_timestamp);
+        }
+    }
 }

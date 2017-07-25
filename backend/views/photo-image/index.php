@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['attribute'=>'date',
                 'filter'=>  DatePicker::widget([
                     'model' => $searchModel,
-                    'language' => 'ru-RU',
+                    'language' => 'en-En',
                     'attribute' => 'date_from',
                     'attribute2' => 'date_to',
                     'options' => ['placeholder' => 'от'],

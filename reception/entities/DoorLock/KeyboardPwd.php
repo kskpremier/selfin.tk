@@ -8,13 +8,15 @@
 
 namespace reception\entities\DoorLock;
 
+use reception\entities\User\User;
+use reception\helpers\TTLHelper;
 use Yii;
-use \backend\models\DOMOUPRAV;
-use backend\models\Booking;
-use yii\httpclient\Client;
+use reception\entities\Booking\Booking;
+//use yii\httpclient\Client;
+use yii\db\ActiveRecord;
 use api\models\test\BodyPost;
 use api\models\test\oFile;
-use api\models\TTL;
+use reception\useCases\manage\TTL\TTL;
 use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
 
@@ -34,7 +36,7 @@ use yii\web\ServerErrorHttpException;
  * @property Booking $booking
  * @property DoorLock $doorLock
  */
-class KeyboardPwd extends \yii\db\ActiveRecord
+class KeyboardPwd extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -47,15 +49,15 @@ class KeyboardPwd extends \yii\db\ActiveRecord
     public static function create( $start_date, $end_date, $type, $keyboardPwdVersion, $booking_id,
                                    $door_lock_id) :self
     {
-        $key = new static();
-        $key->start_date = $start_date;
-        $key->end_date = $end_date;
-        $key->keyboard_pwd_type = $type;
-        $key->keyboard_pwd_version = $keyboardPwdVersion;
-        $key->booking_id = $booking_id;
-        $key->door_lock_id = $door_lock_id;
+        $keyboardPwd = new static();
+        $keyboardPwd->start_date = $start_date;
+        $keyboardPwd->end_date = $end_date;
+        $keyboardPwd->keyboard_pwd_type = $type;
+        $keyboardPwd->keyboard_pwd_version = $keyboardPwdVersion;
+        $keyboardPwd->booking_id = $booking_id;
+        $keyboardPwd->door_lock_id = $door_lock_id;
 
-        return $key;
+        return $keyboardPwd;
     }
 
     public function edit( $start_date, $end_date, $type, $booking_id,
@@ -118,44 +120,6 @@ class KeyboardPwd extends \yii\db\ActiveRecord
         return $this->hasOne(DoorLock::className(), ['id' => 'door_lock_id']);
     }
 
-    /*
-     * Этот вызов будет дергать китайский наш api
-     * */
-
-    public function getKeyboardPwdLocal(){
-        //тут надо сформировать запрос и послать
-        $client = $client = new Client([
-          //  'baseUrl' => DOMOUPRAV::DOMOUPRAV_URL_TO_KEYBOARD_PWD_GET,
-        ]);
-        $response = $client->createRequest()
-            ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/x-www-form-urlencoded'])
-
-            ->addHeaders(['Authorization' =>'Bearer '.DOMOUPRAV:: DOMOUPRAV_ADMIN_TOKEN ])
-            ->setUrl(DOMOUPRAV::DOMOUPRAV_URL_TO_KEYBOARD_PWD_GET)
-            ->setData([
-                'door_lock_id' => $this->door_lock_id,
-                'booking_id'=>$this->booking_id,
-                'keyboard_pwd_version' => $this->keyboard_pwd_version,
-                'keyboard_pwd_type' => $this->keyboard_pwd_type ,
-                'start_date'=>  $this->start_date,
-                'end_date'=> ($this->keyboard_pwd_type == 2)?  0 : $this->end_date,
-                'accessToken'=>DOMOUPRAV:: DOMOUPRAV_ADMIN_TOKEN
-            ])
-            ->send();
-        if ($response->isOk) {
-//            $this->value = $response->data['value']; //пока непонятно какой ответ возвращает сервер
-//            $this->keyboard_pwd_id = $response->data['keyboard_pwd_id']; //пока непонятно какой ответ возвращает сервер
-            return $response->data['id'];
-        }
-        else return false;
-    }
-    //return current time in milliseconds
-    private function getCurrentTimeMillis(){
-        list($usec, $sec) = explode(" ", microtime());
-        return (integer)(( (float)$usec + (float)$sec )*1000);
-    }
-
     /**
      * Этот вызов будет дергать китайский api контроллер
      * При успешном получении ответа запишет данные в модель и сохранит ее, вернет json
@@ -163,40 +127,7 @@ class KeyboardPwd extends \yii\db\ActiveRecord
      * */
 
     public function getKeyboardPwdFromChina(){
-        $response = KeyboardPwd::SendPost(
-            time(),
-            strtotime($this->start_date),
-            ($this->keyboard_pwd_type == 2)?  0 : strtotime($this->end_date),
-            $this->doorLock->lock_id ,//TTL::TTL_LOCKID,
-            $this->keyboard_pwd_type,
-            TTL::TTL_CLIENT_ID,
-            TTL::TTL_TOKEN,
-            $this->keyboard_pwd_version//4 по умолчанию
-        );
-
-        $data = json_decode($response,true);
-        //в китайском ответе должно быть поле keyboardPwd
-        if (is_array($data)){
-            if (array_key_exists('keyboardPwd', $data)) {
-                $this->value = $data['keyboardPwd'];
-                $this->keyboard_pwd_id = $data['keyboardPwdId'];
-                $this->start_date = strtotime($this->start_date);
-                $this->end_date = ($this->keyboard_pwd_type == 2)? 0: strtotime($this->end_date);
-
-
-                $this->validate(); $data['success'] =  $this->save(false);
-            }
-            else if (array_key_exists('errcode', $data) ) {
-                if ($data['errcode']!=0) $data['success'] = false;
-            }
-            return json_encode($data);
-        }
-        else throw new ServerErrorHttpException('Problems with request '. $response);
-
-    }
-
-    public static function SendPost($date, $startDate, $endDate, $lockId, $keyboardPwdType, $clientId, $accessToken, $keyboardPwdVersion )
-    {
+        $token = TTL::getToken((User::find()->where(['username'=>TTL::TTL_DOOR_LOCK_ADMIN_USERNAME])->one())->id);
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_HTTPHEADER, array('Content-type: application/x-www-form-urlencoded'));
         curl_setopt_array($ch, array(
@@ -204,21 +135,38 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query([
-            'clientId'=>$clientId,
-            'date'=> 1000*$date,//+(8*60+60),
-            'accessToken'=>$accessToken,//'7c714894bea74accb1b98d028dbc8dd5',
-            'startDate'=> $startDate*1000, //китайцы добавляют милисекунды
-            'endDate'=> $endDate*1000,//китайцы добавляют милисекунды
-            'keyboardPwdVersion'=>$keyboardPwdVersion,
-            'lockId'=>$lockId,
-            'keyboardPwdType'=>$keyboardPwdType
+                'clientId' =>  TTL::TTL_CLIENT_ID,
+                'date'=> 1000*time(),
+                'accessToken'=>$token->access_token,
+                'startDate'=> (gettype($this->start_date)==='integer')?$this->start_date*1000:strtotime($this->start_date)*1000, //китайцы добавляют милисекунды
+                'endDate'=> ($this->keyboard_pwd_type == 2)?  0 : (gettype($this->end_date)==='integer')?$this->end_date*1000:strtotime($this->end_date)*1000,//китайцы добавляют милисекунды
+                'keyboardPwdVersion'=>$this->keyboard_pwd_version,
+                'lockId'=>$this->doorLock->lock_id,
+                'keyboardPwdType'=>$this->keyboard_pwd_type
             ])
         ));
-        $result = curl_exec ($ch) or die(curl_error($ch));
+        $response = curl_exec ($ch) or die(curl_error($ch));
         curl_close ($ch);
-        return $result;
-    }
 
+
+        $data = json_decode($response,true);
+        //в китайском ответе должно быть поле keyboardPwd
+        if (is_array($data)){
+            if (array_key_exists('keyboardPwd', $data)) {
+                $this->value = $data['keyboardPwd'];
+                $this->keyboard_pwd_id = $data['keyboardPwdId'];
+                $this->start_date = $this->start_date;
+                $this->end_date = ($this->keyboard_pwd_type == 2)? 0: $this->end_date;
+                $this->validate();
+                $data['success'] =  $this->save(false);
+            }
+            else if (array_key_exists('errcode', $data) ) {
+                if ($data['errcode']!=0) $data['success'] = false;
+            }
+            return json_encode($data);
+        }
+        else throw new ServerErrorHttpException('Problems with request '. $response);
+    }
 
     /**
      * For REST/API controller
@@ -252,7 +200,7 @@ class KeyboardPwd extends \yii\db\ActiveRecord
             'value' => $this->value,
             'start_date' => date('Y-m-d H:i:s', $this->start_date),
             'end_date' => ($this->keyboard_pwd_type == 2)? 0: date('Y-m-d H:i:s', $this->end_date),
-            'keyboardPwd_type' => \api\helpers\KeyboardPwdHelper::type($this->keyboard_pwd_type)
+            'keyboardPwd_type' => TTLHelper::getKeyboardPwdTypeName($this->keyboard_pwd_type)
         ];
         }
 }

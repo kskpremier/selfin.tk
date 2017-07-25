@@ -9,21 +9,21 @@
 namespace api\controllers;
 
 
+use reception\forms\BookingForm;
+use reception\repositories\Booking\BookingRepository;
+use reception\useCases\manage\Booking\BookingManageService;
 use Yii;
 use backend\models\Booking;
 use backend\models\BookingSearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\AccessControl;
-
-
+use yii\web\BadRequestHttpException;
 use filsh\yii2\oauth2server\filters\auth\CompositeAuth;
-
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
-
 use yii\web\ServerErrorHttpException;
 
 
@@ -33,6 +33,18 @@ use yii\web\ServerErrorHttpException;
  */
 class  BookingController extends Controller
 {
+    private $booking;
+    private $service;
+
+
+    public function __construct($id, $module, BookingManageService $service, BookingRepository $booking, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->booking = $booking;
+        $this->service = $service;
+
+    }
+
     /**
      * @inheritdoc
      */
@@ -147,7 +159,7 @@ class  BookingController extends Controller
      * If creation is successful, return Response as Json string
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreateOld()
     {
         $model = new Booking();
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
@@ -162,6 +174,31 @@ class  BookingController extends Controller
             return  $this->serializeBookingInfo($modelAdded);
         }
         throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+    }
+    /**
+     * Creates a new Booking model.
+     * If creation is successful, return Response as Json string
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $form = new BookingForm();
+
+        if ($form->load(Yii::$app->getRequest()->getBodyParams(), '') && $form->validate()) {
+            try {
+                $booking = $this->service->create($form);
+                if ($booking) {
+                    $response = Yii::$app->getResponse();
+                    $response->setStatusCode(201);
+                    $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $booking->id], true));
+                } elseif (!$booking->hasErrors()) {
+                    throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+                }
+                return $this->serializeBooking($booking);
+            } catch (\DomainException $e) {
+                throw new BadRequestHttpException($e->getMessage(), null, $e);
+            }
+        }
     }
     /**
      * @SWG\Get(
@@ -348,6 +385,23 @@ class  BookingController extends Controller
             'external_apartment_id' => $booking->apartment->external_id,
             'username' => $booking->author->user->username,
             'password' => $booking->temporary_password, //$booking->author->user->getNewReadablePassword(),
+            'keyboardPwds' => $keyboardPwds,
+        ];
+    }
+
+    public function serializeBooking($booking): array
+    {
+        $listOfKeyboardPwd = $booking->keyboardPwds;
+        $keyboardPwds = [];
+        foreach ($listOfKeyboardPwd as $keyboardPwd){
+            $keyboardPwds = array_merge( $keyboardPwds, $keyboardPwd->serializeKeyboardPwd());
+        }
+        return [
+            'id' => $booking->id,
+            'apartment_id' => $booking->apartment_id,
+            'external_apartment_id' => $booking->apartment->external_id,
+            'author' => $booking->author->user->username,
+//            'password' => ($booking->author->user->temporaryPassword)? $booking->author->user->temporaryPassword :'',
             'keyboardPwds' => $keyboardPwds,
         ];
     }

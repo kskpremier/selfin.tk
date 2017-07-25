@@ -12,15 +12,13 @@ use reception\entities\DoorLock\DoorLock;
 
 use reception\helpers\TTLHelper;
 use yii\helpers\ArrayHelper;
-use yii\base\Model;
+use reception\forms\FormWithDates;
 
 /**
  * @property LockVersionForm $lockVersion
  */
-class KeyboardPwdForm extends Model
+class KeyboardPwdForm extends FormWithDates
 {
-    public $startDate;
-    public $endDate;
     public $doorLockId;
     public $bookingId;
     public $type;
@@ -36,6 +34,7 @@ class KeyboardPwdForm extends Model
     {
         return [
             [['type','startDate', 'endDate'],'string', 'max' => 255],
+            [['startDateTimestamp','endDateTimestamp'],'integer'],
             [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
             [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
             [['doorLockId','keyboardPwdVersion','type'],'required'],
@@ -65,14 +64,4 @@ class KeyboardPwdForm extends Model
         return TTLHelper::getKeyboardPwdTypeNameList();
     }
 
-    public function validateDates(){
-        if ($this->type != "2"){
-            if (strtotime($this->startDate) < (time()-60) ){
-                $this->addError('Start Date must be bigger then current time');
-            }
-            if (strtotime($this->endDate) < strtotime($this->startDate) ){
-                $this->addError( 'End Date must be bigger then Start Date');
-            }
-        }
-    }
 }
