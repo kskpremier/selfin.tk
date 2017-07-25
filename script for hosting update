@@ -1,0 +1,4 @@
+eval "S(ssh-agent -s"
+ssh-add ~/.ssh/ssh-rsa-key
+kskpremier
+git pull

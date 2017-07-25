@@ -124,7 +124,7 @@ class ProfileController extends Controller
  *     required={
  *      "accessToken"
  *      },
- *     @SWG\Property(property="Authorization", type="string", description = "Access Token", example="Bearer b0939c1f6094a0480fc81d20b1fb6fc10553da56"),
+ *     @SWG\Property(property="Authorization", type="string", description = "Access Token", example="Bearer fce6c63214e6b08b4e6c44d3d655c3782ad00caa"),
  * )
  */
 /**

@@ -453,25 +453,25 @@ class  BookingController extends Controller
  *     definition="BookingNew",
  *     type="object",
  *     required= {
- *          "external_booking_id",
- *          "apartment_id",
- *
- *          "first_name",
- *          "second_name",
- *          "contact_email",
- *          "start_date",
- *          "end_date",
- *           "number_of_tourist"
+ *          "externalId",
+ *          "externalApartmentId",
+ *          "firstName",
+ *          "secondName",
+ *          "contactEmail",
+ *          "startDate",
+ *          "endDate",
+ *           "numberOfTourist"
  *      },
- *     @SWG\Property(property="external_apartment_id", type="integer",description = "Identity of booking from external systems", example= "ID 5"),
- *
- *     @SWG\Property(property="external_id", type="string", description = "Identity of booking from external systems", example= "A 45"),
- *     @SWG\Property(property="first_name", type="string", description = "Guest's first name"),
- *     @SWG\Property(property="second_name", type="string", description = "Guest's second name"),
- *     @SWG\Property(property="contact_email", type="string", description = "Guest's e-mail, using for Mobile App username", example= "example@exa.com" ),
- *     @SWG\Property(property="start_date", type="string", description = "Guest's second name",example="2017-05-29 12:00:00"),
- *     @SWG\Property(property="end_date", type="string", description = "Guest's second name",example="2017-06-05 14:00:00"),
- *     @SWG\Property(property="number_of_tourist", type="integer", description = "Total number of tourist in booking", example="3"),
+ *     @SWG\Property(property="externalId", type="integer",description = "Identity of booking from external systems", example= "615731"),
+ *     @SWG\Property(property="externalApartmentId", type="integer",description = "Identity of apartment from external systems", example= "249"),
+ *     @SWG\Property(property="firstName", type="string", description = "Guest's first name"),
+ *     @SWG\Property(property="secondName", type="string", description = "Guest's second name"),
+ *     @SWG\Property(property="contactEmail", type="string", description = "Guest's e-mail, using for Mobile App username", example= "example@exa.com" ),
+ *     @SWG\Property(property="startDate", type="string", description = "arrival date",example="2017-05-29 12:00:00"),
+ *     @SWG\Property(property="endDate", type="string", description = "departure date",example="2017-06-05 14:00:00"),
+ *     @SWG\Property(property="numberOfTourist", type="integer", description = "Total number of tourist in booking", example="3"),
+ *     @SWG\Property(property="startDateTimestamp", type="integer", description = "UNIX timestamp for arrival date",example="1501098754"),
+ *     @SWG\Property(property="endDateTimestamp", type="integer", description = "UNIX timestamp for departure date",example="21501357954"),
 
  * )
  */
