@@ -37,19 +37,21 @@ return [
         'oauth2' => [
             'class' => 'filsh\yii2\oauth2server\Module',
             'tokenParamName' => 'accessToken',
-            'tokenAccessLifetime' => 36000 * 24,
+            'tokenAccessLifetime' => 3600 * 24 * 7,
             'storageMap' => [
                 'user_credentials' => 'common\auth\Identity',
             ],
             'grantTypes' => [
                 'user_credentials' => [
-                    'class' => 'OAuth2\GrantType\UserCredentials',
+//                    'class' => 'OAuth2\GrantType\UserCredentials',
+                //необходимое переопределение механизмы выдачи токенов
+                    'class' =>'backend\models\MyUserCredentials'
                 ],
                 'refresh_token' => [
                     'class' => 'OAuth2\GrantType\RefreshToken',
                     'always_issue_new_refresh_token' => true
-                ]
-            ]
+                ],
+            ],
         ]
     ],
 
@@ -106,12 +108,10 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
-//                'auth' => 'site/login', //старая версия логина
                 'POST auth'=>'oauth2/rest/token',
                 'POST oauth2/<action:\w+>' => 'oauth2/rest/<action>',
                 'GET profile' => 'profile/index',
                 'GET user' => 'profile/index',
-
 //                'PATCH photoimage' => 'photo-image/update',
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-image',
@@ -123,7 +123,6 @@ return [
                 'GET booking/view-external' => 'booking/view-external',
                 'DELETE booking/delete' => 'booking/delete',
 
-//
 //               //crud  для замков
                 'POST lock/add' => 'door-lock/create',
 //                'PUT,PATCH door_lock' => 'door-lock/update',
@@ -148,13 +147,6 @@ return [
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
         ],
-//        'authManager' => [
-//            'class' => 'yii\rbac\PhpManager',
-//            'itemFile' => '@console/rbac/items.php',
-//            'assignmentFile' => '@console/rbac/assignments.php',
-//            'ruleFile' => '@console/rbac/rules.php',
-//            'defaultRoles' => ['tourist'],
-//        ],
     ],
     'as authenticator' => [
         'class' => 'filsh\yii2\oauth2server\filters\auth\CompositeAuth',

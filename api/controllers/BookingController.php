@@ -416,8 +416,8 @@ class  BookingController extends Controller
  *     @SWG\Property(property="apartment_id", type="integer", description = "Internal apartment identity",example="1"),
  *     @SWG\Property(property="apartment_name", type="string", description = "External apartment name",example="Zizi"),
  *     @SWG\Property(property="external_apartment_id", type="string", description = "External apartment identity",example="ID 45"),
- *     @SWG\Property(property="username", type="string", description = "Login username for DoorLock Mobile App",example="admin"),
- *     @SWG\Property(property="password", type="string", description = "Login password for DoorLock Mobile App",example="admin"),
+ *     @SWG\Property(property="author", type="string", description = "Login username for DoorLock Mobile App",example="admin"),
+ *     @SWG\Property(property="password", type="string", description = "Login password for DoorLock Mobile App - could not be in answer if user is already exist",example="admin"),
  *     @SWG\Property(property="keyboardPwds", type="array", @SWG\Items(ref="#/definitions/KeyboardPwd"),description = "Array of keyborad passwords for opening door locks (usually only one)"),
  * )
  */
@@ -460,7 +460,9 @@ class  BookingController extends Controller
  *          "contactEmail",
  *          "startDate",
  *          "endDate",
- *           "numberOfTourist"
+ *          "numberOfTourist",
+ *     "startDateTimestamp",
+ *     "endDateTimestamp"
  *      },
  *     @SWG\Property(property="externalId", type="integer",description = "Identity of booking from external systems", example= "615731"),
  *     @SWG\Property(property="externalApartmentId", type="integer",description = "Identity of apartment from external systems", example= "249"),
@@ -470,8 +472,8 @@ class  BookingController extends Controller
  *     @SWG\Property(property="startDate", type="string", description = "arrival date",example="2017-05-29 12:00:00"),
  *     @SWG\Property(property="endDate", type="string", description = "departure date",example="2017-06-05 14:00:00"),
  *     @SWG\Property(property="numberOfTourist", type="integer", description = "Total number of tourist in booking", example="3"),
- *     @SWG\Property(property="startDateTimestamp", type="integer", description = "UNIX timestamp for arrival date",example="1501098754"),
- *     @SWG\Property(property="endDateTimestamp", type="integer", description = "UNIX timestamp for departure date",example="21501357954"),
+ *     @SWG\Property(property="startDateTimestamp", type="long", description = "UNIX timestamp for arrival date",example="1501098754"),
+ *     @SWG\Property(property="endDateTimestamp", type="long", description = "UNIX timestamp for departure date",example="1501357954"),
 
  * )
  */

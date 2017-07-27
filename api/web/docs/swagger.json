@@ -750,13 +750,13 @@
                     "type": "string",
                     "example": "ID 45"
                 },
-                "username": {
+                "author": {
                     "description": "Login username for DoorLock Mobile App",
                     "type": "string",
                     "example": "admin"
                 },
                 "password": {
-                    "description": "Login password for DoorLock Mobile App",
+                    "description": "Login password for DoorLock Mobile App - could not be in answer if user is already exist",
                     "type": "string",
                     "example": "admin"
                 },
@@ -833,53 +833,65 @@
         },
         "BookingNew": {
             "required": [
-                "external_booking_id",
-                "apartment_id",
-                "first_name",
-                "second_name",
-                "contact_email",
-                "start_date",
-                "end_date",
-                "number_of_tourist"
+                "externalId",
+                "externalApartmentId",
+                "firstName",
+                "secondName",
+                "contactEmail",
+                "startDate",
+                "endDate",
+                "numberOfTourist",
+                "startDateTimestamp",
+                "endDateTimestamp"
             ],
             "properties": {
-                "external_apartment_id": {
+                "externalId": {
                     "description": "Identity of booking from external systems",
                     "type": "integer",
-                    "example": "ID 5"
+                    "example": "615731"
                 },
-                "external_id": {
-                    "description": "Identity of booking from external systems",
-                    "type": "string",
-                    "example": "A 45"
+                "externalApartmentId": {
+                    "description": "Identity of apartment from external systems",
+                    "type": "integer",
+                    "example": "249"
                 },
-                "first_name": {
+                "firstName": {
                     "description": "Guest's first name",
                     "type": "string"
                 },
-                "second_name": {
+                "secondName": {
                     "description": "Guest's second name",
                     "type": "string"
                 },
-                "contact_email": {
+                "contactEmail": {
                     "description": "Guest's e-mail, using for Mobile App username",
                     "type": "string",
                     "example": "example@exa.com"
                 },
-                "start_date": {
-                    "description": "Guest's second name",
+                "startDate": {
+                    "description": "arrival date",
                     "type": "string",
                     "example": "2017-05-29 12:00:00"
                 },
-                "end_date": {
-                    "description": "Guest's second name",
+                "endDate": {
+                    "description": "departure date",
                     "type": "string",
                     "example": "2017-06-05 14:00:00"
                 },
-                "number_of_tourist": {
+                "numberOfTourist": {
                     "description": "Total number of tourist in booking",
                     "type": "integer",
                     "example": "3"
+                },
+                "startDateTimestamp": {
+                    "description": "UNIX timestamp for arrival date",
+                    "type": "long",
+                    "example": "1501098754"
+                },
+                "endDateTimestamp": {
+                    "description": "UNIX timestamp for departure date",
+                    "type": "long",
+                    "example": "1501357954"
                 }
             },
             "type": "object"
@@ -1311,7 +1323,7 @@
                     "type": "string",
                     "example": "C0:DE:EE:66:05:79"
                 },
-                "lockAliases": {
+                "lockAlias": {
                     "description": "Alias of door lock",
                     "type": "string",
                     "example": "M201T_780566"
@@ -1628,7 +1640,7 @@
                 "Authorization": {
                     "description": "Access Token",
                     "type": "string",
-                    "example": "Bearer b0939c1f6094a0480fc81d20b1fb6fc10553da56"
+                    "example": "Bearer fce6c63214e6b08b4e6c44d3d655c3782ad00caa"
                 }
             },
             "type": "object"
@@ -1705,6 +1717,11 @@
                     "description": "Digital code for opening the door lock",
                     "type": "integer",
                     "example": "86400"
+                },
+                "scope": {
+                    "description": "Scope of actions for this token",
+                    "type": "string",
+                    "example": "booking,door lock"
                 }
             },
             "type": "object"

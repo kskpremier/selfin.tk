@@ -8,9 +8,11 @@
 
 namespace api\models;
 
-use common\models\Token;
+use backend\models\Token;
 use common\models\User;
+use filsh\yii2\oauth2server\models\OauthRefreshTokens;
 use yii\base\Model;
+use yii\web\BadRequestHttpException;
 
 /**
  * Login form
@@ -70,22 +72,18 @@ class LoginForm extends Model
     {
 
         if ($this->validate()) {
-            // Chek if valid token exist
+            // Check if valid token exist
             $token = Token::find()
                 ->andWhere(['user_id' => $this->getUser()->id])
-                ->andWhere(['>', 'expired_at', time()])
+                ->andWhere(['>', 'expires', time()])
                 ->one();
             if ($token === null) {
-               $token = new Token();
-               $token->user_id = $this->getUser()->id;
-               // Define duraion of token valid
-               $token->generateToken(time() + 3600 * 24 * 7);
-               return $token->save() ? $token : null;
+                return null;
             } else {
                 return $token;
             }
         } else {
-            return null;
+            throw new BadRequestHttpException("Wrong request parameters");
         }
     }
     /**

@@ -43,6 +43,7 @@ namespace api\controllers;
  */
 
 use Yii;
+use yii\helpers\Url;
 use yii\rest\Controller;
 use api\models\LoginForm;
 //use api\models\test\BodyPost;
@@ -78,19 +79,21 @@ class SiteController extends Controller
     {
         $model = new LoginForm();
         $model->load(Yii::$app->request->bodyParams, '');
-//        return Yii::$app->getResponse()->redirect(['oauth2/token',
-//            'username'=>$model->username,
-//            'password'=>$model->password,
-//            'client_id'=>$model->client_id,
-//            'client_secret'=>$model->client_secret,
-//            'grant_type'=>$model->grant_type
-//        ]);
         if ($token = $model->auth()) {
-            return $token;
+            return $this->serializeToken($token);
         } else {
-            return $model;
+           return $this->redirect(['oauth2/rest/token',Yii::$app->request->bodyParams]);
         }
-
+    }
+    private function serializeToken($token)
+    {
+        $refresh_token = \backend\models\OauthRefreshTokens::find()->where(['user_id'=>$token->user_id])->one();
+        return [
+            "access_token"=>$token->access_token,
+            "token_type"=> "Bearer",
+            "refresh_token"=> $refresh_token->refresh_token,
+            "expires_in"=> strtotime($token->expires)-time()
+        ];
     }
 
     protected function verbs()
@@ -145,6 +148,7 @@ class SiteController extends Controller
  *     @SWG\Property(property="token_type", type="integer", description = "Type of token", example="Bearer"),
  *     @SWG\Property(property="refresh_token", type="integer" ,description = "Token for refreshing expired one", example="ohWo1ohr"),
  *     @SWG\Property(property="expires_in", type="integer",description = "Digital code for opening the door lock", example="86400"),
+ *     @SWG\Property(property="scope", type="string",description = "Scope of actions for this token", example="booking,door lock"),
  * )
  */
 
