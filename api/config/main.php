@@ -49,6 +49,7 @@ return [
                 ],
                 'refresh_token' => [
                     'class' => 'OAuth2\GrantType\RefreshToken',
+                    'user_credentials' => 'common\auth\Identity',
                     'always_issue_new_refresh_token' => true
                 ],
             ],
