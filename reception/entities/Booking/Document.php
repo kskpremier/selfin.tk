@@ -8,14 +8,11 @@
 
 namespace reception\entities\Booking;
 
-use backend\models\Citizenship;
+use backend\models\Country;
 use backend\models\DocumentType;
 use backend\models\PhotoImage;
-use reception\entities\User\User;
-use reception\entities\Booking\Guest;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use reception\entities\Booking\DocumentPhoto;
-use Yii;
+
 
 /**
  * This is the model class for table "guest".
@@ -79,27 +76,29 @@ class Document extends \yii\db\ActiveRecord
 
     public function fields(){
         return [
-            "b2b_id"=> 146,
-           // "object_id"=> 6269,
-           // "date_from"=>  date("Y-m-d",  strtotime($this->date_of_birth)),
-           // "date_until"=> date("Y-m-d",  strtotime($this->date_of_birth)),
-           // "rent_id"=> 611338,
-
-            "erp_id"=>"01_01_01",
-
+           // "b2b_id"=> 146,
+           // "erp_id"=>"01_01_01",
             "name_first"=>$this->first_name,
             "name_last"=> $this->second_name,
-            "email"=>$this->guest->contact_email,
-            "terrace"=> "Y",
-            "tel"=> "+38511234567",
+           // "email"=>$this->guest->contact_email,
+           // "terrace"=> "Y",
+            // "tel"=> "+38511234567",
             "citizenship"=> $this->citizenship->code,
             "birth_country"=>$this->birthCountry->code,
-            "gender"=>$this->gender,
+            "gender"=>($this->gender=="male")?  "muški":"ženski", // "gender" : "muški",
             "birth_city"=>$this->city_of_birth,
-            "residence_city"=>$this->city_of_birth,
+            "residence_city"=>$this->city_of_birth, ///не совсем корректно
             "birth_date"=> date("Y-m-d",  strtotime($this->date_of_birth)),
             "document_number"=>$this->number,
-            "document_type"=>$this->documentType->code
+            "document_type"=>$this->documentType->code,
+            "residence_country" => $this->citizenship->code,
+            "residence_adress"  =>"ilica 1",
+
+            "arrival_organisation" => "I",
+            "offered_service_type" => "noćenje",
+            "tt_payment_category"  => "14"
+
+
         ];
     }
 
@@ -116,21 +115,21 @@ class Document extends \yii\db\ActiveRecord
      */
     public function getCitizenship()
     {
-        return $this->hasOne(Citizenship::className(), ['id' => 'country_id']);
+        return $this->hasOne(Country::className(), ['id' => 'country_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getBirthCitizenship()
     {
-        return $this->hasOne(Citizenship::className(), ['id' => 'citizenship_of_birth_id']);
+        return $this->hasOne(Country::className(), ['id' => 'citizenship_of_birth_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getBirthCountry()
     {
-        return $this->hasOne(Citizenship::className(), ['id' => 'country_of_birth_id']);
+        return $this->hasOne(Country::className(), ['id' => 'country_of_birth_id']);
     }
 
     /**

@@ -149,8 +149,12 @@ class DocumentController extends Controller
         $form->load(Yii::$app->request->post(), '');
         if ($form->validate()) {
             try {
-                $this->service->addGuest($form);
+                $document = $this->service->addGuest($form);
                 Yii::$app->getResponse()->setStatusCode(201);
+                if ($document) {
+                    $booking = Booking::findByBookingIdentity($form->eVisitorForm->bookingId);
+                    $result = MyRent::addGuest($document, $booking);
+                }
                 return [];
             } catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);

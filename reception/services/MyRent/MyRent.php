@@ -17,7 +17,7 @@ use yii\web\ServerErrorHttpException;
 class MyRent extends ActiveRecord
 {
     public const MyRent_URL_TO_TOKEN = "https://api.my-rent.net/account/login";
-    public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guest/add";
+    public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/1";
 
 
     public const MyRent_ACCESS_TOKEN = "f4e08415-c6e7-11e5-b7cf-0050563c3009"; // test
@@ -33,10 +33,11 @@ class MyRent extends ActiveRecord
         $post = $document->fields();
         $post = array_merge ([
             "rent_id"=>$booking->external_id,
-            "object_id"=>$booking->apartment->external_id,
-            "date_from"=>  date("Y-m-d",  strtotime($booking->start_date)),
-            "date_until"=> date("Y-m-d",  strtotime($booking->end_date)),
+            //"object_id"=>$booking->apartment->external_id,
+           // "date_from"=>  date("Y-m-d",  strtotime($booking->start_date)),
+           // "date_until"=> date("Y-m-d",  strtotime($booking->end_date)),
         ], $post);
+        $json = \GuzzleHttp\json_encode($post);
         $client = new Client();
         $response = $client->createRequest()
             ->setMethod('post')
@@ -44,7 +45,7 @@ class MyRent extends ActiveRecord
             ->setHeaders([
                 'Authorization: Basic '. $token,
                 'Content-Type: application/json'])
-            ->setData($post)
+            ->setData($json)
             ->send();
         return $response->content;
     }
