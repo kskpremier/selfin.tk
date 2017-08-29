@@ -49,14 +49,14 @@ class DocumentController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view','guest-add'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete', 'view','add'],
+            'only' => ['create', 'update', 'delete', 'view','guest-add'],
             'rules' => [
                 [
                     'allow' => true,
