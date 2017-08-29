@@ -19,14 +19,12 @@ use yii\httpclient\Client;
 
 class DoorLockManageService
 {
-   // private $lockVersionRepository;
     private $doorLockRepository;
-//    private $userId;
 
     public function __construct(DoorLockRepository $doorLockRepository)
     {
         $this->doorLockRepository = $doorLockRepository;
-//        $this->userId = $userId;
+
     }
     public function init(DoorLockForm $form, $userId): DoorLock
     {

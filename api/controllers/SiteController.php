@@ -48,8 +48,8 @@ use yii\rest\Controller;
 use api\models\LoginForm;
 //use api\models\test\BodyPost;
 //use api\models\test\oFile;
-//include "/Users/SAS/Sites/E-reception/api/models/test/oFile.php";
-//include "/Users/SAS/Sites/E-reception/api/models/test/BodyPost.php";
+//include "/Users/superbrodyaga/Sites/public_html/restapi/models/test/oFile.php";
+//include "/Users/superbrodyaga/Sites/public_html/restapi/models/test/BodyPost.php";
 
 class SiteController extends Controller
 {

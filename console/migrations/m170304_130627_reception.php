@@ -28,7 +28,7 @@ class m170304_130627_reception extends Migration
         //справочная таблица типов документов
         $this->createTable('{{%document_type}}', [
             'id' => $this->primaryKey(), //внутренний уникальный идентификатор
-            'name' => $this->string(32),
+            'name' => $this->string(50),
         ], $tableOptions);
 
 

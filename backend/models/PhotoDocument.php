@@ -34,7 +34,6 @@ class PhotoDocument extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date', 'application_id', 'album_id'], 'required'],
             [['date'], 'safe'],
             [['application_id', 'album_id'], 'integer'],
             [['file_name'], 'string', 'max' => 255],

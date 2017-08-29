@@ -17,11 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?= Html::a('Add New Image', ['photo-image/create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Add New Image via RESTAPI', ['photo-image/create-rest','bookingId'=>function($model){return $model->id;}], ['class' => 'btn btn-success']) ?>
 
-    </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,

@@ -12,6 +12,8 @@ use backend\models\Document;
  */
 class DocumentSearch extends Document
 {
+    public $bookingId;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +21,7 @@ class DocumentSearch extends Document
     {
         return [
             [['id', 'photo_document_face_id', 'document_type_id', 'country_id', 'photo_document_id', 'guest_id'], 'integer'],
-            [['first_name', 'second_name', 'number', 'seria', 'date_of_issue', 'valid_before'], 'safe'],
+            [['first_name', 'second_name', 'number', 'seria', 'date_of_issue', 'valid_before','bookingId'], 'safe'],
         ];
     }
 
@@ -57,6 +59,9 @@ class DocumentSearch extends Document
             return $dataProvider;
         }
 
+//        $subQuery = Booking::find();
+//        $subQuery->joinWith('guests')
+        $query->joinWith('guest');
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,

@@ -33,7 +33,7 @@ class FACEMATIKA extends ActiveRecord
      * @param $_token
      * @param $_expires
      */
-    public static function token()
+    public static function token():string
     {
         $token = new static();
         $expiresString = $token->find()->max('expires');
@@ -54,7 +54,7 @@ class FACEMATIKA extends ActiveRecord
                     $token->status = 1;
                     $token->type =$data["type"];
                     $token->save();
-                    return $token;
+                    return $token->token;
                 }
                 throw new ServerErrorHttpException("Can not renew token!");
             }

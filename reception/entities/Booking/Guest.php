@@ -24,11 +24,11 @@ use Yii;
  *
  * @property Booking[] $bookings
  * @property Application $application
- * @property Document $document
+ * @property Document[] $documents
  */
 class Guest extends \yii\db\ActiveRecord
 {
-    public static function create( $first_name, $second_name, $contact_email, $user) :self
+    public static function create( $first_name, $second_name, $contact_email, $user, $booking=null) :self
     {
         $guest = Guest::find()->where(['first_name'=>$first_name,'second_name'=>$second_name,'contact_email'=>$contact_email])->one();
         if (!isset($guest)) {
@@ -38,12 +38,24 @@ class Guest extends \yii\db\ActiveRecord
             $guest->contact_email = $contact_email;
             $guest->user = $user;
         }
+        $guest->bookings = $booking;
+        return $guest;
+    }
+
+    public static function addToBookingGuestList( $first_name, $second_name, $booking ) :self
+    {
+        $guest = Guest::find()->where(['first_name'=>$first_name,'second_name'=>$second_name])->one();
+        if (!isset($guest)) {
+            $guest = new static();
+            $guest->first_name = $first_name;
+            $guest->second_name = $second_name;
+        }
+        $guest->bookings = $booking;
         return $guest;
     }
 
     public function edit( $first_name,$second_name,$contact_email, $application_id, $user_id, $document_id)
     {
-
         $this->$first_name = $first_name;
         $this->$second_name = $second_name;
         $this->$contact_email = $contact_email;
@@ -51,6 +63,8 @@ class Guest extends \yii\db\ActiveRecord
         $this->$user_id = $user_id;
         $this->$document_id = $document_id;
     }
+
+
     /**
      * @inheritdoc
      */
@@ -59,7 +73,7 @@ class Guest extends \yii\db\ActiveRecord
         return [
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['user'],
+                'relations' => ['user', 'bookings'],
             ],
         ];
     }
@@ -100,8 +114,8 @@ class Guest extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDocument()
+    public function getDocuments()
     {
-        return $this->hasOne(Document::className(), ['id' => 'document_id']);
+        return $this->hasMany(Document::className(), ['document_id' => 'id']);
     }
 }

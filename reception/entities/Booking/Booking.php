@@ -192,5 +192,9 @@ class Booking extends \yii\db\ActiveRecord
         return true;
     }
 
+    public static function findByBookingIdentity($identity){
+        return Booking::find()->where(['external_id'=>$identity])->orWhere(['id'=>$identity])->one();
+    }
+
 
 }

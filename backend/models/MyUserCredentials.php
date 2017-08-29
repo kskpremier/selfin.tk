@@ -25,7 +25,7 @@ class MyUserCredentials extends UserCredentials {
 // переопределил функцию базового класса, чтобы она возращала готовый токен, если он есть и делала бы новый, если его нет
     public function createAccessToken(AccessTokenInterface $accessToken, $client_id, $user_id, $scope)
     {
-        $token = OauthAccessTokens::find()->where(['user_id'=>$user_id,'client_id'=>$client_id,'scope'=>$scope])->andWhere(['>','expires',time()])->one();
+        $token = OauthAccessTokens::find()->where(['user_id'=>$user_id,'client_id'=>$client_id,'scope'=>$scope])->andWhere(['>','expires',date("Y-m-d H:i:s",time())])->one();
         if (!isset($token)) {
             return parent::createAccessToken($accessToken, $client_id, $user_id, $scope);
         }

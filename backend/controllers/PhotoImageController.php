@@ -63,9 +63,10 @@ class PhotoImageController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($bookingId=null)
     {
         $model = new \backend\models\PhotoImage();
+        $model->booking_id = $bookingId;
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->user_id = Yii::$app->getUser()->id;

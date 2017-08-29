@@ -73,14 +73,15 @@ $this->params['breadcrumbs'][] = $this->title;
     echo Html::a(Yii::t('app', 'Get new password'), ['keyboard-pwd/create','booking_id'=>$model->id], ['class' => 'btn btn-success']);
     $searchModel = new \backend\models\PhotoImageSearch();
     $searchModel->booking_id = $model->id;
-    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);?>
 
-    echo $this->render('/photo-image/index', [
+    <?php echo $this->render('/photo-image/index', [
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider,
     ]);
 
     ?>
+    <?= Html::a('Add New Image', ['photo-image/create','bookingId'=>$model->id], ['class' => 'btn btn-success']) ?>
 
 
 </div>

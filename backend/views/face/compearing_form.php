@@ -17,14 +17,23 @@ use yii\widgets\ActiveForm;
 <div class="compearing-face-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
+    <div class="row">
+    <p>You will compare this face : </p>
+    <div class="col-md-11"><?php echo Html::img(Yii::getAlias('@imageUrl') . '/' . $originalFace->face_id . '.jpg', [
+            'alt'=>'Preview',
+            'style' => 'width:50px;'
+        ]); ?>
+    </div>
+    <p> with your choice from the other in list</p>
+    </div>
+    <p>List:</p>
    <?php foreach ($facesList as $id=>$face) { ?>
        <div class="row">
            <div class="col-md-11"><?php echo Html::img(Yii::getAlias('@imageUrl') . '/' . $face->face_id . '.jpg', [
                    'alt'=>'Preview',
                    'style' => 'width:50px;'
                ]); ?></div>
-           <div class="col-md-12"><?php echo $form->field($face, "[$id]isChecked")->checkbox(); ?> </div>
+           <div class="col-md-12"><?php echo $form->field($face, "[$id]isChecked")->checkbox()->label(false); ?> </div>
        </div>
    <?php }?>
 

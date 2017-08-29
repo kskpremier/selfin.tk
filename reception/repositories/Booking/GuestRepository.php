@@ -28,7 +28,7 @@ class GuestRepository
         return false;
     }
 
-    public function save(Guest $guest): void
+        public function save(Guest $guest): void
     {
         if (!$guest->save()) {
             throw new \RuntimeException('Saving error.');

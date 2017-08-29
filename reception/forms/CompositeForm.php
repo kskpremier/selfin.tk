@@ -9,10 +9,12 @@
 
 namespace reception\forms;
 
-use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
-abstract class CompositeForm extends Model
+use yii\helpers\ArrayHelper;
+use yii\base\Model;
+//use reception\forms\ModelForParsingJSON;
+
+abstract class CompositeForm extends Model//ModelForParsingJSON
 {
     /**
      * @var Model[]|array[]
@@ -23,12 +25,16 @@ abstract class CompositeForm extends Model
 
     public function load($data, $formName = null): bool
     {
+        $dataArrayFromJson=false;
         $success = parent::load($data, $formName);
         foreach ($this->forms as $name => $form) {
             if (is_array($form)) {
                 $success = Model::loadMultiple($form, $data, $formName === null ? null : $name) && $success;
             } else {
-                $success = $form->load($data, $formName !== '' ? null : $name) && $success;
+              if (array_key_exists($name,$data) && !is_array($data[$name]))
+                    $dataArrayFromJson[$name] = json_decode($data[$name],true); //если в качестве содержимого фомы передается оыщт объект то надо его распарсить в массив
+
+                $success = $form->load( is_array($dataArrayFromJson)?$dataArrayFromJson:$data , $formName !== '' ? null : $name) && $success; // если распарсился удачно, подставиться массив иначе начальные данные $data
             }
         }
         return $success;
@@ -113,4 +119,5 @@ abstract class CompositeForm extends Model
     {
         return isset($this->forms[$name]) || parent::__isset($name);
     }
+
 }

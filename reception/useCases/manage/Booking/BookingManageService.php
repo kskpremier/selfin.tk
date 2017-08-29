@@ -55,7 +55,9 @@ class BookingManageService
                 $form->contactEmail,
                 $user
             );
-
+            /**
+             * @TODO how to add guest in guest list of booking
+             */
             $booking = Booking::create(
                 $form->startDate,
                 $form->endDate,

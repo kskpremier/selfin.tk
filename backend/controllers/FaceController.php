@@ -173,17 +173,21 @@ class FaceController extends Controller
             if ( is_array($data['result'])) {
                 $flag = true;
                 foreach ($data['result'] as $id=>$result){
-                    $faceComparation = new FaceComparation([
+                    $faceComparation = FaceComparation::find()->where([
                         'origin_id'=>$faceImage->id,
                         'face_id'=>key($result),
-                        'probability'=>$result[key($result)],
-                    ]);
-                    $flag = $flag && $faceComparation->save();
+                    ])->one();
+                    $flag=true;
+                    if (!isset($faceComparation)) {
+                        $faceComparation = new FaceComparation([
+                            'origin_id' => $faceImage->id,
+                            'face_id' => key($result),
+                            'probability' => $result[key($result)],
+                        ]);
+                        $flag = $flag && $faceComparation->save();
+                    }
                 }
                 if ($flag) {
-//                    $searchModel = new FaceComparationSearch();
-//                    $searchModel->origin_id = $faceImage->id;
-//                    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
                     return $this->redirect (['face-comparation/index', 'origin_id'=>$faceImage->id ]);
                 }
                 throw new ServerException('Some problems with saving result of comparation' );
@@ -192,6 +196,7 @@ class FaceController extends Controller
         }
        else return $this->render('compearing_form', [
             'facesList' => $faceList,
+           'originalFace'=>$faceImage
         ]);
     }
 

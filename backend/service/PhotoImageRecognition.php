@@ -14,6 +14,8 @@ use yii\web\ServerErrorHttpException;
 use backend\models\Face;
 use backend\models\PhotoImage;
 use backend\service\Draw;
+use yii\httpclient\Client;
+
 
 /**
  * Class PhotoImageRecognition
@@ -109,26 +111,23 @@ class PhotoImageRecognition {
     public function faceDetect($filename)
     {
         $token  = FACEMATIKA::token();
-        $delimiter = '-------------'.uniqid();
-        $mime = $this->getMimeContentType();
-        $file = new oFile(Yii::getAlias('@imagePath').'/'.$filename, $mime, null);
-        $post = BodyPost::Get(['filename'=> $file ], $delimiter);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, FACEMATIKA::FACEMATIKA_URL_TO_FACE_DETECT);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: bearer '. $token,
-                'Content-Type: multipart/form-data; boundary=' . $delimiter,
-                'Content-Length: ' . strlen($post)]
-        );
-        $result = curl_exec ($ch);// or die(curl_error($ch));
-        curl_close ($ch);
-        return $result;
+        $result = $this->testRequest($token,$filename);
+        return $result->getContent();
+
     }
 
-
+    private function testRequest($token,$filename){
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setUrl(FACEMATIKA::FACEMATIKA_URL_TO_FACE_DETECT)
+            ->setHeaders([
+                'Authorization: bearer '. $token,
+                'Content-Type: multipart/form-data;'])
+            ->addFile('filename', Yii::getAlias('@imagePath').'/'.$filename)
+            ->send();
+        return $response;
+    }
     /**
      * Match specified face with a list of faces passed in request
      * @param string $originFace - id of origin photo
@@ -159,19 +158,29 @@ class PhotoImageRecognition {
         $token  = FACEMATIKA::token();
         $post = substr($post, 0, -1);
         $post.=']';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, FACEMATIKA::FACEMATIKA_URL_TO_FACE_MATCH.'/'.$originFace->face_id.'/match');
-//        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setUrl(FACEMATIKA::FACEMATIKA_URL_TO_FACE_MATCH.'/'.$originFace->face_id.'/match')
+            ->setHeaders([
                 'Authorization: bearer '. $token,
-                'Content-Type: application/json',
-                ]
-        );
+                'Content-Type: application/json'])
+           ->setContent($post)
+            ->send();
 
-        $result = curl_exec ($ch) or die(curl_error($ch));
-        curl_close ($ch);
+//        $ch = curl_init();
+//        curl_setopt($ch, CURLOPT_URL, FACEMATIKA::FACEMATIKA_URL_TO_FACE_MATCH.'/'.$originFace->face_id.'/match');
+////        curl_setopt($ch, CURLOPT_POST, 1);
+//        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+//                'Authorization: bearer '. $token,
+//                'Content-Type: application/json',
+//                ]
+//        );
+
+        $result = $response->content;//curl_exec ($ch) or die(curl_error($ch));
+        //curl_close ($ch);
         return $result;
     }
 
