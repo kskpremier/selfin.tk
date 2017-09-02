@@ -7,6 +7,7 @@ use yii\db\ActiveRecord;
 use yii\web\UploadedFile;
 use yiidreamteam\upload\ImageUploadBehavior;
 use reception\entities\Booking\Document;
+use Yii;
 
 /**
  * @property integer $id
@@ -49,10 +50,10 @@ class DocumentPhoto extends ActiveRecord
                 'class' => ImageUploadBehavior::className(),
                 'attribute' => 'file_name',
                 'createThumbsOnRequest' => true,
-                'filePath' => '@backend/uploads/images/document_photos/[[attribute_document_id]]/[[id]].[[extension]]',
-                'fileUrl' => '@backend/origin/uploads/images/document_photos/[[attribute_document_id]]/[[id]].[[extension]]',
-                'thumbPath' => '@backend/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
-                'thumbUrl' => '@backend/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+                'filePath' => Yii::getAlias('@documentPath').'/[[attribute_document_id]]/[[id]].[[extension]]',
+                'fileUrl' => Yii::getAlias('@documentUrl').'/[[attribute_document_id]]/[[id]].[[extension]]',
+                'thumbPath' => Yii::getAlias('@backend').'/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+                'thumbUrl' => Yii::getAlias('@backend').'/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
                 'thumbs' => [
                     'thumb' => ['width' => 120, 'height' => 48],
 

@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'date')->textInput() ?>
 
-    <?= $form->field($model, 'application_id')->textInput() ?>
+
 
     <?= $form->field($model, 'file_name')->textInput(['maxlength' => true]) ?>
 

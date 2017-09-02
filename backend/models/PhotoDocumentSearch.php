@@ -18,7 +18,7 @@ class PhotoDocumentSearch extends PhotoDocument
     public function rules()
     {
         return [
-            [['id', 'application_id', 'album_id'], 'integer'],
+            [['id', 'album_id'], 'integer'],
             [['date', 'file_name'], 'safe'],
         ];
     }
@@ -61,7 +61,7 @@ class PhotoDocumentSearch extends PhotoDocument
         $query->andFilterWhere([
             'id' => $this->id,
             'date' => $this->date,
-            'application_id' => $this->application_id,
+
             'album_id' => $this->album_id,
         ]);
 

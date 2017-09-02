@@ -265,6 +265,119 @@
                 ]
             }
         },
+        "/document": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Adding new document for rurthe registration in eVisitor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "documentForm",
+                        "in": "body",
+                        "description": "Document info",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/document/add": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Add document for guest",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "Document Info",
+                        "in": "body",
+                        "description": "Document information and images",
+                        "schema": {
+                            "$ref": "#/definitions/DocumentInfo"
+                        }
+                    },
+                    {
+                        "name": "img1",
+                        "in": "formData",
+                        "description": "Photoimage of first document page to upload",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "name": "img2",
+                        "in": "formData",
+                        "description": "Photoimage page file to upload",
+                        "type": "file"
+                    },
+                    {
+                        "name": "img3",
+                        "in": "formData",
+                        "description": "Photoimage page  file to upload",
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
         "/lock/add": {
             "post": {
                 "tags": [
@@ -385,6 +498,137 @@
                         "description": "Success response",
                         "schema": {
                             "$ref": "#/definitions/DoorLock"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/guest": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Adding new guest for rurthe registration in eVisitor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "guestForm",
+                        "in": "body",
+                        "description": "Guest info",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/GuestNew"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/Guest"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/guests": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Return all bookings model for authorized user",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "bookingId",
+                        "in": "query",
+                        "description": "Identity of booking from external systems",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/GuestList"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": [],
+                        "OAuth2": []
+                    }
+                ]
+            }
+        },
+        "/guest/view": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "description": "Return booking model finding by booking_id (internal door lock management system identity)",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Access token",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        },
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Identity of booking from internal systems",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/BookingView"
                         }
                     }
                 },
@@ -960,6 +1204,98 @@
                 "description": "Booking details",
                 "$ref": "#/definitions/BookingView"
             }
+        },
+        "Document": {
+            "properties": {
+                "id": {
+                    "description": "Internal document identity",
+                    "type": "integer",
+                    "example": "12"
+                },
+                "first_name": {
+                    "description": "Document's first name",
+                    "type": "string"
+                },
+                "second_name": {
+                    "description": "Document's second name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DocumentInfo": {
+            "required": {
+                "0": "firstName",
+                "1": "secondName",
+                "identityData": "027",
+                "numberOfDocument": "123456",
+                "gender": "male",
+                "country": "syr",
+                "city": "Damask",
+                "countryOfBirth": "syr",
+                "cityOfBirth": "Damask",
+                "dateOfBirth": "1972-10-08",
+                "citizenshipOfBirth": "rus",
+                "2": "bookingId"
+            },
+            "properties": {
+                "firstName": {
+                    "description": "First name of tourist",
+                    "type": "string",
+                    "example": "serg"
+                },
+                "secondName": {
+                    "description": "Second name of tourist",
+                    "type": "string",
+                    "example": "serginio"
+                },
+                "identityData": {
+                    "description": "Document's e-mail, using for Mobile App username",
+                    "type": "string",
+                    "example": "example@exa.com"
+                },
+                "numberOfDocument": {
+                    "description": "Number of document",
+                    "type": "string",
+                    "example": "123456"
+                },
+                "gender": {
+                    "description": "Gender (male/female)",
+                    "type": "string",
+                    "example": "male"
+                },
+                "country": {
+                    "description": "Citizenship",
+                    "type": "string",
+                    "example": "syr"
+                },
+                "city": {
+                    "description": "Current city in adress",
+                    "type": "string",
+                    "example": "Damask"
+                },
+                "countryOfBirth": {
+                    "description": "Country of birth",
+                    "type": "string",
+                    "example": "syr"
+                },
+                "dateOfBirth": {
+                    "description": "Date of birth",
+                    "type": "string",
+                    "example": "1972-10-08"
+                },
+                "citizenshipOfBirth": {
+                    "description": "Citizenship of birth",
+                    "type": "string",
+                    "example": "rus"
+                },
+                "bookingId": {
+                    "description": "Booking internal or external identity",
+                    "type": "string",
+                    "example": "616297"
+                }
+            },
+            "type": "object"
         },
         "DoorLockInit": {
             "required": [

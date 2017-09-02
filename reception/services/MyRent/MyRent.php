@@ -16,8 +16,9 @@ use yii\web\ServerErrorHttpException;
 
 class MyRent extends ActiveRecord
 {
+    public const MyRent_User_ID = "611";
     public const MyRent_URL_TO_TOKEN = "https://api.my-rent.net/account/login";
-    public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/1";
+    public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/".MyRent::MyRent_User_ID;
 
 
     public const MyRent_ACCESS_TOKEN = "f4e08415-c6e7-11e5-b7cf-0050563c3009"; // test

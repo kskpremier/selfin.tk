@@ -31,10 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'date',
 
-            [   'attribute'=>'application_id',
-                'value' => $model->application->name,
-                'label'=>'Application'
-            ],
+
             [   'attribute'=>'album_id',
                 'value'=> $model->album->name,
                 'label'=>'Album'

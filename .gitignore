@@ -1,8 +1,9 @@
 .idea
-vendor
+/vendor
+/vagrant
 composer.lock
 debugger.xml
-/_windows/
+
 /_mac/
 /backend/config/test-local.php
 /backend/config/params-local.php
@@ -14,14 +15,14 @@ debugger.xml
 /api/tests/
 
 Registration diagramma.png
-backend/config/bootstrap.php
-frontend/config/bootstrap.php
+/backend/config/bootstrap.php
+/frontend/config/bootstrap.php
 init.bat
 yii_test
 yii_test.bat
 
 /api/web
-/backend/web/
+/backend/web
 /frontend/web/
 
 /api/runtime/
@@ -29,12 +30,29 @@ yii_test.bat
 /frontend/runtime/
 .gitignore
 Description
-api/UML/end-to-end
-api/config/params-local-for-hosting.php
-api/controllers/1.php
-api/models/test/
-api/requests
-UML/
-backend/modules/
-environments/prod/api/
-vagrant/nginx/log/
+/api/UML/end-to-end
+/api/config/params-local-for-hosting.php
+/api/controllers/1.php
+/api/models/test/
+/api/requests
+/UML
+/backend/modules/
+/environments/prod/api/
+/vagrant/nginx/log/
+
+composer.phar
+
+.DS_Store
+
+
+phpunit.phar
+# local phpunit config
+/phpunit.xml
+
+/yii
+.gitsept02/
+current BP.graphmlz
+data
+data.php
+
+swagger.json

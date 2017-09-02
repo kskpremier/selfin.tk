@@ -50,5 +50,5 @@
   <option name="haveFileToSend" value="false" />
   <option name="isFileUpload" value="false" />
   <option name="textToSend" value="" />
-  <option name="filesToSend" value="/Users/SAS/Sites/E-reception/backend/web/uploads/images/real_photos/example.png" />
+  <option name="filesToSend" value="/Users/superbrodyaga/Sites/public_html/backend/web/uploads/images/real_photos/example.png" />
 </RestClientRequest>

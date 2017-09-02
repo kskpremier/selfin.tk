@@ -26,6 +26,7 @@ use yii\web\ServerErrorHttpException;
 use reception\services\MyRent\MyRent;
 
 
+
 /**
  * BookingController implements the CRUD actions for Booking model.
  */

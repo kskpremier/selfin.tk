@@ -27,11 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
            // 'id',
             'date',
             //'application_id',
-            [
-                'attribute'=>'application_id',
-                'label'=>'Application',
-                'value'=> 'application.type'
-            ],
+
             [
                 'attribute'=>'album_id',
                 'label'=>'Album',
