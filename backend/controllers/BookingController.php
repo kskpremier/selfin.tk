@@ -66,9 +66,11 @@ class BookingController extends Controller
         $model = new Booking();
 
         if ($model->load(Yii::$app->request->post()) ) {
-            if ($response=$model->createBookingLocal()) {
+            $modelAdded =  $model->addNewBooking(true); //добавляем букинг и посылаем писмьо пользователю (true)
+            if ($modelAdded) {
+                //$modelAdded->sendEmail($modelAdded->contact_email,$modelAdded); //пока письмо шлем сами
                 Yii::$app->session->setFlash('success', 'Booking was successfully downloaded');
-                return $this->redirect(['view', 'id' => $response]);
+                return $this->redirect(['view', 'id' => $modelAdded->id]);
             }
             else {
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');

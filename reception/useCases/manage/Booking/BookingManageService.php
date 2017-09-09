@@ -32,31 +32,49 @@ class BookingManageService
         $this->bookingRepository = $bookingRepository;
     }
 
-    public function create(BookingForm $form): Booking
+    public function create(BookingForm $form,$needToSendConfirmationLetter=null, $needToMakeUser=null): Booking
     {
+        $needToSendConfirmationLetter = ($needToSendConfirmationLetter==null)?false:$needToSendConfirmationLetter;
         if ($booking = $this->bookingRepository->isBookingExist($form->externalId, $form->startDate, $form->endDate, $form->apartmentId)){
             return $booking;
         }
         else {
-            //сначала проверяем - есть ли юзер
-            $user = User::findByEmail($form->contactEmail);
-            if (!isset($user)){
-                $password = User::generatePassword(6);
-                $user= User::create(
-                    $form->secondName.'_'.$form->firstName,
-                    $form->contactEmail,
-                    $password
+            $needToMakeUser = ($needToMakeUser==null)?false:$needToMakeUser;
+            if ($needToMakeUser) {
+                //сначала проверяем - есть ли юзер
+                $user = User::findByEmail($form->contactEmail);
+                if (isset($user) && $user->email === "info@my-rent.net") {
+                    $user = User::create(
+                        strtolower(str_replace(" ", "_", trim($form->firstName))),
+                        strtolower("mail_temp_" . User::generatePassword(6) . "_") . $form->contactEmail, //генерим "случайный" адрес
+                        $form->externalId //пароль - это значение номера букинга
+                    );
+                    $needToSendConfirmationLetter = false;
+                } elseif (!isset($user)) {
+                    $password = User::generatePassword(6);
+                    $user = User::create(
+                        $form->secondName . '_' . $form->firstName,
+                        $form->contactEmail,
+                        $password //пароль - это случайная строка
+                    );
+                }
+            }
+            $user = null;
+            $author = null;
+            if( $form->firstName|| $form->secondName|| $form->contactEmail) {
+                //теперь проверяем был ли такой автор заявки на букинг и делаем для него запись
+                $author = Guest::create(
+                    ($form->firstName) ? $form->firstName : "",
+                    ($form->secondName) ? $form->secondName : "",
+                    (!$form->contactEmail) ? (($user == null) ? '' : $user->email) : $form->contactEmail,
+                    $user
                 );
             }
-            //теперь проверяем был ли такой автор заявки на букинг
-            $author = Guest::create(
-                $form->firstName,
-                $form->secondName,
-                $form->contactEmail,
-                $user
-            );
+            //если в заявке есть список гостей - их надо добавить в список гостей букинга
+            $guestList = ($form->guests->isEmpty())?  $author : Guest::createGuestList($form->guests);
+
             /**
-             * @TODO how to add guest in guest list of booking
+             * @TODO how to add guest in guest list of booking - оно сделано в Gueste
              */
             $booking = Booking::create(
                 $form->startDate,
@@ -65,10 +83,14 @@ class BookingManageService
                 $author,
                 $form->numberOfTourist,
                 $form->externalId,
-                $form->status
+                Booking::STATUS_ACTIVE, //$form->status,
+                $guestList
             );
 
             $this->bookingRepository->save($booking);
+            if($needToSendConfirmationLetter) {
+                $booking->sendEmail($form->contactEmail, $password);
+            }
             $this->generateKeyboardPwdForBooking($booking);
             return $booking;
         }

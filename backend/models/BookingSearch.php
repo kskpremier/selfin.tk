@@ -76,8 +76,8 @@ class BookingSearch extends Booking
 
 
 
-        $query->andFilterWhere(['>=', 'booking.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
-        ->andFilterWhere(['<=', 'booking.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);
+        $query->andFilterWhere(['>=', 'booking.start_date', date("Y-m-d H:i:s",$this->start_date ? strtotime($this->start_date . ' 00:00:00'):null)])
+        ->andFilterWhere(['<=', 'booking.end_date', date("Y-m-d H:i:s",$this->end_date ? strtotime($this->end_date . ' 23:59:59'):null)]);
 
         return $dataProvider;
     }

@@ -28,7 +28,7 @@ use Yii;
  */
 class Guest extends \yii\db\ActiveRecord
 {
-    public static function create( $first_name, $second_name, $contact_email, $user, $booking=null) :self
+    public static function create( $first_name, $second_name, $contact_email, $user=null, $booking=null) :self
     {
         $guest = Guest::find()->where(['first_name'=>$first_name,'second_name'=>$second_name,'contact_email'=>$contact_email])->one();
         if (!isset($guest)) {
@@ -36,7 +36,8 @@ class Guest extends \yii\db\ActiveRecord
             $guest->first_name = $first_name;
             $guest->second_name = $second_name;
             $guest->contact_email = $contact_email;
-            $guest->user = $user;
+            if (isset($user))
+                $guest->user = $user;
         }
         $guest->bookings = $booking;
         return $guest;
@@ -52,6 +53,17 @@ class Guest extends \yii\db\ActiveRecord
         }
         $guest->bookings = $booking;
         return $guest;
+    }
+//формирует массив гостей в для букинга и возвращает его
+    public static function createGuestList($guests) {
+        foreach ($guests as $guest){
+            $guestList[] = Guest::create(
+                $guest->firstName,
+                $guest->secondName,
+                $guest->contactEmail
+                );
+        }
+        return $guestList;
     }
 
     public function edit( $first_name,$second_name,$contact_email, $application_id, $user_id, $document_id)

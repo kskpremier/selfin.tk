@@ -19,7 +19,7 @@
         "application/json"
     ],
     "paths": {
-        "/booking": {
+        "/booking?XDEBUG_SESSION_START=123456": {
             "post": {
                 "tags": [
                     "Booking"
@@ -314,7 +314,7 @@
                 ]
             }
         },
-        "/document/add": {
+        "/document/add?XDEBUG_SESSION_START=123456": {
             "post": {
                 "tags": [
                     "Booking"
@@ -1252,7 +1252,7 @@
                 "identityData": {
                     "description": "Document's e-mail, using for Mobile App username",
                     "type": "string",
-                    "example": "example@exa.com"
+                    "example": "027"
                 },
                 "numberOfDocument": {
                     "description": "Number of document",

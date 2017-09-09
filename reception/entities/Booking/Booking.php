@@ -36,8 +36,11 @@ use yii\httpclient\Client;
  */
 class Booking extends \yii\db\ActiveRecord
 {
+    public const STATUS_ACTIVE=10;
+    public const STATUS_CANCELLED=20;
+    public const STATUS_NONE=0;
 
-    public static function create( $startDate,$endDate,$apartmentId,$author,$numberOfGuest,$externalId,$status) :self
+    public static function create( $startDate,$endDate,$apartmentId,$author=null,$numberOfGuest,$externalId,$status,$guests=null) :self
     {
         $booking = self::find()->where([
             'start_date' =>$startDate,
@@ -55,7 +58,10 @@ class Booking extends \yii\db\ActiveRecord
             $booking->external_id = $externalId;
             $booking->number_of_tourist = $numberOfGuest;
             $booking->status = $status;
-            $booking->author = $author; 
+            if (isset($author))
+                $booking->author = $author;
+            if (isset($guests))
+                $booking->guests = $guests;
         }
         return $booking;
     }
@@ -165,19 +171,26 @@ class Booking extends \yii\db\ActiveRecord
      * @param string $email the target email address
      * @return bool whether the email was sent
      */
-    public function sendEmail($email)
+    public function sendEmail($email,$password=null)
     {
         $booking = $this;
         //Костыль - пока не знаю как поступить с человекочитаемым паролем
         //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRent
         //Перезатирается пароль
-        $this->temporary_password = $booking->author->user->getNewReadablePassword();
+        $this->temporary_password = (isset($password))? $password : $booking->author->user->getNewReadablePassword();
 
         return Yii::$app->mailer->compose()
             ->setTo($email)
             ->setFrom(["info@domouprav.hr"=>'Rona mReception'])
             ->setSubject('Booking informantion - door lock password key')
-            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.$booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.$booking->author->first_name.' '.PHP_EOL.'Password : '.$this->temporary_password.PHP_EOL.'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
+            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.
+                $booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.
+                ' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.
+                PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.
+                $booking->author->second_name.' '.PHP_EOL.'Password : '.$this->temporary_password.PHP_EOL.
+                'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.
+                ' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.
+                PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
             ->send();
     }
 

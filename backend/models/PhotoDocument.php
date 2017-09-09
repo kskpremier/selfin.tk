@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use yiidreamteam\upload\ImageUploadBehavior;
 
 /**
  * This is the model class for table "photo_document".
@@ -20,6 +21,7 @@ use Yii;
  */
 class PhotoDocument extends \yii\db\ActiveRecord
 {
+    public $file;
     /**
      * @inheritdoc
      */
@@ -35,10 +37,12 @@ class PhotoDocument extends \yii\db\ActiveRecord
     {
         return [
             [['date'], 'safe'],
-            [[ 'album_id'], 'integer'],
-            [['file_name'], 'string', 'max' => 255],
-            [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
 
+           // [['file_name'], 'file'],
+           // [['file_name'], 'string', 'max' => 255],
+            ['file_name', 'file', 'extensions' => 'jpeg, gif, png, jpg'],
+            [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => Album::className(), 'targetAttribute' => ['album_id' => 'id']],
+            [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
         ];
     }
 
@@ -50,7 +54,7 @@ class PhotoDocument extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'date' => 'Date',
-
+            'document_id'=>'Document ID',
             'file_name' => 'File Name',
             'album_id' => 'Album ID',
         ];
@@ -59,9 +63,9 @@ class PhotoDocument extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDocuments()
+    public function getDocument()
     {
-        return $this->hasMany(Document::className(), ['photo_document_id' => 'id']);
+        return $this->hasOne( Document::className(), ['id' => 'document_id']);
     }
 
     /**
@@ -80,5 +84,27 @@ class PhotoDocument extends \yii\db\ActiveRecord
     public function getPhotoDocumentFaces()
     {
         return $this->hasMany(PhotoDocumentFace::className(), ['photo_document_id' => 'id']);
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => ImageUploadBehavior::className(),
+                'attribute' => 'file_name',
+                'createThumbsOnRequest' => true,
+
+                'filePath' => '@documentPath/[[attribute_album_id]]/[[attribute_document_id]]/[[id]].[[extension]]',
+                'fileUrl' => '@documentUrl/[[attribute_album_id]]/[[attribute_document_id]]/[[id]].[[extension]]',
+                'thumbPath' => '@documentPath/cache/[[attribute_album_id]]/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+                'thumbUrl' => '@documentUrl/cache/[[attribute_album_id]]/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+
+
+                'thumbs' => [
+                    'thumb' => ['width' => 120, 'height' => 48],
+
+                ],
+            ],
+        ];
     }
 }

@@ -21,7 +21,7 @@ class DocumentPhoto extends ActiveRecord
     public static function create(UploadedFile $file, $documentId): self
     {
         $photo = new static();
-        $photo->file_name = $file->name;
+        $photo->file_name =  $file; //$documentId . '_' . uniqid() .'.'. $file->getExtension();
         $photo->document_id = $documentId;
         $photo->date = date("Y-m-d H:i",time());
         $photo->album_id=3; //оно вообще скорее всего не нужно это поле, но пока по умолчанию 3 -фото документов типа
@@ -50,10 +50,13 @@ class DocumentPhoto extends ActiveRecord
                 'class' => ImageUploadBehavior::className(),
                 'attribute' => 'file_name',
                 'createThumbsOnRequest' => true,
-                'filePath' => Yii::getAlias('@documentPath').'/[[attribute_document_id]]/[[id]].[[extension]]',
-                'fileUrl' => Yii::getAlias('@documentUrl').'/[[attribute_document_id]]/[[id]].[[extension]]',
-                'thumbPath' => Yii::getAlias('@backend').'/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
-                'thumbUrl' => Yii::getAlias('@backend').'/cache/document_photos/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+
+                'filePath' => '@documentPath/[[attribute_album_id]]/[[attribute_document_id]]/[[id]].[[extension]]',
+                'fileUrl' => '@documentUrl/[[attribute_album_id]]/[[attribute_document_id]]/[[id]].[[extension]]',
+                'thumbPath' => '@documentPath/cache/[[attribute_album_id]]/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+                'thumbUrl' => '@documentUrl/cache/[[attribute_album_id]]/[[attribute_document_id]]/[[profile]]_[[id]].[[extension]]',
+
+
                 'thumbs' => [
                     'thumb' => ['width' => 120, 'height' => 48],
 

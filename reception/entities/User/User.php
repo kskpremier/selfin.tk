@@ -2,7 +2,7 @@
 namespace reception\entities\User;
 
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use reception\entities\DoorLock\Key;
+use reception\entities\Apartment\Owner;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -48,6 +48,9 @@ class User extends ActiveRecord
             $user->status = self::STATUS_ACTIVE;
             $user->auth_key = Yii::$app->security->generateRandomString();
             $user->temporaryPassword =$password;
+            //толи хак, толи так надо я пока не понимаю
+            $user->save();
+            // TODO - change user->save() in USER
             return $user;
         }
     }
@@ -69,6 +72,7 @@ class User extends ActiveRecord
         $user->status = self::STATUS_WAIT;
         $user->email_confirm_token = Yii::$app->security->generateRandomString();
         $user->generateAuthKey();
+
         return $user;
     }
 
@@ -130,10 +134,17 @@ class User extends ActiveRecord
         return $this->status === self::STATUS_ACTIVE;
     }
 
+
     public function getNetworks(): ActiveQuery
     {
         return $this->hasMany(Network::className(), ['user_id' => 'id']);
     }
+
+    public function getOwner(): ActiveQuery
+    {
+        return $this->hasOne(Owner::className(), ['user_id' => 'id']);
+    }
+
 
 
     /**
@@ -153,7 +164,7 @@ class User extends ActiveRecord
             TimestampBehavior::className(),
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['networks', 'wishlistItems'],
+                'relations' => ['networks', 'guest'],
             ],
         ];
     }

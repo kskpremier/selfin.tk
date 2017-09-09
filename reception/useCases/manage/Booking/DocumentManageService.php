@@ -48,15 +48,23 @@ class DocumentManageService
         }
         $document = $this->documentRepository->isDocumentExist($form->firstName, $form->secondName, $form->numberOfDocument, $form->country, $form->dateOfBirth);
         if (!$document) {
-
+            $country=Country::find()->where(['code'=>$form->country])->one();
+            $citizen = ($country !=null) ? $country->id : 237; ///по умолчанию Зимбабве
+            $countryOfBirth=(Country::find()->where(['code'=>$form->countryOfBirth])->one());
+            $birthCountry = ($countryOfBirth !=null)? $countryOfBirth->id : $citizen;
+            $citizenshipOfBirth=(Country::find()->where(['code'=>$form->citizenshipOfBirth])->one());
+            $birthCitizenship = ($citizenshipOfBirth !=null)? $citizenshipOfBirth->id : $citizen;
             $document = Document::create($form->firstName,
                                         $form->secondName,
                                         (DocumentType::find()->where(['code'=>$form->identityData])->one())->id,
                                         $form->numberOfDocument, $form->gender,
-                                        (Country::find()->where(['code'=>$form->country])->one())->id, $form->city,
-                                        (Country::find()->where(['code'=>$form->countryOfBirth])->one())->id,
-                                        (Country::find()->where(['code'=>$form->citizenshipOfBirth])->one())->id,
-                                        $form->cityOfBirth, $form->dateOfBirth);
+                                        $citizen,
+                                        $form->city,
+                                        $birthCountry,
+                                        $birthCitizenship,
+                                        $form->cityOfBirth,
+                                        $form->dateOfBirth,
+                                        $form->validBefore);
         }
 
         $document->guest = $guest;
@@ -77,6 +85,23 @@ class DocumentManageService
             $images[]=$photo;
         }
         $document->images = $images;
+//        $document->populateRelation("images", reset($images));
+        $this->documentRepository->save($document);
+        return $document;
+    }
+
+    public function addGuestWithOnePageDocument(GuestDocumentAddForm $form): Document
+    {
+        //обработка и добавление семантики документа гостя
+        $document = $this->addDocument($form->eVisitorForm);
+        //обработка и добавление фотографий
+        foreach ($form->PhotosForm->files as $image){
+            $photo = new DocumentPhoto();
+            $photo=$photo->create($image, $document->id);
+            $images[]=$photo;
+        }
+        $document->images = $images;
+//        $document->populateRelation("images", reset($images));
         $this->documentRepository->save($document);
         return $document;
     }

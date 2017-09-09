@@ -24,6 +24,8 @@
  */
 namespace reception\forms;
 
+use backend\models\Country;
+use backend\models\DocumentType;
 use reception\entities\Booking\Booking;
 use yii\base\Model;
 //use yii\web\UploadedFile;
@@ -44,6 +46,7 @@ class eVisitorForm extends Model
     public $cityOfBirth;
     public $dateOfBirth;
     public $citizenshipOfBirth;
+    public $validBefore;
     //public $files;
 
     public $bookingId;
@@ -61,7 +64,11 @@ class eVisitorForm extends Model
             parent::rules(),[
                 [['firstName', 'secondName','country','city',
                     'identityData','numberOfDocument','gender','countryOfBirth','cityOfBirth','dateOfBirth','citizenshipOfBirth'], 'string'],
-                //['files', 'each', 'rule' => ['image']],
+                [['validBefore'],'integer'],
+
+                [['identityData'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['identityData'=>'code'],'message'=>'Type of  Document ID should exist'],
+                [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
+
                 [['bookingId'],'validateBooking','message'=>'Booking with this ID should exist']
             ]
         );

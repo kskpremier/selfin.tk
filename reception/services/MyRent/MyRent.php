@@ -8,6 +8,7 @@
 
 namespace reception\services\MyRent;
 
+use reception\forms\BookingForm;
 use yii\httpclient\Client;
 use yii\db\ActiveRecord;
 
@@ -19,11 +20,11 @@ class MyRent extends ActiveRecord
     public const MyRent_User_ID = "611";
     public const MyRent_URL_TO_TOKEN = "https://api.my-rent.net/account/login";
     public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/".MyRent::MyRent_User_ID;
+    public const MyRent_URL_TO_BOOKINGS_LIST = "https://api.my-rent.net/rents/list_change";
+    public const RENT_TIME_PERIOD = 3600*24;
+    public const MyRent_ACCESS_TOKEN = "bc8da49e-2b11-11e7-b171-0050563c3009"; // test
 
-
-    public const MyRent_ACCESS_TOKEN = "f4e08415-c6e7-11e5-b7cf-0050563c3009"; // test
-
-    public const MyRent_SICRET_KEY = "f4e08415-c6e7-11e5-b7cf-0050563c3009";
+    public const MyRent_SICRET_KEY = "bc8da49e-2b11-11e7-b171-0050563c3009";
 
     private $_token;
     private $_expires;
@@ -44,10 +45,38 @@ class MyRent extends ActiveRecord
             ->setMethod('post')
             ->setUrl(MyRent::MyRent_URL_TO_GUEST_ADD)
             ->setHeaders([
-                'Authorization: Basic '. $token,
+                'Authorization:'.$token,
                 'Content-Type: application/json'])
-            ->setData($json)
+            ->setContent($json)
             ->send();
+        return $response->content;
+    }
+
+    public static function getBookingsForOwner($userId,$objectId)
+    {
+        $token = MyRent::token();
+
+        //для всех помещений, где owner числится собственником проверяетсяналичие изменений в букингах
+
+            $post = [
+                "object_id" => $objectId,
+                "from_date" => date("Y-m-d", time()),
+                "until_date" => date("Y-m-d", time() + MyRent::RENT_TIME_PERIOD),
+                "changed" => date("y-m-d h:i:s", time())
+            ];
+
+        $json = \GuzzleHttp\json_encode($post);
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setUrl(MyRent::MyRent_URL_TO_BOOKINGS_LIST . "/" . $userId)
+            ->setHeaders([
+                'Authorization:' . $token,
+                'Content-Type: application/json'])
+            ->setContent($json)
+            ->send();
+            //обработка ответа и укладка данных в базу
+
         return $response->content;
     }
 

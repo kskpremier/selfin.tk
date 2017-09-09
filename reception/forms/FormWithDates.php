@@ -16,11 +16,12 @@
 namespace reception\forms;
 
 use yii\base\Model;
+use reception\forms\CompositeForm;
 
 /**
  * @property LockVersionForm $lockVersion
  */
-class FormWithDates extends Model
+abstract class FormWithDates extends CompositeForm
 {
     public $startDate;
     public $endDate;
@@ -45,7 +46,10 @@ class FormWithDates extends Model
 
     public function validateDates(){
 
-            if (strtotime($this->startDate) < (time()-60) ){
+//            if (strtotime($this->startDate) < (time()-60) ){
+//                $this->addError('Start Date must be bigger then current time');
+//            }
+            if (strtotime($this->endDate) < (time()) ){
                 $this->addError('Start Date must be bigger then current time');
             }
             if (strtotime($this->endDate) < strtotime($this->startDate) ){
@@ -53,7 +57,7 @@ class FormWithDates extends Model
             }
 
     }
-    public function load($data, $formName = null)
+    public function load($data, $formName = null) : bool
     {
         $result = parent::load($data, $formName);
         $this->convertDates();
@@ -62,6 +66,9 @@ class FormWithDates extends Model
     }
 
     private function convertDates(){
+//        if ($this->startDateTimestamp && gettype($this->startDateTimestamp)=='integer'){
+//            $this->startDate = date('Y-m-d H:i:s',$this->startDateTimestamp);
+//        }
         if ($this->startDateTimestamp && gettype($this->startDateTimestamp)=='integer'){
             $this->startDate = date('Y-m-d H:i:s',$this->startDateTimestamp);
         }

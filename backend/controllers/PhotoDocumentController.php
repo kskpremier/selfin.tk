@@ -67,13 +67,13 @@ class PhotoDocumentController extends Controller
         $model = new PhotoDocument();
 
         if ($model->load(Yii::$app->request->post()) ) {
-
+            $model->file_name = UploadedFile::getInstances($model, 'file_name');
             $model->save();
-            $image = UploadedFile::getInstance($model,'file_name');
-            $imageName = 'doc_image_'.$model->id.'.'.$image->getExtension() ;
-            $image->saveAs(Yii::getAlias('@documentPath').'/'.$imageName);
-            $model->file_name = $imageName;
-            $model->save();
+//            $image = UploadedFile::getInstance($model,'file_name');
+//            $imageName = 'doc_image_'.$model->id.'.'.$image->getExtension() ;
+//            $image->saveAs(Yii::getAlias('@documentPath').'/'.$imageName);
+//            $model->file_name = $imageName;
+//            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [

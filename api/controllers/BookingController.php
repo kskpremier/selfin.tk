@@ -13,7 +13,10 @@ use reception\forms\BookingForm;
 use reception\repositories\Booking\BookingRepository;
 use reception\useCases\manage\Booking\BookingManageService;
 use Yii;
-use backend\models\Booking;
+use reception\entities\Booking\Booking;
+use reception\services\MyRent\Myrent;
+use reception\entities\User\User;
+use reception\entities\Booking\Guest;
 use backend\models\BookingSearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -136,7 +139,7 @@ class  BookingController extends Controller
 
     /**
      * @SWG\Post(
-     *     path="/booking",
+     *     path="/booking?XDEBUG_SESSION_START=123456",
      *     tags={"Booking"},
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -186,7 +189,7 @@ class  BookingController extends Controller
 
         if ($form->load(Yii::$app->getRequest()->getBodyParams(), '') && $form->validate()) {
             try {
-                $booking = $this->service->create($form);
+                $booking = $this->service->create($form,true,true); //с письмом и потенциальным пользователем
                 if ($booking) {
                     $response = Yii::$app->getResponse();
                     $response->setStatusCode(201);
@@ -198,6 +201,9 @@ class  BookingController extends Controller
             } catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
+        }
+        else {
+            throw new ServerErrorHttpException('Failed to create the object => '. \GuzzleHttp\json_encode($form->getFirstErrors()) );
         }
     }
     /**
@@ -220,15 +226,91 @@ class  BookingController extends Controller
      * @return mixed
      */
     public function actionBookings()
-    {   $result=[];
+    {
+        //$result=[];
+        if (Yii::$app->user->can('owner',[])) {
+            //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
+            $user = User::findOne(Yii::$app->user->id);
+            // затем списка для регистрации туристов
+            foreach ($user->owner->apartments as $object) {
+                $response = MyRent::getBookingsForOwner($user->owner->external_id, $object->external_id);
+                //в ответе должен быть массив Json  c букингами - их надо разобрать
+                foreach ($response->content as $rentInfo) {
 
-        $guest = \backend\models\Guest::find()->where(['user_id'=>Yii::$app->user->getId()])->one();
-        $bookings = $guest->bookings;
-//        foreach($bookings as $booking){
-//            $result[] = $this->serializeBookingInfo($booking);
-//        }
+                    $config['externalId'] = $rentInfo["id"];
+                    $config['startDateTimestamp'] = strtotime($rentInfo["from_time"]);
+                    $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
+                    $config['apartmentId'] = $object->id;
+                    $config['externalApartmentId'] = $object->external_id;
+                    $config['firstName'] = $rentInfo["contact_name"];
+                    $config['secondName'] = $rentInfo["contact_name"];
+                    $config['contactEmail'] = $rentInfo["contact_email"];
+                    $config['numberOfTourist'] = $rentInfo["total_guests"];
+                    $config['status']= Booking::STATUS_ACTIVE;  // $rentInfo["rent_status"];
 
+                    $bookingForm = new BookingForm( $config);
+                    if ($bookingForm->load($bookingForm, '') && $bookingForm->validate()) {
+                        try {
+                            $booking = $this->service->create($bookingForm,false,false); //ни писем, ни пользователей
+                        } catch (\DomainException $e) {
+                            throw new BadRequestHttpException($e->getMessage(), null, $e);
+                        }
+                    } else {
+                        throw new ServerErrorHttpException('Failed to create the object => ' . \GuzzleHttp\json_encode($form->getFirstErrors()));
+                    }
+                }
+            }
+        }
+        $guest = Guest::find()->where(['user_id'=>Yii::$app->user->getId()])->one();
+        $bookings = $guest->getBookings()->fromToday()->all();//$guest->bookings;
+//        if ($guest) {
+//            $authorBookings = \backend\models\Booking::find()->where(['guest_id'=>$guest->id])->all();
+//            foreach($authorBookings as $booking){
+//                if (!key_exists($booking->id, $bookings))
+//                    $bookings[]  = $booking;//$this->serializeBookingInfo($booking);
+//                }
+//            }
         return $bookings;
+    }
+
+    public function actionMyRent()
+    {
+        //$result=[];
+        if (Yii::$app->user->can('owner', [])) {
+            //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
+            $user = User::findOne(Yii::$app->user->id);
+            // затем списка для регистрации туристов
+            foreach ($user->owner->apartments as $object) {
+                //$response = MyRent::getBookingsForOwner($user->owner->external_id, $object->external_id);
+                $response = Yii::$app->getRequest()->getBodyParams();
+//                $response = $bookingForm->load(Yii::$app->getRequest()->getBodyParams(),'');
+                //в ответе должен быть массив Json  c букингами - их надо разобрать
+                foreach ($response as $rentInfo) {
+
+                    $config['externalId'] = $rentInfo["id"];
+                    $config['startDateTimestamp'] = strtotime($rentInfo["from_date"])+ strtotime($rentInfo["from_time"],0);
+                    $config['endDateTimestamp'] = strtotime($rentInfo["until_date"])+strtotime($rentInfo["until_time"],0);
+                    $config['apartmentId'] = $object->id;
+                    $config['externalApartmentId'] = $object->external_id;
+                    $config['firstName'] = $rentInfo["contact_name"];
+                    $config['secondName'] = $rentInfo["contact_name"];
+                    $config['contactEmail'] = $rentInfo["contact_email"];
+                    $config['numberOfTourist'] = $rentInfo["total_guests"];
+                    $config['status'] = Booking::STATUS_ACTIVE;  // $rentInfo["rent_status"];
+
+                    $bookingForm = new BookingForm($config);
+                    if ($bookingForm->validate()) {
+                        try {
+                            $booking = $this->service->create($bookingForm);
+                        } catch (\DomainException $e) {
+                            throw new BadRequestHttpException($e->getMessage(), null, $e);
+                        }
+                    } else {
+                        throw new ServerErrorHttpException('Failed to create the object => ' . \GuzzleHttp\json_encode($bookingForm->getFirstErrors()));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -401,8 +483,11 @@ class  BookingController extends Controller
             'apartment_id' => $booking->apartment_id,
             'external_apartment_id' => $booking->apartment->external_id,
             'author' => $booking->author->user->username,
+            'login'=>  str_replace(" ","_",trim($booking->author->first_name)),
+            'password'=>$booking->external_id,
 //            'password' => ($booking->author->user->temporaryPassword)? $booking->author->user->temporaryPassword :'',
             'keyboardPwds' => $keyboardPwds,
+
         ];
     }
     

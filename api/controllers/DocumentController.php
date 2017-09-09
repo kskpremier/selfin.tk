@@ -50,18 +50,18 @@ class DocumentController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view','guest-add'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete', 'view','guest-add'],
+            'only' => ['create', 'update', 'delete', 'view'],
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin'],
+                    'roles' => ['receptionist','admin','tourist'],
                 ],
             ],
         ];
@@ -137,7 +137,7 @@ class DocumentController extends Controller
                 } elseif (!$document->hasErrors()) {
                     throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
                 }
-                return $this->serializeDocument($document);
+                return $this->serializeDocument($document,$result);
             } catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
@@ -154,17 +154,22 @@ class DocumentController extends Controller
                 Yii::$app->getResponse()->setStatusCode(201);
                 if ($document) {
                     $booking = Booking::findByBookingIdentity($form->eVisitorForm->bookingId);
+
                     $result = MyRent::addGuest($document, $booking);
                 }
-                return [];
+                return $this->serializeDocument($document);
             } catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
         }
+        else {
+            Yii::$app->getResponse()->setStatusCode(501);
+            throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->PhotosForm->getErrors()).' '.json_encode ($form->eVisitorForm->getErrors()));
+        }
     }
     /**
      * @SWG\Post(
-     *     path="/document/add",
+     *     path="/document/add?XDEBUG_SESSION_START=123456",
      *     tags={"Booking"},
      *     consumes={"multipart/form-data"},
      *     description="Add document for guest",
@@ -272,13 +277,18 @@ class DocumentController extends Controller
         }
     }
 
-    public function serializeDocument($document): array
+    public function serializeDocument($document,$result=null): array
     {
-
+        $images=[];
+            foreach($document->images as $image){
+                $images[]=$image->file_name;
+            }
         return [
             'first_name' => $document->first_name,
             'second_name' => $document->second_name,
             'id' => $document->id,
+            'image_files'=>$images,
+            'eVisitorID'=>$result
         ];
     }
 

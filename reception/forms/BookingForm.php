@@ -20,11 +20,10 @@
 namespace reception\forms;
 
 use reception\entities\Booking\Guest;
-use backend\models\Apartment;
+use reception\entities\Apartment\Apartment;
 use reception\entities\User\User;
 use yii\helpers\ArrayHelper;
-use reception\forms\FormWithDates;
-use yii\base\Model;
+
 
 /**
  * @property LockVersionForm $lockVersion
@@ -43,9 +42,14 @@ class BookingForm extends FormWithDates
     public $externalId;
     public $status;
 
+    /**
+     * BookingForm constructor.
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         parent::__construct($config);
+        $this->guests = new GuestForm();
         $this->status = self::STATUS_ACTIVE;
     }
 
@@ -58,9 +62,11 @@ class BookingForm extends FormWithDates
             parent::rules(),[
             [['firstName', 'secondName'], 'string', 'max'=>50],
             [['contactEmail'],'email'],
-            [['externalApartmentId','externalId'],'string', 'max'=>20],
+            [['externalApartmentId','externalId'],'safe'],
             [['apartmentId', 'numberOfTourist','status'], 'integer'],
-            [['externalApartmentId','apartmentId'],'validateApartment','message'=>'Apartment internal or external ID should exist']
+            [['externalApartmentId','apartmentId'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(),
+                'targetAttribute' => ['externalApartmentId'=>'external_id'],'message'=>'Apartment internal or external ID should exist'],
+           // [['externalApartmentId','apartmentId'],'validateApartment','message'=>'Apartment internal or external ID should exist']
                 ]
         );
         return $rules;
@@ -80,7 +86,7 @@ class BookingForm extends FormWithDates
     }
 
     public function getApartmentId(){
-        return (Apartment::find()->where(['external_id'=>$this->externalApartmentId])->one())->id;
+        return (Apartment::find()->where(['or', ['external_id'=>$this->externalApartmentId], ['id' => $this->apartmentId]])->one())->id;
     }
     public function getGuestId(){
         return Guest::find()->where(['external_id'=>$this->externalApartmentId])->one();
@@ -96,6 +102,10 @@ class BookingForm extends FormWithDates
         }
     }
 
+    protected function internalForms(): array
+    {
+        return ['guests'];
+    }
 
 
 }

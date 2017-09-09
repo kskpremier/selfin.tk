@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function($data){
                     //return Html::img(Url::toRoute(Yii::getAlias('@imageUrl').'/'.$data->file_name),[
-                    return Html::img(Yii::getAlias('@documentUrl').'/'.$data->file_name,[
+                    return Html::img($data->getImageFileUrl('file_name'),[
                         'alt'=>'Preview',
                         'style' => 'width:25px;'
                     ]);

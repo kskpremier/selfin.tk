@@ -34,9 +34,15 @@ class GuestForm extends Model
     public function rules(): array
     {
         return [
-            [['first_name','second_name'],'string'],
+            [['firstName','secondName'],'string'],
+            [['contactEmail'],'email'],
             [['applicationId', 'documentId','userId'],'integer'],
         ];
+    }
+    public function isEmpty(){
+        if (isset( $this->firstName) && isset( $this->firstName) && isset( $this->contactEmail) )
+            return false;
+        return true;
     }
 
 }

@@ -124,7 +124,7 @@ return [
                 'GET booking/view' => 'booking/view',
                 'GET booking/view-external' => 'booking/view-external',
                 'DELETE booking/delete' => 'booking/delete',
-
+                'POST myrent'=>'booking/my-rent',
 //               //crud  для замков
                 'POST lock/add' => 'door-lock/create',
 //                'PUT,PATCH door_lock' => 'door-lock/update',

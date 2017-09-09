@@ -196,7 +196,7 @@ class Booking extends \yii\db\ActiveRecord
             try {
 
                 //создать нового User, предварительно проверив наличие такого юзера по почтовому ящику
-                $user = User::findByUserEmail($this->contact_email);
+                $user = User::findByEmail($this->contact_email);
                 if (!$user) {
                     $signUp = new \frontend\models\SignupForm();
                     $signUp->email = $this->contact_email;
@@ -221,7 +221,7 @@ class Booking extends \yii\db\ActiveRecord
                     throw new BadRequestHttpException('Can not add guest with this name/email combination.');
                 }
                 //Найти имеющиеся апартаменты
-                if ($this->apartment_id) $apartment = Apartment::findOne(['apartment_id' => $this->apartment_id]);
+                if ($this->apartment_id) $apartment = Apartment::findOne(['id' => $this->apartment_id]);
                 else $apartment = Apartment::findOne(['external_id' => $this->external_apartment_id]);
                 if (!$apartment) {
                     throw new BadRequestHttpException('Can not find apartment with this identity.');
@@ -321,7 +321,7 @@ class Booking extends \yii\db\ActiveRecord
             ->setTo($email)
             ->setFrom(["info@domouprav.hr"=>'Rona mReception'])
             ->setSubject('Booking informantion - door lock password key')
-            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.$booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.$booking->author->first_name.' '.PHP_EOL.'Password : '.$this->temporary_password.PHP_EOL.'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
+            ->setTextBody('Dear guest, thank you for using our booking service.'.PHP_EOL.'You booking for apartment - '.$booking->apartment->name.' - is confirmed.'.PHP_EOL.' Period of living from '.$booking->start_date.' to '.$booking->end_date.PHP_EOL.'For opening the door you can use our Rona Mobile Application (for Android platform only). You can download it from http://domouprav.hr/mReception.apk .'.PHP_EOL.'Please use this login/password for first login to . '.PHP_EOL.' Login : '.$booking->author->second_name.' '.PHP_EOL.'Password : '.$this->temporary_password.PHP_EOL.'Please, don\'t forget change this password when you make your first login.'.PHP_EOL.' You can use Rona Mobile Application for opening door, self-registration, ordering services and getting some useful touristic information.'.PHP_EOL.'If you don\'t have Android platform smartphone - just use  digital keyboard password for opening the door :'.$booking->getKeyboardPwds()->one()->value )
             ->send();
     }
 

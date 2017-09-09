@@ -1,15 +1,13 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: SAS
- * Date: 01.06.17
- * Time: 0:09
+ * User: superbrodyaga
+ * Date: 9/8/17
+ * Time: 2:14 PM
  */
-
-
 namespace backend\models\query;
 
-use backend\models\Booking;
+use reception\entities\Booking\Booking;
 use yii\db\ActiveQuery;
 
 class BookingQuery extends ActiveQuery
@@ -20,7 +18,7 @@ class BookingQuery extends ActiveQuery
     }
     public function fromToday()
     {
-        return $this->andWhere(['>=', 'booking.end_date', date("Y-m-d",time())." 00:00:01"]);
+        return $this->andWhere(['>=', 'end_date', date("Y-m-d",time())." 00:00:01"]);
     }
     /**
      * @param null $db

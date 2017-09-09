@@ -45,7 +45,7 @@ class Document extends \yii\db\ActiveRecord
                                     $numberOfDocument, $gender,
                                     $country,  $city,
                                     $countryOfBirth,$citizenshipOfBirth,
-                                    $cityOfBirth, $dateOfBirth) :self
+                                    $cityOfBirth, $dateOfBirth, $validBefore) :self
     {
 
             $document = new static();
@@ -61,6 +61,7 @@ class Document extends \yii\db\ActiveRecord
             $document->second_name = $secondName;
             $document->number = $numberOfDocument;
             $document->country_id = $country;
+            $document->valid_before = date("Y-m-d H:i:s",$validBefore/1000);
 
         return $document;
     }
@@ -85,7 +86,7 @@ class Document extends \yii\db\ActiveRecord
             // "tel"=> "+38511234567",
             "citizenship"=> $this->citizenship->code,
             "birth_country"=>$this->birthCountry->code,
-            "gender"=>($this->gender=="male")?  "muški":"ženski", // "gender" : "muški",
+            "gender"=>(($this->gender=="male")||($this->gender=="M"))?  "muški":"ženski", // "gender" : "muški",
             "birth_city"=>$this->city_of_birth,
             "residence_city"=>$this->city_of_birth, ///не совсем корректно
             "birth_date"=> date("Y-m-d",  strtotime($this->date_of_birth)),
