@@ -281,7 +281,7 @@ class DocumentController extends Controller
     {
         $images=[];
             foreach($document->images as $image){
-                $images[]=$image->file_name;
+                $images[]=$image->getThumbFileUrl('file_name', 'thumb');
             }
         return [
             'first_name' => $document->first_name,

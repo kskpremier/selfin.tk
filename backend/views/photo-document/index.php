@@ -33,21 +33,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Album',
                 'value'=> 'album.name'
             ],
-            [
-                'attribute'=>'file_name',
-                'label'=>'Image',
-                //'value'=> 'album.name'
-            ],
+//            [
+//                'attribute'=>'file_name',
+//                'label'=>'Image',
+//                //'value'=> 'album.name'
+//            ],
             [
                 'label'=>'Preview',
                 'format' => 'raw',
                 'value' => function($data){
-                    //return Html::img(Url::toRoute(Yii::getAlias('@imageUrl').'/'.$data->file_name),[
-                    return Html::img($data->getImageFileUrl('file_name'),[
-                        'alt'=>'Preview',
-                        'style' => 'width:25px;'
-                    ]);
-                },
+                    return Html::a(
+                    Html::img($data->getThumbFileUrl('file_name', 'thumb')),
+                    $data->getUploadedFileUrl('file_name'),
+                    ['class' => 'thumbnail', 'target' => '_blank']);},
+//                    function($data){
+//                    //return Html::img(Url::toRoute(Yii::getAlias('@imageUrl').'/'.$data->file_name),[
+//                    return Html::img($data->getImageFileUrl('file_name'),[
+//                        'alt'=>'Preview',
+//                        'style' => 'width:25px;'
+//                    ]);
+//                },
             ],
             //'album_id',
 

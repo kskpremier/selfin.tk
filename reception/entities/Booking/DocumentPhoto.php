@@ -58,7 +58,7 @@ class DocumentPhoto extends ActiveRecord
 
 
                 'thumbs' => [
-                    'thumb' => ['width' => 120, 'height' => 48],
+                    'thumb' => ['width' => 350, 'height' => 250],
 
                 ],
             ],
