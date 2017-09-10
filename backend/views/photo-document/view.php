@@ -38,17 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [   'attribute'=>'file_name',
                 'format' => 'raw',
-                'value'=>Html::a(
-                    Html::img($model->getThumbFileUrl('file_name', 'thumb')),
-                    $model->getUploadedFileUrl('file_name'),
-                    ['class' => 'thumbnail', 'target' => '_blank']),
-
-                 //   $model->getThumbFileUrl('file_name','thumb'),//Yii::getAlias('@documentUrl').'/'.$model->file_name,
-//                'format'=>['image', [
-//                    'width'=>'100px',
-//                    //'height'=>130
-//                ],
-//                ],
+                'value'=>function($data) {
+                    $imageBlock='';
+                    foreach($data->images as $model) {
+                        $imageBlock .= Html::div(Html::a(
+                            Html::img($model->getThumbFileUrl('file_name', 'thumb')),
+                            $model->getUploadedFileUrl('file_name'),
+                            ['class' => 'thumbnail', 'target' => '_blank']), ['class' => "row"]);
+                    }
+                    return $imageBlock;
+                },
                 'label'=>'Preview'
             ],
 

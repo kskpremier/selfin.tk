@@ -31,15 +31,44 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'first_name',
             'second_name',
+            'gender',
             'number',
             'seria',
+            [   'attribute'=>'images',
+                'format' => 'raw',
+                'value'=>function($model) {
+                    $imageBlock='';
+                    foreach($model->images as $image) {
+
+                        $imageBlock = $imageBlock. Html::tag('span',
+                            Html::a(
+                                Html::img($image->getThumbFileUrl('file_name', 'thumb')),
+                                $image->getUploadedFileUrl('file_name'),
+                                ['class' => 'thumbnail', 'target' => '_blank'])
+                                ,['class'=>'row'])
+                                ;
+
+                    }
+                    return $imageBlock;
+                },
+                'label'=>'Preview'
+            ],
             'date_of_issue',
-            'photo_document_face_id',
-            'document_type_id',
-            'country_id',
+            [   'attribute'=>'document_type_id',
+            'value' => $model->documentType->name],
+            [   'attribute'=>'country_id',
+                'value' => $model->citizenship->name,
+                'label'=>'Citizenship'],
+            'city',
+            [   'attribute'=>'country_of_birth_id',
+                'value' => $model->birthCountry->name,
+                'label'=>'Country of birth'],
+            [   'attribute'=>'country_of_birth_id',
+                'value' => $model->birthCitizenship->name,
+                'label'=>'Citizenship of birth'],
             'valid_before',
-            'photo_document_id',
-            'guest_id',
+
+
         ],
     ]) ?>
 

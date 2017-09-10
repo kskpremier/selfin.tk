@@ -10,8 +10,8 @@
 
 namespace reception\entities\Apartment;
 
-use reception\entities\Booking\Booking;
-use reception\entities\DoorLock\DoorLock;
+use reception\entities\User\User;
+use reception\entities\Apartment\Apartment;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
@@ -24,13 +24,18 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  */
 class Owner extends ActiveRecord
 {
-    public static function create($user,$externalId)
+    public static function create( $externalId, $apartments, $user)
     {
         $owner = new static();
         $owner->user = $user;
         $owner->external_id = $externalId;
-
+        $owner->apartments = $apartments;
         return $owner;
+    }
+
+    public function updateApartment ($apartments)
+    {
+        $this->apartments = $apartments;
     }
 
     public static function tableName(): string

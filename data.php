@@ -8,10 +8,10 @@
 
 
 
-echo strtotime("2018-01-01T00:00:00");
-echo PHP_EOL;
-//echo date('y-m-d H:i:s', strtotime("2018-01-01 00:00:00"));
+//echo strtotime("2018-01-01T00:00:00");
 //echo PHP_EOL;
+echo date('y-m-d H:i:s', time()+60*60*24*90);
+echo PHP_EOL;
 //echo date('y-m-d H:i:s', "2018-08-11 00:00:00");
 //echo PHP_EOL;
 //

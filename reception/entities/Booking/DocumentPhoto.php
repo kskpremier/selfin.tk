@@ -2,7 +2,7 @@
 
 namespace reception\entities\Booking;
 
-//use shop\services\WaterMarker;
+use backend\models\Album;
 use yii\db\ActiveRecord;
 use yii\web\UploadedFile;
 use yiidreamteam\upload\ImageUploadBehavior;
@@ -71,5 +71,12 @@ class DocumentPhoto extends ActiveRecord
     public function getDocument()
     {
         return $this->hasOne( Document::className(), ['id' => 'document_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAlbum()
+    {
+        return $this->hasOne(Album::className(), ['id' => 'album_id']);
     }
 }

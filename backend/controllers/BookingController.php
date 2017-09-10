@@ -35,7 +35,7 @@ class BookingController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new BookingSearch();
+        $searchModel = new BookingSearch(['end_date'=>date('Y-m-d', time()+60*60*24*90)]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [

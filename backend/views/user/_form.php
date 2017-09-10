@@ -13,8 +13,9 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'username')->textInput() ?>
-    <?= $form->field($model, 'password_hash')->textInput() ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'email')->textInput() ?>
+    <?= $form->field($model, 'role')->dropDownList($model->rolesList()) ?>
 
 
     <div class="form-group">

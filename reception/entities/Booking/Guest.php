@@ -128,6 +128,6 @@ class Guest extends \yii\db\ActiveRecord
      */
     public function getDocuments()
     {
-        return $this->hasMany(Document::className(), ['document_id' => 'id']);
+        return $this->hasMany(Document::className(), ['guest_id' => 'id']);
     }
 }

@@ -28,12 +28,21 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+
             'first_name',
             'second_name',
             'contact_email:email',
-            'application_id',
-            'user_id',
+            ['attribute'=>'documents',
+                 'format' => 'raw',
+                'value'=>function($model) {
+                    $documentList='';
+                    foreach($model->documents as $document) {
+                        $documentList.= Html::a($document->number,['document/view','id'=>$document->id],['class' => 'thumbnail', 'target' => '_blank']);
+                    }
+                    return $documentList;
+                },
+            'label'=>'GuestList'],
+
         ],
     ]) ?>
 

@@ -2,7 +2,7 @@
 
 namespace backend\controllers;
 
-use phpDocumentor\Reflection\Types\Null_;
+
 use Yii;
 use backend\models\PhotoImage;
 use backend\models\PhotoImageSearch;

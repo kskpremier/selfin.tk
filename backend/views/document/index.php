@@ -24,11 +24,24 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
             'first_name',
             'second_name',
             'number',
-            'seria',
+
+            [   'attribute'=>'images',
+                'format' => 'raw',
+                'value'=>function($model) {
+                    $imageBlock='';
+                    foreach($model->images as $image) {
+
+                        $imageBlock = $imageBlock. Html::tag('span',Html::img($image->getThumbFileUrl('file_name', 'thumb'),
+                            ['class' => 'thumbnail', 'target' => '_blank']),['class'=>'row']);
+
+                    }
+                    return $imageBlock;
+                },
+                'label'=>'Preview'
+            ],
             // 'date_of_issue',
             // 'photo_document_face_id',
             // 'document_type_id',

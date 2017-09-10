@@ -62,6 +62,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
     ]);
     echo Html::a(Yii::t('app', 'Send E-Key'), ['key/create','booking_id'=>$model->id], ['class' => 'btn btn-success']);
+
+
+
     $searchModel = new \backend\models\KeyboardPwdSearch();
     $searchModel->booking_id = $model->id;
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

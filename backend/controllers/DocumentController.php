@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Document;
+use reception\entities\Booking\Document;
 use backend\models\DocumentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -63,7 +63,7 @@ class DocumentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Document();
+        $model = new Document() ;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Guest;
+use reception\entities\Booking\Guest;
 use backend\models\GuestSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

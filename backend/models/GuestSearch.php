@@ -5,7 +5,7 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Guest;
+use reception\entities\Booking\Guest;
 
 /**
  * GuestSearch represents the model behind the search form about `backend\models\Guest`.
@@ -18,7 +18,7 @@ class GuestSearch extends Guest
     public function rules()
     {
         return [
-            [['id', 'application_id', 'user_id'], 'integer'],
+            [['id', 'user_id'], 'integer'],
             [['first_name', 'second_name', 'contact_email'], 'safe'],
         ];
     }
@@ -60,12 +60,12 @@ class GuestSearch extends Guest
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'application_id' => $this->application_id,
             'user_id' => $this->user_id,
         ]);
 
         $query->andFilterWhere(['like', 'first_name', $this->first_name])
             ->andFilterWhere(['like', 'second_name', $this->second_name])
+
             ->andFilterWhere(['like', 'contact_email', $this->contact_email]);
 
         return $dataProvider;

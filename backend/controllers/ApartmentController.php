@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Apartment;
+use reception\entities\Apartment\Apartment;
 use backend\models\ApartmentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
