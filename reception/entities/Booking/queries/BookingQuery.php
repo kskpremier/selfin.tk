@@ -5,7 +5,7 @@
  * Date: 9/8/17
  * Time: 2:14 PM
  */
-namespace backend\models\query;
+namespace reception\entities\Booking\queries;
 
 use reception\entities\Booking\Booking;
 use yii\db\ActiveQuery;

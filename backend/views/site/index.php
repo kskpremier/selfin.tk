@@ -2,7 +2,7 @@
 
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = 'Mobile Reception';
 ?>
 <div class="site-index">
 
@@ -11,7 +11,7 @@ $this->title = 'My Yii Application';
 
         <p class="lead">Prove of concept for self-registration, electronic door locks, documents and images recognition </p>
 
-        <p><a class="btn btn-lg btn-success" href="http://e-reception.local/backend/index.php?r=booking%2Findex">Get started</a></p>
+        <p><a class="btn btn-lg btn-success" href="http://backend.domouprav.local/auth/login">Get started</a></p>
     </div>
 
     <div class="body-content">
@@ -29,9 +29,9 @@ $this->title = 'My Yii Application';
             <div class="col-lg-4">
                 <h2>Documents</h2>
 
-                <p>For document recognition we are going to use REST-API from ABBY </p>
+                <p>For document recognition we use  SDK from Microblink </p>
 
-                <p><a class="btn btn-default" href="http://ocrsdk.com/documentation/apireference/">ABBYY Cloud OCR SDK &raquo;</a></p>
+                <p><a class="btn btn-default" href="https://microblink.com/en">Microblink OCR SDK &raquo;</a></p>
             </div>
             <div class="col-lg-4">
                 <h2>Door locks</h2>

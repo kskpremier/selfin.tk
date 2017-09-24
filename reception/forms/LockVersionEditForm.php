@@ -5,7 +5,7 @@
  * Date: 05.07.17
  * Time: 7:42
  */
-namespace shop\forms\manage\Shop\Order;
+namespace reception\forms\manage\Shop\Order;
 
 use reception\entities\DoorLock\LockVersion;
 use reception\forms\CompositeForm;

@@ -28,16 +28,20 @@ class BookingRepository
         }
         return $booking;
     }
-    public function isBookingExist($externalId, $startDate,$endDate,$apartmentId)
+    public function isBookingExist($externalId, $startDate,$endDate,$status,$apartmentId)
     {
-        if ($booking = Booking::findOne([
-            'external_id' => $externalId,
-            'start_date'=>$startDate,
-            'end_date'=>$endDate,
-            'apartment_id'=>$apartmentId
-            ])) {
+        if ($booking = Booking::find()->where([
+                    'external_id' => $externalId,
+                    'start_date'=>$startDate,
+                    'end_date'=>$endDate,
+                    'status'=>$status,
+                    'apartment_id'=>$apartmentId
+                    ])
+//                    ->joinWith('apartment')
+//                    ->andWhere( ['apartment.external_id'=>$externalApartmentId])
+                    ->one()
+            )
             return $booking;
-        }
         return false;
     }
 

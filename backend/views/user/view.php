@@ -1,18 +1,19 @@
 <?php
 
+use reception\helpers\UserHelper;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\rbac\Item;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\User */
+/* @var $model reception\entities\User */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -25,19 +26,29 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'username',
-            'auth_key',
-            'password_hash',
-            'password_reset_token',
-            'email:email',
-            'status',
-            'created_at',
-            'updated_at',
-        ],
-    ]) ?>
-
+    <div class="box">
+        <div class="box-body">
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'id',
+                    'username',
+                    'email:email',
+//                    'phone',
+                    [
+                        'attribute' => 'status',
+                        'value' => UserHelper::statusLabel($model->status),
+                        'format' => 'raw',
+                    ],
+                    [
+                        'label' => 'Role',
+                        'value' => implode(', ', ArrayHelper::getColumn(Yii::$app->authManager->getRolesByUser($model->id), 'description')),
+                        'format' => 'raw',
+                    ],
+                    'created_at:datetime',
+                    'updated_at:datetime',
+                ],
+            ]) ?>
+        </div>
+    </div>
 </div>

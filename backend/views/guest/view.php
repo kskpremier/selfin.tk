@@ -37,11 +37,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($model) {
                     $documentList='';
                     foreach($model->documents as $document) {
-                        $documentList.= Html::a($document->number,['document/view','id'=>$document->id],['class' => 'thumbnail', 'target' => '_blank']);
+                        $documentList.= Html::a($document->number,['document/view','id'=>$document->id],['class' => 'link', 'target' => '_blank'])." ";
                     }
                     return $documentList;
                 },
-            'label'=>'GuestList'],
+            'label'=>'Documents'],
 
         ],
     ]) ?>

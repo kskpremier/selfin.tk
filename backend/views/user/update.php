@@ -1,21 +1,30 @@
 <?php
 
+/* @var $this yii\web\View */
+/* @var $model reception\forms\manage\User\UserEditForm */
+/* @var $user reception\entities\User */
+
+use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\User */
-
-$this->title = 'Update User: ' . $model->id;
+$this->title = 'Update User: ' . $user->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $user->id, 'url' => ['view', 'id' => $user->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="user-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <?php $form = ActiveForm::begin(); ?>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+    <?= $form->field($model, 'username')->textInput(['maxLength' => true]) ?>
+    <?= $form->field($model, 'email')->textInput(['maxLength' => true]) ?>
+    <?php //echo $form->field($model, 'phone')->textInput(['maxLength' => true]) ?>
+    <?= $form->field($model, 'role')->dropDownList($model->rolesList()) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton('Save', ['class' => 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
 
 </div>

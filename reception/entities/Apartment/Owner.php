@@ -18,7 +18,9 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 /**
  * @property String $location
  * @property String $name
+ * @property User $user
  * @property String $external_id
+ * * @property Apartment [] $apartments
 
 
  */
@@ -30,6 +32,7 @@ class Owner extends ActiveRecord
         $owner->user = $user;
         $owner->external_id = $externalId;
         $owner->apartments = $apartments;
+
         return $owner;
     }
 

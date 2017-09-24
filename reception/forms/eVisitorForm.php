@@ -18,6 +18,7 @@
  * @property string cityOfBirth
  * @property string dateOfBirth
  * @property string citizenshipOfBirth
+ * @property string $address
 
  * @property string bookingId
  *
@@ -47,7 +48,7 @@ class eVisitorForm extends Model
     public $dateOfBirth;
     public $citizenshipOfBirth;
     public $validBefore;
-    //public $files;
+    public $address;
 
     public $bookingId;
 
@@ -62,7 +63,7 @@ class eVisitorForm extends Model
     {
         $rules = array_merge(
             parent::rules(),[
-                [['firstName', 'secondName','country','city',
+                [['firstName', 'secondName','country','city','address',
                     'identityData','numberOfDocument','gender','countryOfBirth','cityOfBirth','dateOfBirth','citizenshipOfBirth'], 'string'],
                 [['validBefore'],'integer'],
 

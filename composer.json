@@ -43,7 +43,9 @@
         "yiisoft/yii2-redis": "^2.0",
         "zhuravljov/yii2-queue": "^1.0",
         "league/flysystem": "^1.0",
-        "yii-dream-team/yii2-upload-behavior": "*"
+        "yii-dream-team/yii2-upload-behavior": "*",
+        "yiisoft/yii2-queue": "^2.0",
+        "dmstr/yii2-adminlte-asset": "2.*"
 
 
     },
@@ -55,7 +57,8 @@
         "codeception/base": "^2.2.3",
         "codeception/verify": "~0.3.1",
 
-        "zircote/swagger-php": "^2.0"
+        "zircote/swagger-php": "^2.0",
+        "scotthuangzl/yii2-google-chart": "dev-master"
 
     },
     "repositories": [

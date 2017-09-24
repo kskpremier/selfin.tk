@@ -14,27 +14,34 @@ use yii\web\ServerErrorHttpException;
 class Draw {
 
     public $photoImage;
+    public $mime;
+    public $filename;
 
     /**
      * Draw constructor.
      * @param $photo
      */
-    public function __construct(PhotoImage $photo)
+    public function __construct($photo,$document=null,$filename=null,$mime=null)
     {
         $this->photoImage = $photo;
+        $this->filename = $filename;
+        $this->mime = $mime;
     }
 
 
     public function DrawRectangleFaceDetected()  {
-        $mime = mime_content_type(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
+        $mime = ($this->mime)?$this->mime : mime_content_type(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
         if ($mime == 'image/jpeg') {
-            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefromjpeg($this->filename);
         }
         elseif ($mime == 'image/png') {
-            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefrompng($this->filename);
         }
         elseif ($mime == 'image/bmp') {
-            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefromwbmp($this->filename);
         }
         else {
             throw new ServerErrorHttpException('Unknown file mime type.');
@@ -62,15 +69,27 @@ class Draw {
 
         //создаем файл или октрываем существующий для изменения
 //        $info = new SplFileInfo(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
-        $mime = mime_content_type(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
+        $mime = ($this->mime)?$this->mime : mime_content_type(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
+//        if ($mime == 'image/jpeg') {
+//            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//        }
+//        elseif ($mime == 'image/png') {
+//            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//        }
+//        elseif ($mime == 'image/bmp') {
+//            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//        }
         if ($mime == 'image/jpeg') {
-            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefromjpeg($this->filename);
         }
         elseif ($mime == 'image/png') {
-            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefrompng($this->filename);
         }
         elseif ($mime == 'image/bmp') {
-            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+//            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
+            $imageSrc = imagecreatefromwbmp($this->filename);
         }
         else {
             throw new ServerErrorHttpException('Unknown file mime type.');

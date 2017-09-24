@@ -12,17 +12,33 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        'formatter' => [
+            // 'dateFormat' => 'dd.MM.yyyy',
+            'decimalSeparator' => ',',
+            'thousandSeparator' => ' ',
+            'currencyCode' => 'EUR',
+            'numberFormatterOptions' => [
+                NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                NumberFormatter::MAX_FRACTION_DIGITS => 2,
+            ]
+        ],
         'request' => [
             'csrfParam' => '_csrf-frontend',
+            'cookieValidationKey' => $params['cookieValidationKey'],
         ],
         'user' => [
             'identityClass' => 'common\auth\Identity',
             'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true, 'domain' => $params['cookieDomain']],
+            'loginUrl' => ['auth/auth/login'],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
-            'name' => 'advanced-frontend',
+            'name' => '_session',
+            'cookieParams' => [
+                'domain' => $params['cookieDomain'],
+                'httpOnly' => true,
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

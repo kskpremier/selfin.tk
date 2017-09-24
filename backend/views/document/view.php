@@ -23,6 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?php echo  Html::a('Send image for faces recognition',
+            ['face/detect-face-from-document', 'documentId' => $model->id],
+            ['class' => 'btn btn-primary']); ?>
     </p>
 
     <?= DetailView::widget([
@@ -33,7 +36,24 @@ $this->params['breadcrumbs'][] = $this->title;
             'second_name',
             'gender',
             'number',
-            'seria',
+            'date_of_issue',
+            [   'attribute'=>'document_type_id',
+                'value' => $model->documentType->name],
+            [   'attribute'=>'country_id',
+                'value' => $model->citizenship->name,
+                'label'=>'Citizenship'],
+            'city',
+            'address',
+            [   'attribute'=>'country_of_birth_id',
+                'value' => $model->birthCountry->name,
+                'label'=>'Country of birth'],
+            [   'attribute'=>'country_of_birth_id',
+                'value' => $model->birthCitizenship->name,
+                'label'=>'Citizenship of birth'],
+            [   'attribute'=>'valid_before',
+                'value'=> function ($model) {
+                return $model->valid_before; },
+            ],
             [   'attribute'=>'images',
                 'format' => 'raw',
                 'value'=>function($model) {
@@ -45,28 +65,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                 Html::img($image->getThumbFileUrl('file_name', 'thumb')),
                                 $image->getUploadedFileUrl('file_name'),
                                 ['class' => 'thumbnail', 'target' => '_blank'])
-                                ,['class'=>'row'])
-                                ;
+                                ,['class'=>'row']).PHP_EOL;
+//                        foreach($image->faces as $face){
+//                            $imageBlock.= Html::img(Yii::getAlias('@imageUrl') . '/' . $face->face_id . '.jpg'.PHP_EOL,['class' => 'thumbnail', 'target' => '_blank']);
+//                        }
 
                     }
                     return $imageBlock;
                 },
                 'label'=>'Preview'
             ],
-            'date_of_issue',
-            [   'attribute'=>'document_type_id',
-            'value' => $model->documentType->name],
-            [   'attribute'=>'country_id',
-                'value' => $model->citizenship->name,
-                'label'=>'Citizenship'],
-            'city',
-            [   'attribute'=>'country_of_birth_id',
-                'value' => $model->birthCountry->name,
-                'label'=>'Country of birth'],
-            [   'attribute'=>'country_of_birth_id',
-                'value' => $model->birthCitizenship->name,
-                'label'=>'Citizenship of birth'],
-            'valid_before',
+
+
+
 
 
         ],

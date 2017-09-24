@@ -64,12 +64,12 @@ class DocumentManageService
                                         $birthCitizenship,
                                         $form->cityOfBirth,
                                         $form->dateOfBirth,
-                                        $form->validBefore);
+                                        $form->validBefore,
+                                        $form->address);
         }
 
         $document->guest = $guest;
         $this->documentRepository->save($document);
-
 
         return $document;
     }
@@ -85,7 +85,6 @@ class DocumentManageService
             $images[]=$photo;
         }
         $document->images = $images;
-//        $document->populateRelation("images", reset($images));
         $this->documentRepository->save($document);
         return $document;
     }
@@ -101,7 +100,6 @@ class DocumentManageService
             $images[]=$photo;
         }
         $document->images = $images;
-//        $document->populateRelation("images", reset($images));
         $this->documentRepository->save($document);
         return $document;
     }

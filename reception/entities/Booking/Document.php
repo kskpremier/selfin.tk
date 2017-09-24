@@ -30,7 +30,9 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property integer $citizenship_of_birth_id
  * @property string $city_of_birth
  * @property string $date_of_birth
+  * @property string $address
  * @property integer $document_type_id
+ *
  *
  * @property PhotoImage $photo
  * @property integer $guest_id
@@ -45,7 +47,7 @@ class Document extends \yii\db\ActiveRecord
                                     $numberOfDocument, $gender,
                                     $country,  $city,
                                     $countryOfBirth,$citizenshipOfBirth,
-                                    $cityOfBirth, $dateOfBirth, $validBefore) :self
+                                    $cityOfBirth, $dateOfBirth, $validBefore, $address) :self
     {
 
             $document = new static();
@@ -61,6 +63,7 @@ class Document extends \yii\db\ActiveRecord
             $document->second_name = $secondName;
             $document->number = $numberOfDocument;
             $document->country_id = $country;
+            $document->address = $address;
             $document->valid_before = date("Y-m-d H:i:s",$validBefore/1000);
 
         return $document;
@@ -77,23 +80,18 @@ class Document extends \yii\db\ActiveRecord
 
     public function fields(){
         return [
-           // "b2b_id"=> 146,
-           // "erp_id"=>"01_01_01",
             "name_first"=>$this->first_name,
             "name_last"=> $this->second_name,
-           // "email"=>$this->guest->contact_email,
-           // "terrace"=> "Y",
-            // "tel"=> "+38511234567",
             "citizenship"=> $this->citizenship->code,
             "birth_country"=>$this->birthCountry->code,
-            "gender"=>(($this->gender=="male")||($this->gender=="M"))?  "muški":"ženski", // "gender" : "muški",
+            "gender"=>(($this->gender=="male")||($this->gender=="M"))?  "muški":"ženski",
             "birth_city"=>$this->city_of_birth,
-            "residence_city"=>$this->city_of_birth, ///не совсем корректно
-            "birth_date"=> date("Y-m-d",  strtotime($this->date_of_birth)),
+            "residence_city"=>$this->city_of_birth,
+            "birth_date"=> $this->date_of_birth,
             "document_number"=>$this->number,
             "document_type"=>$this->documentType->code,
             "residence_country" => $this->citizenship->code,
-            "residence_adress"  =>"ilica 1",
+            "residence_adress"  =>$this->address,
 
             "arrival_organisation" => "I",
             "offered_service_type" => "noćenje",

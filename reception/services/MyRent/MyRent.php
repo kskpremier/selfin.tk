@@ -20,7 +20,8 @@ class MyRent extends ActiveRecord
     public const MyRent_User_ID = "611";
     public const MyRent_URL_TO_TOKEN = "https://api.my-rent.net/account/login";
     public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/".MyRent::MyRent_User_ID;
-    public const MyRent_URL_TO_BOOKINGS_LIST = "https://api.my-rent.net/rents/list_change";
+    public const MyRent_URL_TO_BOOKINGS_LIST = "https://api.my-rent.net/rents/list";
+    public const MyRent_URL_TO_ARRIVALS_LIST = "https://api.my-rent.net/rents/arrivals";
     public const RENT_TIME_PERIOD = 3600*24;
     public const MyRent_ACCESS_TOKEN = "bc8da49e-2b11-11e7-b171-0050563c3009"; // test
 
@@ -58,18 +59,18 @@ class MyRent extends ActiveRecord
 
         //для всех помещений, где owner числится собственником проверяетсяналичие изменений в букингах
 
-            $post = [
-                "object_id" => $objectId,
-                "from_date" => date("Y-m-d", time()),
-                "until_date" => date("Y-m-d", time() + MyRent::RENT_TIME_PERIOD),
-                "changed" => date("y-m-d h:i:s", time())
-            ];
+            $post = //[
+               // "object_id" => $objectId,
+              //  "from_date" => date("Y-m-d", time()),
+              //  "until_date" => date("Y-m-d", time() + MyRent::RENT_TIME_PERIOD),
+              //  "changed" => date("Y-m-d h:i:s", time())
+           // ];
 
-        $json = \GuzzleHttp\json_encode($post);
+        $json ="{}";// \GuzzleHttp\json_encode($post);
         $client = new Client();
         $response = $client->createRequest()
             ->setMethod('post')
-            ->setUrl(MyRent::MyRent_URL_TO_BOOKINGS_LIST . "/" . $userId)
+            ->setUrl(MyRent::MyRent_URL_TO_ARRIVALS_LIST . "/" . $userId)
             ->setHeaders([
                 'Authorization:' . $token,
                 'Content-Type: application/json'])

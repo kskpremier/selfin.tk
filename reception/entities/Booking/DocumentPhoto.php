@@ -79,4 +79,11 @@ class DocumentPhoto extends ActiveRecord
     {
         return $this->hasOne(Album::className(), ['id' => 'album_id']);
     }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFaces()
+    {
+        return $this->hasMany(\backend\models\Face::className(), ['photo_image_id' => 'id']);
+    }
 }

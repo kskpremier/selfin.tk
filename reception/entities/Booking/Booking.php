@@ -40,21 +40,20 @@ class Booking extends \yii\db\ActiveRecord
     public const STATUS_CANCELLED=20;
     public const STATUS_NONE=0;
 
-    public static function create( $startDate,$endDate,$apartmentId,$author=null,$numberOfGuest,$externalId,$status,$guests=null) :self
+    public static function create( $startDate,$endDate,$apartment,$author=null,$numberOfGuest,$externalId,$status,$guests=null) :self
     {
-        $booking = self::find()->where([
-            'start_date' =>$startDate,
-            'end_date' =>$endDate,
-            'apartment_id' =>$apartmentId,
-            'external_id' =>$externalId,
-            'number_of_tourist' =>$numberOfGuest,
-            'status' =>$status
-            ])->one();
+//        $booking = self::find()->where([
+//            'start_date' =>$startDate,
+//            'end_date' =>$endDate,
+//            'external_id' =>$externalId,
+//            'number_of_tourist' =>$numberOfGuest,
+//            'status' =>$status
+//            ])->one();
         if ( !isset($booking) ) {
             $booking = new static();
             $booking->start_date = $startDate;
             $booking->end_date = $endDate;
-            $booking->apartment_id = $apartmentId;
+//            $booking->apartment_id = $apartmentId;
             $booking->external_id = $externalId;
             $booking->number_of_tourist = $numberOfGuest;
             $booking->status = $status;
@@ -63,6 +62,7 @@ class Booking extends \yii\db\ActiveRecord
             if (isset($guests))
                 $booking->guests = $guests;
         }
+        $booking->apartment = $apartment;
         return $booking;
     }
 
@@ -144,8 +144,10 @@ class Booking extends \yii\db\ActiveRecord
         return [
             'booking_id'=>'id',
             'external_booking_id' => 'external_id',
-            'start_date'=>'start_date',
-            'end_date'=>'end_date',
+            'start_date'=>function (){
+                             return date ("Y-m-d H:i", strtotime($this->start_date));
+                            },
+            'end_date'=>function (){return date ("Y-m-d H:i", strtotime( $this->end_date));},
             'apartment_id'=>'apartment_id',
             'apartment_name'=>function (){return $this->apartment->name;},
             'external_apartment_id' => function (){return $this->apartment->external_id;},
@@ -160,7 +162,7 @@ class Booking extends \yii\db\ActiveRecord
             //   MetaBehavior::className(),
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['author','guests'],
+                'relations' => ['author','guests','apartment'],
             ],
         ];
     }

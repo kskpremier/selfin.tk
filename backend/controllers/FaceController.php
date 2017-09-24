@@ -7,6 +7,8 @@ use backend\models\FaceComparation;
 use backend\models\PhotoImage;
 use backend\service\PhotoImageRecognition;
 use GuzzleHttp\Exception\ServerException;
+use reception\entities\Booking\Document;
+use reception\entities\Booking\DocumentPhoto;
 use Yii;
 use backend\models\Face;
 use backend\models\FaceSearch;
@@ -145,6 +147,24 @@ class FaceController extends Controller
             return $this->redirect(['photo-image/view', 'id' => $photoImageId]);
         }
         throw new ServerException('Could not find Photoimage with this id'.$photoImageId );
+    }
+
+    /**
+     * @param integer $photoImageId
+     * @return \yii\web\Response
+     */
+    public function actionDetectFaceFromDocument($documentId){
+
+        $document = Document::findOne($documentId);
+
+        if ($document) {
+            foreach ($document->images as $photoImage) {
+                $recognizedImage = new PhotoImageRecognition($photoImage);
+                $recognizedImage->recognize(true); //признак того, что распознаем документ
+            }
+            return $this->redirect(['document/view', 'id' => $documentId]);
+        }
+        throw new ServerException('Could not find Document photo with this id'.$documentPhotoId );
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\views\Calculator\CalculateForm;
+use frontend\views\Calculator\Calculator;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -209,5 +211,88 @@ class SiteController extends Controller
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
+    }
+
+
+    /**
+     * Displays Calculate page.
+     *
+     * @return mixed
+     */
+    public function actionCalculate()
+    {
+        $form = new CalculateForm();
+
+        if ($form->load(Yii::$app->getRequest()->post(), 'CalculateForm') && $form->validate()) {
+
+            $result = Calculator::calculate($form);
+
+            return $this->render('/Calculator/ComplexView', [
+                'model' => $result,
+                'modelForm'=>$form
+            ]);
+
+        }
+
+        else {
+            return $this->render('/Calculator/_Calculator', [
+                'model' => $form,
+            ]);
+        }
+    }
+    /**
+     * Displays chart page.
+     *
+     * @return mixed
+     */
+    public function actionChart($name,$volumeOfBooking=null,$beds=null,$square=null)
+    {
+        switch ($name) {
+            case  "Multichannel" :
+                for ($i=2000; $i<20000 ; $i=$i+1) {
+                    $X[] = $i;
+                    $Y[] = Calculator::calculatePercentageRateForMultichanneling($i);
+                }
+                $data["Title"] = "Multichannel, %rate from booking value";
+                $data["AxisX"] = "Volume of booking, EUR";
+                $data["AxisY"] = "Price, %";
+                break;
+            case  "Yielding" :
+                for ($i=2000; $i<20000 ; $i=$i+1) {
+                    $X[] = $i;
+                    $Y[] = Calculator::calculatePercentageRateForYielding($i);
+                }
+                $data["Title"] = "Yielding, %rate from booking value";
+                $data["AxisX"] = "Volume of booking, EUR";
+                $data["AxisY"] = "Price, %";
+                break;
+            case  "Reception" :
+                for ($i=5; $i<50 ; $i=$i+1) {
+                    $X[] = $i;
+                    $Y[] = Calculator::calculatePercentageRateForReception($i,$volumeOfBooking,$beds);
+                }
+                $data["Title"] = "Reception, %rate from booking value / smena";
+                $data["AxisX"] = "Number of registrations";
+                $data["AxisY"] = "Price, %";
+                break;
+            case  "Housekeeping" :
+                for ($i=25; $i<200 ; $i=$i+2) {
+                    $X[] = $i;
+                    $Y[] = Calculator::calculateEURSquareMPriceForCleaning($i);
+                }
+                $data["Title"] = "Price for cleaning 1 m2";
+                $data["AxisX"] = "m2";
+                $data["AxisY"] = "Price, EUR";
+                break;
+
+        }
+
+        return $this->render('/Charts/Multichannel', [
+            'x' => $X,
+            'y' => $Y,
+            'legend'=>$data
+        ]);
+
+
     }
 }

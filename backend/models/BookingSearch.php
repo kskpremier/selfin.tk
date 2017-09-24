@@ -67,7 +67,7 @@ class BookingSearch extends Booking
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'booking.id' => $this->id,
             'number_of_tourist' => $this->number_of_tourist,
         ]);
         $query->andFilterWhere(['like', 'apartment.name', $this->apartmentName]);

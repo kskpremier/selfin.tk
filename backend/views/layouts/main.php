@@ -10,7 +10,11 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
 
-AppAsset::register($this);
+backend\assets\AppAsset::register($this);
+
+dmstr\web\AdminLteAsset::register($this);
+
+$directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -38,23 +42,22 @@ AppAsset::register($this);
         $menuItems = [
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'Apartments', 'url' => ['/apartment/index']],
-            ['label' => 'Booking', 'url' => ['/booking/index']],
+            ['label' => 'Bookings', 'url' => ['/booking/index']],
             ['label' => 'Faces', 'url' => ['/photo-image/index']],
             ['label' => 'Documents', 'url' => ['/document/index']],
             ['label' => 'Photo', 'url' => ['/photo-document/index']],
             ['label' => 'Owner', 'url' => ['/owner/index']],
             ['label' => 'DoorLocks', 'url' => ['/door-lock/index']],
-            ['label' => 'Users', 'url' => ['/user/index']],
             ['label' => 'Keys', 'url' => ['/key/index']],
             ['label' => 'Passwords', 'url' => ['/keyboard-pwd/index']],
-
+            ['label' => 'Users', 'url' => ['/user/index']],
         ];
     }
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => 'Login', 'url' => ['/auth/login']];
     } else {
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['/auth/logout'], 'post')
             . Html::submitButton(
                 'Logout (' . Yii::$app->user->identity->getUsername() . ')',
                 ['class' => 'btn btn-link logout']
@@ -80,7 +83,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Domouprav <?= date('Y') ?></p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>

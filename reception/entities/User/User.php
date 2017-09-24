@@ -1,12 +1,21 @@
 <?php
 namespace reception\entities\User;
 
+use reception\entities\EventTrait;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Owner;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+//
+//use filsh\yii2\oauth2server\Module;
+//use OAuth2\Storage\UserCredentialsInterface;
+////use reception\entities\User\User;
+//use reception\readModels\UserReadRepository;
+//
+//use yii\web\IdentityInterface;
+
 
 /**
  * User model
@@ -27,8 +36,12 @@ use yii\db\ActiveRecord;
  * @property Network[] $networks
  * @property WishlistItem[] $wishlistItems
  */
-class User extends ActiveRecord
+class User extends ActiveRecord //implements IdentityInterface, UserCredentialsInterface
 {
+    use EventTrait;
+
+//    private $user;
+
     const STATUS_WAIT = 0;
     const STATUS_ACTIVE = 10;
 
@@ -38,6 +51,7 @@ class User extends ActiveRecord
     {
         $user = User::find()->where(['username'=>$username,'email'=>$email])->one();
         if ($user)
+//            $this->user = $user;
             return $user;
         else {
             $user = new User();
@@ -72,7 +86,7 @@ class User extends ActiveRecord
         $user->status = self::STATUS_WAIT;
         $user->email_confirm_token = Yii::$app->security->generateRandomString();
         $user->generateAuthKey();
-
+        $user->recordEvent(new UserSignUpRequested($user));
         return $user;
     }
 
@@ -83,6 +97,7 @@ class User extends ActiveRecord
         }
         $this->status = self::STATUS_ACTIVE;
         $this->email_confirm_token = null;
+        $this->recordEvent(new UserSignUpRequested($this));
     }
 
     public static function signupByNetwork($network, $identity): self
@@ -277,4 +292,61 @@ class User extends ActiveRecord
         }
         return $string;
     }
+
+
+//    public static function findIdentity($id)
+//    {
+//        $user = self::getRepository()->findActiveById($id);
+//        return $user ? new self($user): null;
+//    }
+//
+//    public static function findIdentityByAccessToken($token, $type = null)
+//    {
+//        $data = self::getOauth()->getServer()->getResourceController()->getToken();
+//        return !empty($data['user_id']) ? static::findIdentity($data['user_id']) : null;
+//    }
+//
+//    public function getId(): int
+//    {
+//        return $this->user->id;
+//    }
+//    public function getUsername(): string
+//    {
+//        return $this->user->username;
+//    }
+//
+//    public function getAuthKey(): string
+//    {
+//        return $this->user->auth_key;
+//    }
+//
+//    public function validateAuthKey($authKey): bool
+//    {
+//        return $this->getAuthKey() === $authKey;
+//    }
+//
+//    public function checkUserCredentials($username, $password): bool
+//    {
+//        if (!$user = self::getRepository()->findActiveByUsername($username)) {
+//            return false;
+//        }
+//        return $user->validatePassword($password);
+//    }
+//
+//    public function getUserDetails($username): array
+//    {
+//        $user = self::getRepository()->findActiveByUsername($username);
+//        return ['user_id' => $user->id];
+//    }
+//
+//    private static function getRepository(): UserReadRepository
+//    {
+//        return \Yii::$container->get(UserReadRepository::class);
+//    }
+//
+//    private static function getOauth(): Module
+//    {
+//        return Yii::$app->getModule('oauth2');
+//    }
+
 }

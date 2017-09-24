@@ -41,7 +41,7 @@ class PhotoImageRecognition {
      * PhotoImageRecognition constructor.
      * @param PhotoImage $photoImage
      */
-    public function __construct (PhotoImage $photoImage){
+    public function __construct ($photoImage){
         $this->photoImage = $photoImage;
     }
     /**
@@ -53,8 +53,9 @@ class PhotoImageRecognition {
      * также пытается нарисовать на фото красную линию между выделенными глазами
      *
      **/
-    public function recognize() {
-        $filename =  $this->photoImage->file_name;
+    public function recognize($document=null) {
+        $filename = ($document)? Yii::getAlias('@documentPath').'/'.$this->photoImage->album_id.'/'.$this->photoImage->document_id.'/'.$this->photoImage->file_name
+            : Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name;
         //если PhotoImage еще не распознана - Status = 0
         if (!$this->photoImage->status) {
             //отправка запроса в Facematika
@@ -76,20 +77,22 @@ class PhotoImageRecognition {
                                 'y' => $face['coordinates']['y'],
                                 'width' => $face['coordinates']['width'],
                                 'angle' => $face['coordinates']['angle'],
-                                'photo_image_id' => $this->photoImage->id
+                                'photo_image_id' => ($document)? null: $this->photoImage->id,
+                                'photo_document_id' => ($document)? $this->photoImage->id:null,
                             ]);
                             $newFace->save();
                             //вырезание квадрата лица для показа
-                            $draw = new Draw($this->photoImage);
+                            $draw = new Draw($this->photoImage,$document,$filename,mime_content_type($filename));
                             $face_image = $draw->getFaceRectangleImage($newFace);
-
-                            imagejpeg($face_image, Yii::getAlias('@imagePath') . '/' . $newFace->face_id . '.jpg');
+                            if (!$document)
+                                imagejpeg($face_image, Yii::getAlias('@imagePath') . '/' . $newFace->face_id . '.jpg');
+                            else imagejpeg($face_image, Yii::getAlias('@documentPath') . '/' . $newFace->face_id . '.jpg');
                             $this->photoImage->status = 1;
                             $this->photoImage->save();
                         }
 
                         $transaction->commit();
-                        return true;
+                        return $this->photoImage->id;
                     }
                      catch (\Exception $e) {
                         $transaction->rollBack();
@@ -124,7 +127,7 @@ class PhotoImageRecognition {
             ->setHeaders([
                 'Authorization: bearer '. $token,
                 'Content-Type: multipart/form-data;'])
-            ->addFile('filename', Yii::getAlias('@imagePath').'/'.$filename)
+            ->addFile('filename', $filename)
             ->send();
         return $response;
     }
@@ -168,19 +171,8 @@ class PhotoImageRecognition {
            ->setContent($post)
             ->send();
 
-//        $ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, FACEMATIKA::FACEMATIKA_URL_TO_FACE_MATCH.'/'.$originFace->face_id.'/match');
-////        curl_setopt($ch, CURLOPT_POST, 1);
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-//                'Authorization: bearer '. $token,
-//                'Content-Type: application/json',
-//                ]
-//        );
+        $result = $response->content;
 
-        $result = $response->content;//curl_exec ($ch) or die(curl_error($ch));
-        //curl_close ($ch);
         return $result;
     }
 

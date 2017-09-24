@@ -22,7 +22,7 @@ class DocumentRepository
     }
     public function isDocumentExist($firstName, $secondName,$numberOfDocument, $country, $dateOfBirth)
     {
-        if ($document = Document::findOne(['first_name' => $firstName,'second_name'=>$secondName,'number'=>$numberOfDocument,'country_id'=>$country,'date_of_birth'=>$dateOfBirth])) {
+        if ($document = Document::findOne(['first_name' => $firstName,'second_name'=>$secondName,'number'=>$numberOfDocument,'date_of_birth'=>$dateOfBirth])) {
             return $document;
         }
         return false;

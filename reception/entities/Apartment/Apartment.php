@@ -18,6 +18,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property String $location
  * @property String $name
  * @property String $external_id
+ * @property Integre $owner_id
 
 
  */
@@ -29,7 +30,7 @@ class Apartment extends ActiveRecord
         $apartment->location = $location;
         $apartment->name = $name;
         $apartment->external_id = $externalId;
-        $apartment->owner = $owner;
+        $apartment->owner_id = $owner->id;
 
         return $apartment;
     }
@@ -55,7 +56,7 @@ class Apartment extends ActiveRecord
      */
     public function getOwner()
     {
-        return $this->hasOne(Owner::className(), ['id' => 'owner_id']);
+        return $this->hasOne(Owner ::className(), ['id' => 'owner_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
