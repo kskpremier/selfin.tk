@@ -21,12 +21,17 @@ use kartik\select2\Select2;
     <?= $form->field($model, 'contactEmail')->textInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'password')->passwordInput(['maxLength' => true]) ?>
 
-    <?= $form->field($model, 'apartments')->widget(Select2::className(), [
-        'data'=> ArrayHelper::map(reception\entities\Apartment\Apartment::find()->all(),'id','name'),
-//        'value'=>($model->type == '0')? 'Permanent':'Period',
-        'options' => ['placeholder' => 'Select an apartment ...'],
-        'pluginOptions' => [],
-    ])->label('Apartment');?>
+
+    <?= $form->field($model, 'apartments')->widget(Select2::className(),[
+            'data'=> ArrayHelper::map(reception\entities\Apartment\Apartment::find()->all(),'id','name'),
+            'options' => ['placeholder' => 'Select an apartment ...','multiple' => true],
+            'pluginOptions' => [
+                'tags' => true,
+                'tokenSeparators' => [',', ' '],
+                'maximumInputLength' => 10
+            ],
+        ]
+    )->label('Apartments of owner'); ?>
 
 
     <div class="form-group">

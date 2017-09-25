@@ -17,10 +17,11 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
 /**
  * @property String $location
+ * @property integer $id
  * @property String $name
  * @property User $user
  * @property String $external_id
- * * @property Apartment [] $apartments
+ * @property Apartment [] $apartments
 
 
  */

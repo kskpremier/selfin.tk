@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use reception\entities\User\User;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\OwnerSearch */
@@ -26,7 +27,25 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'external_id',
-            'user_id',
+            ['attribute'=>'username',
+                'value'=> function ($model) {
+                            return $model->user->username;
+                },
+                'label'=>"Username"
+            ],
+            ['attribute'=>'apartments',
+                'label'=>'Apartment list',
+                'format'=>'raw',
+                'value'=>function ($model) {
+                    $apartmentList='';
+                    foreach ($model->apartments as $apartment){
+                        $apartmentList .= '<p>'.Html::a($apartment->name. ' '. $apartment->external_id,
+                                ['apartment/view', 'id' => $apartment->id],
+                                ['class' => '']). PHP_EOL.'</p>';
+                    }
+                    return $apartmentList;
+                },
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

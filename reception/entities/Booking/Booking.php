@@ -42,26 +42,25 @@ class Booking extends \yii\db\ActiveRecord
 
     public static function create( $startDate,$endDate,$apartment,$author=null,$numberOfGuest,$externalId,$status,$guests=null) :self
     {
-//        $booking = self::find()->where([
-//            'start_date' =>$startDate,
-//            'end_date' =>$endDate,
-//            'external_id' =>$externalId,
-//            'number_of_tourist' =>$numberOfGuest,
-//            'status' =>$status
-//            ])->one();
+        $booking = self::find()->where([
+            'start_date' =>$startDate,
+            'end_date' =>$endDate,
+            'external_id' =>$externalId,
+            'status' =>$status
+            ])->one();
         if ( !isset($booking) ) {
             $booking = new static();
             $booking->start_date = $startDate;
             $booking->end_date = $endDate;
-//            $booking->apartment_id = $apartmentId;
             $booking->external_id = $externalId;
             $booking->number_of_tourist = $numberOfGuest;
             $booking->status = $status;
-            if (isset($author))
-                $booking->author = $author;
-            if (isset($guests))
-                $booking->guests = $guests;
         }
+        $booking->number_of_tourist = $numberOfGuest;
+        if (isset($author))
+            $booking->author = $author;
+        if (isset($guests))
+            $booking->guests = $guests;
         $booking->apartment = $apartment;
         return $booking;
     }

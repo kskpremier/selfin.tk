@@ -5,6 +5,7 @@ namespace backend\controllers;
 use Yii;
 use reception\entities\Apartment\Owner;
 use reception\forms\OwnerForm;
+use reception\forms\OwnerUpdateForm;
 use reception\useCases\manage\Apartment\OwnerManageService;
 use reception\repositories\Apartment\OwnerRepository;
 use backend\models\OwnerSearch;
@@ -113,13 +114,21 @@ class OwnerController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $owner = $this->findModel($id);
+        $form = new OwnerUpdateForm($owner);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            try {
+                $this->service->edit($owner,$form);
+                return $this->redirect(['view', 'id' => $owner->id]);
+            } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+
         } else {
             return $this->render('update', [
-                'model' => $model,
+                'model' => $form,
             ]);
         }
     }

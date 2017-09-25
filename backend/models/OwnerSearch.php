@@ -5,13 +5,15 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Owner;
+use reception\entities\Apartment\Owner;
 
 /**
  * OwnerSearch represents the model behind the search form about `backend\models\Owner`.
  */
 class OwnerSearch extends Owner
 {
+    public $username;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +21,7 @@ class OwnerSearch extends Owner
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['external_id'], 'safe'],
+            [['external_id','username'], 'safe'],
         ];
     }
 
@@ -62,8 +64,10 @@ class OwnerSearch extends Owner
             'id' => $this->id,
             'user_id' => $this->user_id,
         ]);
+        $query->joinWith('user');
 
         $query->andFilterWhere(['like', 'external_id', $this->external_id]);
+        $query->andFilterWhere(['like', 'username', $this->username]);
 
         return $dataProvider;
     }

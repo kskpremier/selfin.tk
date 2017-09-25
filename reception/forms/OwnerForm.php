@@ -12,7 +12,13 @@ namespace reception\forms;
 use yii\base\Model;
 
 /**
- * @property LockVersionForm $lockVersion
+ * @property String $firstName;
+ * @property String $secondName;
+ * @property String $contactEmail;
+ * @property String $externalId;
+ * @property Apartment[] $apartments;
+ * @property String $password;
+ * @property integer $id;
  */
 class OwnerForm extends Model
 {
@@ -22,6 +28,7 @@ class OwnerForm extends Model
     public $externalId;
     public $apartments;
     public $password;
+    public $id;
 
     public function __construct(array $config = [])
     {
@@ -32,6 +39,7 @@ class OwnerForm extends Model
     {
         return [
             [['firstName','secondName','password','externalId'],'string'],
+            [['apartments'],'safe'],
             [['contactEmail'],'email'],
         ];
     }
