@@ -181,6 +181,7 @@ class KeyController extends Controller
      * )
      */
     public function actionIndex(){
+        $result=[];
         $searchModel = new KeySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 

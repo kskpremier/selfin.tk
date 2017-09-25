@@ -227,13 +227,13 @@ class  BookingController extends Controller
      */
     public function actionBookings()
     {
-        //$result=[];
+        $bookings=[];
         if (Yii::$app->user->can('owner',[])) {
             //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
             $user = User::findOne(Yii::$app->user->id);
             // затем списка для регистрации туристов
-            foreach ($user->owner->apartments as $object) {
-                $response = MyRent::getBookingsForOwner($user->owner->external_id, $object->external_id);
+//            foreach ($user->owner->apartments as $object) {
+                $response = MyRent::getBookingsForOwner($user->owner->external_id);//, $object->external_id);
                 //в ответе должен быть массив Json  c букингами - их надо разобрать
                 $response= \GuzzleHttp\json_decode($response,true);
                 foreach ($response as $rentInfo) {
@@ -241,7 +241,7 @@ class  BookingController extends Controller
                     $config['externalId'] = $rentInfo["id"];
                     $config['startDateTimestamp'] = strtotime($rentInfo["from_time"]);
                     $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
-                    $config['apartmentId'] = $object->id;
+                   // $config['apartmentId'] = $object->id;
                     $config['externalApartmentId'] = $rentInfo["object_id"];
                     $config['apartmentName'] = $rentInfo["object_name"];//$object->external_id;
                     $config['firstName'] = $rentInfo["contact_name"];
@@ -262,7 +262,7 @@ class  BookingController extends Controller
                         throw new ServerErrorHttpException('Failed to create the object => ' . \GuzzleHttp\json_encode($bookingForm->getFirstErrors()));
                     }
                 }
-            }
+//            }
 
         }
 //        $guest = Guest::find()->where(['user_id'=>Yii::$app->user->getId()])->one();

@@ -53,7 +53,7 @@ class MyRent extends ActiveRecord
         return $response->content;
     }
 
-    public static function getBookingsForOwner($userId,$objectId)
+    public static function getBookingsForOwner($userId,$objectId=null)
     {
         $token = MyRent::token();
 
