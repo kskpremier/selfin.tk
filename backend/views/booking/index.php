@@ -101,9 +101,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute'=>'author',
                 'format' => 'raw',
                 'value'=> function($guest){
-                    return Html::a($guest->author->second_name. ' '. $guest->author->first_name,
+                    return (isset($guest->author))?Html::a($guest->author->second_name. ' '. $guest->author->first_name,
                         ['guest/view', 'id' => $guest->id],
-                        ['class' => '']);
+                        ['class' => '']):'';
                 },
                 'label'=>'Author'
             ],
@@ -115,15 +115,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
                             ['key/create-for-booking', 'bookingId' => $model->id ],
-                            ['class' => '',
-                                'title'=>'Send E-key for guest']
+                            ['class' => (isset ($model->apartment->doorLock))?'':'btn disabled',
+                                'title'=>'Send E-key for guest',
+                                'disable'=>(isset ($model->apartment->doorlocks))?false:true]
                         );
                     },
                     'pin' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th"></span>',
                             ['keyboard-pwd/create', 'booking_id' => $model->id ],
-                            ['class' => '',
-                                'title'=>'Get Keyboard password']
+                            ['class' => (isset ($model->apartment->doorLock))?'':'btn disabled',
+                                'title'=>'Get Keyboard password',
+                               ]
                         );
                     },
                 ],

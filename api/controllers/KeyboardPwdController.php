@@ -7,6 +7,7 @@
  */
 namespace api\controllers;
 
+use reception\forms\KeyboardPwdForm;
 use Yii;
 use reception\repositories\DoorLock\KeyboardPwdRepository;
 use reception\useCases\manage\DoorLock\KeyboardPwdManageService;
@@ -123,14 +124,15 @@ class KeyboardPwdController extends Controller
      */
     public function actionCreate()
     {
-        $model = new KeyboardPwd();
-        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+        $form = new KeyboardPwdForBookingForm();
+        $form->load(Yii::$app->getRequest()->getBodyParams(), '');
+        $keyboardPwd = $this->service->generateForBooking($form);
         //собственно само обращение к китайцам и получение ответа
-        $data = json_decode($model->getKeyboardPwdFromChina(), true);
+        $data = json_decode($form->getKeyboardPwdFromChina(), true);
         if ($data['success']) {
                 $response = Yii::$app->getResponse();
                 $response->setStatusCode(201);
-                $id = implode(',', array_values($model->getPrimaryKey(true)));
+                $id = implode(',', array_values($form->getPrimaryKey(true)));
                 $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
                 return $model;
         } throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));

@@ -18,7 +18,7 @@ use yii\base\Model;
 /**
  * @property LockVersionForm $lockVersion
  */
-class KeyboardPwdForBookingForm extends Model
+class KeyboardPwdForBookingForm extends FormWithDates
 {
     public $startDate;
     public $endDate;
@@ -26,6 +26,8 @@ class KeyboardPwdForBookingForm extends Model
     public $endDateTimestamp;
     public $doorLockId;
     public $bookingId;
+    public $externalId;
+    public $externalApartmentId;
     public $type;
     public $keyboardPwdVersion = 4; // по умолчанию равно 4
 
@@ -42,7 +44,8 @@ class KeyboardPwdForBookingForm extends Model
             [['startDateTimestamp','endDateTimestamp'],'integer'],
             [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
             [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
-            [['bookingId'],'required'],
+            //[['bookingId'],'required'],
+            [['externalId','externalApartmentId'],'safe'],
             [['bookingId'],'safe'],
             [['doorLockId', 'keyboardPwdVersion','type'],'integer'],
         ];

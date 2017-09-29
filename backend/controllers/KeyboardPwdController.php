@@ -123,7 +123,10 @@ class KeyboardPwdController extends Controller
 
     public function actionCreate($booking_id  = null, $doorLockId = null)
     {
-        $model = new KeyboardPwdForm(['bookingId'=>$booking_id,'doorLockId'=>$doorLockId]);
+
+        $booking = \reception\entities\Booking\Booking::findOne($booking_id);
+        $doorLocks = $booking->apartment->getDoorLocks()->one();
+        $model = new KeyboardPwdForm(['bookingId'=>$booking_id,'doorLockId'=>($doorLockId)?$doorLockId:$doorLocks->id]);
         if ($model->load(Yii::$app->request->post() ) && $model->validate() ) {
             $keyboardPwd =  $this->service->generate($model);
             if ($response = $this->service->getKeyboardPwdValueFromChina($keyboardPwd)) {

@@ -76,4 +76,9 @@ abstract class FormWithDates extends CompositeForm
             $this->endDate = date('Y-m-d H:i:s', $this->endDateTimestamp);
         }
     }
+
+    protected function internalForms(): array
+    {
+        return [];
+    }
 }

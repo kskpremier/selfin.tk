@@ -19,19 +19,6 @@ use reception\entities\Booking\Booking;
  */
 class GuestDocumentAddForm extends CompositeForm
 {
-//    public $firstName;
-//    public $secondName;
-//    public $identityData;
-//    public $numberOfDocument;
-//    public $gender;
-//    public $country;
-//    public $city;
-//    public $countryOfBirth;
-//    public $cityOfBirth;
-//    public $dateOfBirth;
-//    public $citizenshipOfBirth;
-//    public $bookingId;
-
 
     public function __construct(array $config = [])
     {

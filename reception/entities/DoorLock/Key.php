@@ -32,6 +32,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  */
 class Key extends ActiveRecord
 {
+    public $guest_id;
 
     public static function create( $start_date, $end_date, $type, $booking_id,
                                    $door_lock_id, $user_id, $remarks) :self
@@ -92,4 +93,45 @@ class Key extends ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public function sendEKeyByLocal(){
+        //тут надо сформировать запрос и послать его на наш сервер
+        $client = $client = new Client([
+            'baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,
+//            'requestConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
+//            'responseConfig' => [
+//                'format' => Client::FORMAT_JSON
+//            ],
+        ]);
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setHeaders(['content-type' => 'application/json'])
+            ->addHeaders(['Accept' => 'application/json'])
+            ->addHeaders(['Authorization' => 'Bearer '.DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN])
+            ->setData([
+                'door_lock_id' => $this->door_lock_id,
+                'booking_id'=> $this->booking_id,
+                'guest_id' =>($this->guest_id),
+                'type'=>$this->type,
+                'start_date'=>($this->type == '2')?  '0' : strtotime($this->start_date),
+                'end_date'=>($this->type == '2')?  '0' : strtotime( $this->end_date), //2 - это на период, надеюсь
+                'email'=> 'doorlockuser1@domouprav.hr',//$this->guest->contact_email,
+//                'accessToken'=> DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN
+            ])
+            ->send();
+        if ($response->isOk) {
+            // $this->e_key = $response->data['E-key'];
+            return $response->data['id'];
+        }
+        else return false;
+    }
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getUser()
+//    {
+//        return $this->hasOne(User::className(), ['id' => 'user_id']);
+//    }
 }

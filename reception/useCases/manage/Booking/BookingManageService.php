@@ -33,7 +33,7 @@ class BookingManageService
         $this->bookingRepository = $bookingRepository;
     }
 
-    public function create(BookingForm $form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
+    public function create($form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
     {
         $needToSendConfirmationLetter = ($needToSendConfirmationLetter==null)?false:$needToSendConfirmationLetter;
 
@@ -45,7 +45,7 @@ class BookingManageService
             if (isset($user) && $user->email === "info@my-rent.net") {
                 $user = User::create(
                     strtolower(str_replace(" ", "_", trim($form->firstName))),
-                    strtolower("mail_temp_" . User::generatePassword(6) . "_") . $form->contactEmail, //генерим "случайный" адрес
+                    strtolower("mail_" . User::generatePassword(6) . "_") . $form->contactEmail, //генерим "случайный" адрес
                     $form->externalId //пароль - это значение номера букинга
                 );
                 $needToSendConfirmationLetter = false;
@@ -53,7 +53,7 @@ class BookingManageService
                 $password = User::generatePassword(6);
                 $user = User::create(
                     $form->secondName . '_' . $form->firstName,
-                    $form->contactEmail,
+                    ($form->contactEmail)?$form->contactEmail:$password."@test.test",
                     $password //пароль - это случайная строка
                 );
             }

@@ -3,12 +3,15 @@
 namespace api\controllers;
 
 use api\models\PhotoImageSearch;
+use reception\forms\GuestPhotoForm;
+use reception\repositories\Booking\PhotoRepository;
+use reception\useCases\manage\Booking\PhotoManageService;
 use Yii;
 use yii\rest\ActiveController;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\AccessControl;
-use backend\models\PhotoImage;
+//use backend\models\PhotoImage;
 use yii\web\ServerErrorHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\helpers\Url;
@@ -18,6 +21,18 @@ use yii\web\UploadedFile;
 class PhotoImageController extends ActiveController
 {
     public $modelClass = 'backend\models\PhotoImage';
+
+    private $photo;
+    private $service;
+
+    public function __construct($id, $module, PhotoManageService $service, PhotoRepository $photo, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->photo = $photo;
+        $this->service = $service;
+
+    }
+
 
     public function behaviors()
     {
@@ -183,6 +198,28 @@ class PhotoImageController extends ActiveController
 
     }
 
+    public function actionCreatePhoto()
+    {
+        $form = new GuestPhotoForm();
+        $form->load(Yii::$app->request->post(), '');
+        if ($form->validate()) {
+            try {
+                $form->user_id = Yii::$app->user->id;
+                $photo = $this->service->create($form);
+                if ($photo) {
+                    Yii::$app->getResponse()->setStatusCode(201);
+                }
+                return $this->serializePhoto($photo);
+            } catch (\DomainException $e) {
+                throw new BadRequestHttpException($e->getMessage(), null, $e);
+            }
+        }
+        else {
+            Yii::$app->getResponse()->setStatusCode(501);
+            throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->PhotosForm->getErrors()));
+        }
+    }
+
 
 
     private function fileUpload($result)
@@ -218,6 +255,17 @@ class PhotoImageController extends ActiveController
     {
         $searchModel = new PhotoImageSearch();
         return $searchModel->search(Yii::$app->request->queryParams);
+    }
+
+    public function serializeDocument($photo,$result=null): array
+    {
+
+        return [
+            'id' => $photo->id,
+            'date'=>$photo->date,
+            'file_name'=>$photo->file_name,
+            'url'=>$photo->getUploadedFileUrl('file_name')
+        ];
     }
 
 }

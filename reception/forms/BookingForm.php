@@ -66,8 +66,8 @@ class BookingForm extends FormWithDates
             parent::rules(),[
             [['firstName', 'secondName'], 'string', 'max'=>50],
             [['contactEmail'],'email'],
-            [['externalApartmentId','externalId','apartmentName','owner','apartmentId',],'safe'],
-            [[ 'numberOfTourist','status'], 'integer'],
+            [['externalApartmentId','externalId','apartmentName','owner','apartmentId','numberOfTourist'],'safe'],
+            [[ 'status'], 'integer'],
 //            [['externalApartmentId','apartmentId'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(),
 //                'targetAttribute' => ['externalApartmentId'=>'external_id'],'message'=>'Apartment internal or external ID should exist'],
            // [['externalApartmentId','apartmentId'],'validateApartment','message'=>'Apartment internal or external ID should exist']

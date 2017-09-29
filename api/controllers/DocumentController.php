@@ -279,15 +279,18 @@ class DocumentController extends Controller
 
     public function serializeDocument($document,$result=null): array
     {
-        $images=[];
+        $images=[];$urls=[];
             foreach($document->images as $image){
-                $images[]=$image->getThumbFileUrl('file_name', 'thumb');
+                //$images[]=$image->getThumbFileUrl('file_name', 'thumb');
+                $urls[]=$image->getUploadedFileUrl('file_name');
             }
         return [
             'first_name' => $document->first_name,
             'second_name' => $document->second_name,
             'id' => $document->id,
-            'image_files'=>$images,
+            'birth_date' => $document->date_of_birth,
+            //'image_files'=>$images,
+            'image_urls'=>$urls,
             'eVisitorID'=>$result
         ];
     }

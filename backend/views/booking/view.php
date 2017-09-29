@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]);
-
+    if (isset ($model->apartment->doorLock)) {
     $searchModel = new KeySearch();
     $searchModel->booking_id = $model->id;
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -74,6 +74,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
     ]);
     echo Html::a(Yii::t('app', 'Get new password'), ['keyboard-pwd/create','booking_id'=>$model->id], ['class' => 'btn btn-success']);
+    }
+
     $searchModel = new \backend\models\PhotoImageSearch();
     $searchModel->booking_id = $model->id;
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);?>

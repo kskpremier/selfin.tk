@@ -62,11 +62,11 @@ class  BookingController extends Controller
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete','view','view-external','bookings','booking'],
+            'only' => ['create', 'update', 'delete','view','view-external','bookings','booking','create-for-owner'],
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist'],
+                    'roles' => ['receptionist','owner'],
                 ],
                 [
                     'allow' => true,
@@ -183,13 +183,13 @@ class  BookingController extends Controller
      * If creation is successful, return Response as Json string
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreateForOwner()
     {
         $form = new BookingForm();
-
-        if ($form->load(Yii::$app->getRequest()->getBodyParams(), '') && $form->validate()) {
+        $form->load(Yii::$app->getRequest()->getBodyParams(),'');
+        if ( $form->validate()) {
             try {
-                $booking = $this->service->create($form,true,true, true); //с письмом и потенциальным пользователем
+                $booking = $this->service->create($form,false,false, true); //без письма и потенциальным пользователем
                 if ($booking) {
                     $response = Yii::$app->getResponse();
                     $response->setStatusCode(201);
@@ -239,15 +239,16 @@ class  BookingController extends Controller
                 foreach ($response as $rentInfo) {
                     //$rentInfo = \GuzzleHttp\json_decode($rentInfo,true);
                     $config['externalId'] = $rentInfo["id"];
-                    $config['startDateTimestamp'] = strtotime($rentInfo["from_time"]);
+                    $config['startDateTimestamp'] = strtotime($rentInfo["from_date"]);
                     $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
                    // $config['apartmentId'] = $object->id;
                     $config['externalApartmentId'] = $rentInfo["object_id"];
                     $config['apartmentName'] = $rentInfo["object_name"];//$object->external_id;
-                    $config['firstName'] = $rentInfo["contact_name"];
-                    $config['secondName'] = $rentInfo["contact_name"];
+                    $names = explode(' ', $rentInfo["contact_name"] );
+                    $config['firstName'] = (is_array($names) && array_key_exists (1,$names))? $names[1]:'';//$rentInfo["contact_name"];
+                    $config['secondName'] = (is_array($names) && array_key_exists (0,$names))? $names[0]:'';//$rentInfo["contact_name"];
                     $config['contactEmail'] = $rentInfo["contact_email"];
-                    $config['owner'] = $user->owner;
+                    $config['owner'] = (isset($user->owner))?$user->owner : null;
                     $config['numberOfTourist'] = $rentInfo["total_guests"];
                     $config['status']=  ($rentInfo["total_guests"]=="Y")?Booking::STATUS_ACTIVE:Booking::STATUS_CANCELLED;  // $rentInfo["rent_status"];
 
@@ -492,9 +493,9 @@ class  BookingController extends Controller
             'id' => $booking->id,
             'apartment_id' => $booking->apartment_id,
             'external_apartment_id' => $booking->apartment->external_id,
-            'author' => $booking->author->user->username,
+            'author' => $booking->author->first_name.''.$booking->author->second_name,//$booking->author->user->username,
             'login'=>  str_replace(" ","_",trim($booking->author->first_name)),
-            'password'=>$booking->external_id,
+            'password'=> $booking->external_id,
 //            'password' => ($booking->author->user->temporaryPassword)? $booking->author->user->temporaryPassword :'',
             'keyboardPwds' => $keyboardPwds,
 
