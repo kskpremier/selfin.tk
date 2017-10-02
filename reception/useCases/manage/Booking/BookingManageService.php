@@ -110,8 +110,9 @@ class BookingManageService
                 strtotime($booking->end_date), //ключ на весь период действия букинга
                 TTLHelper::TTL_KEYBOARD_PERIOD_TYPE,
                 4,//пока так, потом из модели $doorLock->keyboard_pwd_version,
-                $booking->id,
-                $doorLock->id
+
+                $doorLock->id,
+                $booking->id
             );
             //получаем значение с китайского сервера для этого замка
             $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);

@@ -20,6 +20,7 @@ use reception\forms\FormWithDates;
 class KeyboardPwdForm extends FormWithDates
 {
     public $doorLockId;
+    public $apartmentId;
     public $bookingId;
     public $type;
     public $keyboardPwdVersion = 4; // по умолчанию равно 4

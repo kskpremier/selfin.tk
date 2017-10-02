@@ -61,13 +61,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Booking #'
             ],
             [   'attribute'=>'file_name',
-                'value'=> Yii::getAlias('@imageUrl').'/'.$model->file_name,
-               'format'=>['image', [
-                                   'width'=>'100px',
-                                   //'height'=>130
-                                   ],
-                       ],
-                'label'=>'Image Preview'
+                'format' => 'raw',
+                'value'=>function($model) {
+
+                        $imageBlock = Html::tag('div',Html::a(
+                            Html::img($model->getThumbFileUrl('file_name', 'thumb')),
+                            $model->getUploadedFileUrl('file_name'),
+                            ['class' => 'thumbnail', 'target' => '_blank']), ['class' => "row"]);
+
+                    return $imageBlock;
+                },
+                'label'=>'Preview'
             ],
         ],
     ]) ?>

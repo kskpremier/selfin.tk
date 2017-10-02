@@ -32,7 +32,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @property LockVersionForm $lockVersion
  */
-class BookingForm extends FormWithDates
+class BookingFormForNewApartments extends FormWithDates
 {
     const STATUS_CANCELLED = 20;
     const STATUS_ACTIVE = 10;
@@ -70,14 +70,14 @@ class BookingForm extends FormWithDates
     {
         $rules = array_merge(
             parent::rules(),[
-            [['firstName', 'secondName'], 'string', 'max'=>50],
-            [['contactEmail'],'email'],
-            [['externalApartmentId','externalId','apartmentName','owner','apartmentId','numberOfTourist','eKey'],'safe'],
-            [[ 'status'], 'integer'],
+                [['firstName', 'secondName'], 'string', 'max'=>50],
+                [['contactEmail'],'email'],
+                [['externalApartmentId','externalId','apartmentName','owner','apartmentId','numberOfTourist','eKey'],'safe'],
+                [[ 'status'], 'integer'],
 //            [['externalApartmentId','apartmentId'], 'exist', 'skipOnError' => true, 'targetClass' => Apartment::className(),
 //                'targetAttribute' => ['externalApartmentId'=>'external_id'],'message'=>'Apartment internal or external ID should exist'],
-            [['externalApartmentId','apartmentId'],'validateApartment','message'=>'Apartment internal or external ID should exist']
-                ]
+//                [['externalApartmentId','apartmentId'],'validateApartment','message'=>'Apartment internal or external ID should exist']
+            ]
         );
         return $rules;
     }
@@ -109,7 +109,7 @@ class BookingForm extends FormWithDates
         }
         $apartment = Apartment::find()->where(['external_id'=>$this->externalApartmentId])->orWhere(['id'=>$this->apartmentId])->one();
         if (!isset($apartment)){
-                $this->addError('Wrong ID of apartment');
+            $this->addError('Wrong ID of apartment');
         }
         $this->apartment = $apartment;
     }

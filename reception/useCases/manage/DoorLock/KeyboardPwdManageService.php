@@ -9,8 +9,10 @@
 
 namespace reception\useCases\manage\DoorLock;
 
+use reception\entities\Apartment\Apartment;
 use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\Booking;
+use reception\forms\KeyboardPasswordForm;
 use reception\forms\KeyboardPwdForm;
 use reception\useCases\BusinessException;
 use reception\helpers\TTLHelper;
@@ -24,27 +26,52 @@ use yii\web\ServerErrorHttpException;
 
 class KeyboardPwdManageService
 {
-    private $KeyboardPwdRepository;
+    private $keyboardPwdRepository;
 
-    public function __construct(KeyboardPwdRepository $KeyboardPwdRepository)
+    public function __construct(KeyboardPwdRepository $keyboardPwdRepository)
     {
-        $this->KeyboardPwdRepository = $KeyboardPwdRepository;
+        $this->keyboardPwdRepository = $keyboardPwdRepository;
 
     }
 
-    public function generate(KeyboardPwdForm $form): KeyboardPwd
+    public function generate(KeyboardPasswordForm $form)
     {
-        $KeyboardPwd = KeyboardPwd::create(
-            strtotime($form->startDate),
-            strtotime($form->endDate),
-            $form->type,
-            $form->keyboardPwdVersion,
-            $form->bookingId,
-            $form->doorLockId
-        );
 
-        $this->KeyboardPwdRepository->save($KeyboardPwd);
-        return $KeyboardPwd;
+        if ($form->externalApartmentId) {
+            $result=[];
+            foreach ($form->apartment->doorLocks as $doorlock)
+            {
+                $keyboardPwd = KeyboardPwd::create(
+                    strtotime($form->startDate),
+                    strtotime($form->endDate),
+                    TTLHelper::getKeyboardPwdType($form->type),
+                    $form->keyboardPwdVersion,
+                    $doorlock->id
+                );
+                $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
+                if ($data['success']) {
+                 $result[]=$keyboardPwd;
+                 $this->keyboardPwdRepository->save($keyboardPwd);
+                }
+                else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+            }
+            return $result;
+        }
+        else {
+            $keyboardPwd = KeyboardPwd::create(
+                strtotime($form->startDate),
+                strtotime($form->endDate),
+                TTLHelper::getKeyboardPwdType($form->type),
+                $form->keyboardPwdVersion,
+                $form->doorLockId
+            );
+            $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
+            if ($data['success']) {
+                $this->keyboardPwdRepository->save($keyboardPwd);
+                return $keyboardPwd;
+            }
+            else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+        }
     }
     public function generateForBooking(KeyboardPwdForBookingForm $form): array
     {
@@ -60,11 +87,11 @@ class KeyboardPwdManageService
                 $booking->id,
                 $doorLock->id
             );
-            $this->KeyboardPwdRepository->save($keyboardPwd);
+            $this->keyboardPwdRepository->save($keyboardPwd);
             if ($response = $this->getKeyboardPwdValueFromChina($keyboardPwd)) {
                 $keyboardPwd->value = $response['keyboardPwd'];
                 $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
-                $this->KeyboardPwdRepository->save($keyboardPwd);
+                $this->keyboardPwdRepository->save($keyboardPwd);
                 $result[] = ['id'=>$keyboardPwd->id,'lock_name' => $doorLock->lock_alias, 'password' => $keyboardPwd->value];
             } else throw new BusinessException("Problems with getting password. Error 22.");
         }
@@ -85,7 +112,7 @@ class KeyboardPwdManageService
             $form->keyboardPwdId
 
         );
-        $this->KeyboardPwdRepository->save($KeyboardPwd);
+        $this->keyboardPwdRepository->save($KeyboardPwd);
     }
 
     public function getKeyboardPwdLocal()

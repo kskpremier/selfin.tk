@@ -58,11 +58,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Reservation',
                 'value'=> 'booking_id'
             ],
-            [
-                'attribute'=>'user_id',
-                'label'=>'User',
-                'value'=> 'user.username'
-            ],
+//            [
+//                'attribute'=>'user_id',
+//                'label'=>'User',
+//                'value'=> 'user.username'
+//            ],
 //            [
 //                'attribute'=>'album_id',
 //                'label'=>'Album',
@@ -73,16 +73,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Image',
                 //'value'=> 'album.name'
             ],
-            [
-                'label'=>'Preview',
+            [   'attribute'=>'images',
                 'format' => 'raw',
-                'value' => function($data){
-                    //return Html::img(Url::toRoute(Yii::getAlias('@imageUrl').'/'.$data->file_name),[
-                    return Html::img(Yii::getAlias('@imageUrl').'/'.$data->file_name,[
-                        'alt'=>'Preview',
-                        'style' => 'width:25px;'
-                    ]);
+                'value'=>function($model) {
+                   $imageBlock = Html::tag('span',Html::img($model->getThumbFileUrl('file_name', 'thumb'),
+                                ['class' => 'thumbnail', 'target' => '_blank']),['class'=>'row']);
+
+                    return $imageBlock;
                 },
+                'label'=>'Preview'
             ],
 
 

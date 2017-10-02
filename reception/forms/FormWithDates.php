@@ -10,7 +10,7 @@
  * @property string $startDate
  * @property string $endDate
  * @property integer $startDateTimestamp
- * @property integet $endDateTimestamp
+ * @property integer $endDateTimestamp
  */
 
 namespace reception\forms;

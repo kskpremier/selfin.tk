@@ -38,6 +38,8 @@ use yii\web\ServerErrorHttpException;
  */
 class KeyboardPwd extends ActiveRecord
 {
+
+
     /**
      * @inheritdoc
      */
@@ -46,16 +48,16 @@ class KeyboardPwd extends ActiveRecord
         return 'keyboard_pwd';
     }
 
-    public static function create( $start_date, $end_date, $type, $keyboardPwdVersion, $booking_id,
-                                   $door_lock_id) :self
+    public static function create( $startDate, $endDate, $type, $keyboardPwdVersion,
+                                   $doorLockId, $bookingId =null) :self
     {
         $keyboardPwd = new static();
-        $keyboardPwd->start_date = $start_date;
-        $keyboardPwd->end_date = $end_date;
+        $keyboardPwd->start_date = $startDate;
+        $keyboardPwd->end_date = $endDate;
         $keyboardPwd->keyboard_pwd_type = $type;
         $keyboardPwd->keyboard_pwd_version = $keyboardPwdVersion;
-        $keyboardPwd->booking_id = $booking_id;
-        $keyboardPwd->door_lock_id = $door_lock_id;
+        $keyboardPwd->booking_id = $bookingId;
+        $keyboardPwd->door_lock_id = $doorLockId;
 
         return $keyboardPwd;
     }
@@ -197,6 +199,7 @@ class KeyboardPwd extends ActiveRecord
         [
             'keyboardPwd_id' => $this->id,
             'door_lock_id' => $this->door_lock_id,
+            'door_lock_name' => $this->doorLock->lock_alias,
             'value' => $this->value,
             'start_date' => date('Y-m-d H:i:s', $this->start_date),
             'end_date' => ($this->keyboard_pwd_type == 2)? 0: date('Y-m-d H:i:s', $this->end_date),

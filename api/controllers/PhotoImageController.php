@@ -257,7 +257,7 @@ class PhotoImageController extends ActiveController
         return $searchModel->search(Yii::$app->request->queryParams);
     }
 
-    public function serializeDocument($photo,$result=null): array
+    public function serializePhoto($photo,$result=null): array
     {
 
         return [

@@ -10,6 +10,7 @@ namespace api\controllers;
 
 
 use reception\forms\BookingForm;
+use reception\forms\BookingFormForNewApartments;
 use reception\repositories\Booking\BookingRepository;
 use reception\useCases\manage\Booking\BookingManageService;
 use Yii;
@@ -189,7 +190,7 @@ class  BookingController extends Controller
         $form->load(Yii::$app->getRequest()->getBodyParams(),'');
         if ( $form->validate()) {
             try {
-                $booking = $this->service->create($form,false,false, true); //без письма и потенциальным пользователем
+                $booking = $this->service->create($form,false,$form->eKey, true); //без письма и потенциальным пользователем
                 if ($booking) {
                     $response = Yii::$app->getResponse();
                     $response->setStatusCode(201);
@@ -231,9 +232,7 @@ class  BookingController extends Controller
         if (Yii::$app->user->can('owner',[])) {
             //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
             $user = User::findOne(Yii::$app->user->id);
-            // затем списка для регистрации туристов
-//            foreach ($user->owner->apartments as $object) {
-                $response = MyRent::getBookingsForOwner($user->owner->external_id);//, $object->external_id);
+                $response = MyRent::getBookingsForOwner($user->owner->external_id);
                 //в ответе должен быть массив Json  c букингами - их надо разобрать
                 $response= \GuzzleHttp\json_decode($response,true);
                 foreach ($response as $rentInfo) {
@@ -241,18 +240,17 @@ class  BookingController extends Controller
                     $config['externalId'] = $rentInfo["id"];
                     $config['startDateTimestamp'] = strtotime($rentInfo["from_date"]);
                     $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
-                   // $config['apartmentId'] = $object->id;
                     $config['externalApartmentId'] = $rentInfo["object_id"];
                     $config['apartmentName'] = $rentInfo["object_name"];//$object->external_id;
                     $names = explode(' ', $rentInfo["contact_name"] );
-                    $config['firstName'] = (is_array($names) && array_key_exists (1,$names))? $names[1]:'';//$rentInfo["contact_name"];
-                    $config['secondName'] = (is_array($names) && array_key_exists (0,$names))? $names[0]:'';//$rentInfo["contact_name"];
+                    $config['firstName'] = (is_array($names) && array_key_exists (1,$names))? $names[1]:'';
+                    $config['secondName'] = (is_array($names) && array_key_exists (0,$names))? $names[0]:'';
                     $config['contactEmail'] = $rentInfo["contact_email"];
                     $config['owner'] = (isset($user->owner))?$user->owner : null;
                     $config['numberOfTourist'] = $rentInfo["total_guests"];
-                    $config['status']=  ($rentInfo["total_guests"]=="Y")?Booking::STATUS_ACTIVE:Booking::STATUS_CANCELLED;  // $rentInfo["rent_status"];
+                    $config['status']=  ($rentInfo["total_guests"]=="Y")?Booking::STATUS_ACTIVE:Booking::STATUS_CANCELLED;
 
-                    $bookingForm = new BookingForm( $config);
+                    $bookingForm = new BookingFormForNewApartments ( $config);
                     if ($bookingForm->load($bookingForm, '') && $bookingForm->validate()) {
                         try {
                             $bookings[] = $this->service->create($bookingForm,false,false, false); //ни писем, ни пользователей
@@ -263,22 +261,16 @@ class  BookingController extends Controller
                         throw new ServerErrorHttpException('Failed to create the object => ' . \GuzzleHttp\json_encode($bookingForm->getFirstErrors()));
                     }
                 }
-//            }
+
 
         }
-//        $guest = Guest::find()->where(['user_id'=>Yii::$app->user->getId()])->one();
        else {
            $guest = Guest::find()->where(['user_id' => Yii::$app->user->getId()])->one();
-//        $bookings = $guest->getBookings()->fromToday()->all();//$guest->bookings;
            if ($guest) {
-//            $authorBookings = \backend\models\Booking::find()->where(['guest_id'=>$guest->id])->all();
-//            foreach($guest->bookings as $booking){
-//                if (!key_exists($booking->id, $bookings))
                $bookings = \backend\models\Booking::find()
                    ->where(['>=', 'end_date', date("Y-m-d", time()) . " 00:00:01"])
                    ->andWhere(['guest_id' => $guest->id])->all();
            }
-//            }
        }
         return $bookings;
     }

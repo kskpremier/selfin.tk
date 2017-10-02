@@ -30,7 +30,7 @@ class Apartment extends ActiveRecord
         $apartment->location = $location;
         $apartment->name = $name;
         $apartment->external_id = $externalId;
-        $apartment->owner_id = $owner->id;
+        $apartment->owner_id = ($owner)?$owner->id:null;
 
         return $apartment;
     }

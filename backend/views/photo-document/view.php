@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($data) {
                     $imageBlock='';
                     foreach($data->images as $model) {
-                        $imageBlock .= Html::div(Html::a(
+                        $imageBlock .= Html::tag('div',Html::a(
                             Html::img($model->getThumbFileUrl('file_name', 'thumb')),
                             $model->getUploadedFileUrl('file_name'),
                             ['class' => 'thumbnail', 'target' => '_blank']), ['class' => "row"]);

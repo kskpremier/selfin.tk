@@ -46,8 +46,23 @@ class TTLHelper{
                 return "SATURDAYREP";
             case "14":
                 return "SUNDAYREP";
+            case "":
+                return "PERMANENT"; // by default Permanent
+            case null:
+                return "PERMANENT"; // by default Permanent
+            default:
+                return ""; //if something else - wrong type
+
         }
     }
+    public static function getKeyboardPwdType($type)
+    {
+        if ($type==null||$type=='')
+            return 2;
+        elseif ($type>=0 && $type<=14)
+            return $type;
+    }
+
     public static function getKeyTypeName($type) : string
     {
         switch ($type) {

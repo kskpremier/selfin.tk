@@ -69,7 +69,7 @@ class Album extends \yii\db\ActiveRecord
      */
     public function getPhotoImages()
     {
-        return $this->hasMany(PhotoImage::className(), ['album_id' => 'id']);
+        return $this->hasMany(Photo::className(), ['album_id' => 'id']);
     }
 
     /**

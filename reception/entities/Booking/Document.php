@@ -10,7 +10,7 @@ namespace reception\entities\Booking;
 
 use backend\models\Country;
 use backend\models\DocumentType;
-use backend\models\PhotoImage;
+use reception\entities\Booking\Photo;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
 

@@ -7,6 +7,7 @@
  */
 namespace api\controllers;
 
+use reception\forms\KeyboardPasswordForm;
 use reception\forms\KeyboardPwdForm;
 use Yii;
 use reception\repositories\DoorLock\KeyboardPwdRepository;
@@ -118,24 +119,42 @@ class KeyboardPwdController extends Controller
     }
 
     /**
-     * Creates a new DoorLock model.
+     * Creates a new KeyboardPwd .
      * If creation is successful, return model
      * @return Active Record model
      */
     public function actionCreate()
     {
-        $form = new KeyboardPwdForBookingForm();
+        $form = new KeyboardPasswordForm();
         $form->load(Yii::$app->getRequest()->getBodyParams(), '');
-        $keyboardPwd = $this->service->generateForBooking($form);
-        //собственно само обращение к китайцам и получение ответа
-        $data = json_decode($form->getKeyboardPwdFromChina(), true);
-        if ($data['success']) {
-                $response = Yii::$app->getResponse();
-                $response->setStatusCode(201);
-                $id = implode(',', array_values($form->getPrimaryKey(true)));
-                $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-                return $model;
-        } throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+        if ($form->validate()) {
+            try {
+                $resultOfGenerating = $this->service->generate($form);
+                //собственно само обращение к китайцам и получение ответа
+                // $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
+                if (isset ($resultOfGenerating)) {
+                    $response = Yii::$app->getResponse();
+                    $response->setStatusCode(201);
+                    return $this->serialize($resultOfGenerating);
+                }
+                throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+            }  catch (\DomainException $e) {
+                throw new BadRequestHttpException($e->getMessage(), null, $e);
+            }
+        }
+        else throw new ServerErrorHttpException($form->getErrors());
+    }
+
+    public function serialize($resultOfGenerating)
+    {
+        $result =[];
+        if (KeyboardPwd::className() instanceof $resultOfGenerating) {
+            foreach ($resultOfGenerating as $keyboardPwd) {
+                $result[] = $keyboardPwd->serializeKeyboardPwd();
+            }
+            return $result;
+        }
+        return $resultOfGenerating->serializeKeyboardPwd();
     }
     /**
      * @SWG\Post(

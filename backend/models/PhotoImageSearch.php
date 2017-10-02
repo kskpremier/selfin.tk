@@ -5,12 +5,12 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\PhotoImage;
+use reception\entities\Booking\Photo;
 
 /**
  * PhotoImageSearch represents the model behind the search form about `backend\models\PhotoImage`.
  */
-class PhotoImageSearch extends PhotoImage
+class PhotoImageSearch extends Photo
 {
     public $date_from;
     public $date_to;
@@ -20,7 +20,7 @@ class PhotoImageSearch extends PhotoImage
     public function rules()
     {
         return [
-            [['id', 'camera_id', 'album_id','user_id','booking_id'], 'integer'],
+            [['id',  'album_id','user_id','booking_id'], 'integer'],
             [['date', 'file_name'], 'safe'],
             [['date_from','date_to'],'date']
         ];
@@ -44,7 +44,7 @@ class PhotoImageSearch extends PhotoImage
      */
     public function search($params)
     {
-        $query = PhotoImage::find();
+        $query = Photo::find();
 
         // add conditions that should always apply here
 
@@ -64,9 +64,9 @@ class PhotoImageSearch extends PhotoImage
         $query->andFilterWhere([
             'id' => $this->id,
             'date' => $this->date,
-            'camera_id' => $this->camera_id,
+
             'album_id' => $this->album_id,
-            'user_id' => $this->user_id,
+            //'user_id' => $this->user_id,
             'booking_id' => $this->booking_id,
         ]);
 
