@@ -39,6 +39,7 @@ class Booking extends \yii\db\ActiveRecord
     public const STATUS_ACTIVE=10;
     public const STATUS_CANCELLED=20;
     public const STATUS_NONE=0;
+    public const BOOKING_RECOCNITION_LOWREST_PROBABILITY = 0.9;
 
     public static function create( $startDate,$endDate,$apartment,$author=null,$numberOfGuest,$externalId,$status,$guests=null) :self
     {
@@ -132,6 +133,8 @@ class Booking extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Guest::className(), ['id' => 'guest_id']);
     }
+
+
 
 
     /**

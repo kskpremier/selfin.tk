@@ -6,7 +6,7 @@ use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Owner */
+/* @var $model reception\entities\Apartment\Owner */
 
 $this->title = 'Update Owner: ' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Owners', 'url' => ['index']];

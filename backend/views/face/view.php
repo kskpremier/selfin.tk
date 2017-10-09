@@ -34,7 +34,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'y',
             'width',
             'angle',
-            'photo_image_id',
+            ['attribute'=>'file_name',
+                'format' => 'raw',
+                'value'=>function($model) {
+
+                       // return Html::img($model->getImageFileUrl('file_name'));
+                     return Html::a( Html::img($model->getThumbFileUrl('file_name', 'thumb')), $model->getImageFileUrl('file_name'), ['class' => 'thumbnail', 'target' => '_blank']  );
+
+                },
+                'label'=>'Preview']
         ],
     ]) ?>
 

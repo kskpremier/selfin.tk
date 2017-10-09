@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
         <?php echo (!$model->status)? Html::a('Send image for faces recognition',
-            ['face/detect-face', 'photoImageId' => $model->id],
+            ['photo-image/detect-face', 'id' => $model->id],
             ['class' => 'btn btn-primary']): ''; ?>
     </p>
 

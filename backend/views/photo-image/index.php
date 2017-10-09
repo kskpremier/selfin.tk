@@ -68,18 +68,16 @@ $this->params['breadcrumbs'][] = $this->title;
 //                'label'=>'Album',
 //                'value'=> 'album.name'
 //            ],
-            [
-                'attribute'=>'file_name',
-                'label'=>'Image',
-                //'value'=> 'album.name'
-            ],
+//            [
+//                'attribute'=>'file_name',
+//                'label'=>'Image',
+//                //'value'=> 'album.name'
+//            ],
             [   'attribute'=>'images',
                 'format' => 'raw',
                 'value'=>function($model) {
-                   $imageBlock = Html::tag('span',Html::img($model->getThumbFileUrl('file_name', 'thumb'),
-                                ['class' => 'thumbnail', 'target' => '_blank']),['class'=>'row']);
-
-                    return $imageBlock;
+                    return Html::a( Html::img($model->getThumbFileUrl('file_name', 'thumb')), $model->getImageFileUrl('file_name'), ['class' => 'thumbnail', 'target' => '_blank']  );
+                    //return $imageBlock;
                 },
                 'label'=>'Preview'
             ],

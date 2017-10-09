@@ -31,19 +31,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'y',
             'width',
              'angle',
-            [   'attribute'=>'photo_image_id',
+            [   'attribute'=>'file_name',
                 'value'=>
                     function($model) {
-//                    $image = (new Draw($model->photoImage))->getFaceRectangleImage($model);
-//                    return ($image)?$image:"-";
-//                },
-                        return Yii::getAlias('@imageUrl') . '/' . $model->face_id . '.jpg';
+                        return Html::a(Html::img($model->getThumbFileUrl('file_name','thumb')),
+                            $model->getUploadedFileUrl('file_name'),
+                            ['class' => 'thumbnail', 'target' => '_blank']);
                     },
-                'format'=>['image'
-                    , [
-                    'width'=>'60px',
-                    //'height'=>130
-                ],
+                'format'=>['raw'
+                    ,
+//                    [
+//                    'width'=>'60px',
+//                    //'height'=>130
+//                ],
                 ],
                 'label'=>'Face Preview'
             ],

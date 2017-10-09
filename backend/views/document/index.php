@@ -50,7 +50,36 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'photo_document_id',
             // 'guest_id',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}{delete}{update}',
+                'buttons' => [
+                    'view' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
+                            ['document/view', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'update' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>',
+                            ['document/update', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                            ['document/delete', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'match' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>',
+                            ['face/compearing-face', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>

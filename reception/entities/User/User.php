@@ -64,6 +64,7 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
             $user->temporaryPassword =$password;
             //толи хак, толи так надо я пока не понимаю
             $user->save();
+
             // TODO - change user->save() in USER
             return $user;
         }

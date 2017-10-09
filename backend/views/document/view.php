@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
         <?php echo  Html::a('Send image for faces recognition',
-            ['face/detect-face-from-document', 'documentId' => $model->id],
+            ['document/detect-face', 'id' => $model->id],
             ['class' => 'btn btn-primary']); ?>
     </p>
 
@@ -36,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'second_name',
             'gender',
             'number',
+            'date_of_birth',
             'date_of_issue',
             [   'attribute'=>'document_type_id',
                 'value' => $model->documentType->name],
@@ -70,6 +71,24 @@ $this->params['breadcrumbs'][] = $this->title;
 //                            $imageBlock.= Html::img(Yii::getAlias('@imageUrl') . '/' . $face->face_id . '.jpg'.PHP_EOL,['class' => 'thumbnail', 'target' => '_blank']);
 //                        }
 
+                    }
+                    return $imageBlock;
+                },
+                'label'=>'Preview'
+            ],
+            [   'attribute'=>'faces',
+                'format' => 'raw',
+                'value'=>function($model) {
+                    $imageBlock='';
+                    foreach($model->images as $image) {
+                        foreach ($image->faces as $face) {
+                            $imageBlock = $imageBlock . Html::tag('span',
+                                    Html::a(
+                                        Html::img(Yii::getAlias('@documentPath') . '/' . $face->face_id . '.jpg'),
+                                        ['face/view', 'id' => $face->id],
+                                        ['class' => 'thumbnail', 'target' => '_blank'])
+                                    , ['class' => 'row']) . PHP_EOL;
+                        }
                     }
                     return $imageBlock;
                 },

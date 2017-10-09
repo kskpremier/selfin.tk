@@ -4,13 +4,18 @@ namespace backend\controllers;
 
 use backend\models\FaceComparation;
 
-use backend\models\PhotoImage;
+use reception\entities\Booking\Booking;
+use reception\entities\Booking\Photo;
 use backend\service\PhotoImageRecognition;
 use GuzzleHttp\Exception\ServerException;
 use reception\entities\Booking\Document;
 use reception\entities\Booking\DocumentPhoto;
+use reception\entities\Booking\Face;
+use reception\forms\FaceForm;
+use reception\repositories\Booking\FaceRepository;
+use reception\useCases\manage\Booking\FaceManageService;
 use Yii;
-use backend\models\Face;
+
 use backend\models\FaceSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -25,6 +30,16 @@ use backend\helpers\FaceComparationHelper;
  */
 class FaceController extends Controller
 {
+    private $faceRepository;
+    private $service;
+
+    public function __construct($id, $module, FaceManageService $service, FaceRepository $faceRepository, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->faceRepository = $faceRepository;
+        $this->service = $service;
+    }
+    
     /**
      * @inheritdoc
      */
@@ -74,13 +89,14 @@ class FaceController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Face();
+        $form = new FaceForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($form->load(Yii::$app->request->post()) && $form->validate() ) {
+            $face = $this->service->create($form);
+            return $this->redirect(['view', 'id' => $face->id]);
         } else {
             return $this->render('create', [
-                'model' => $model,
+                'model' => $form,
             ]);
         }
     }
@@ -118,7 +134,7 @@ class FaceController extends Controller
     }
 
     /**
-     * Finds the Face model based on its primary key value.
+     * Finds the Face model based on its primary face value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return Face the loaded model
@@ -126,7 +142,7 @@ class FaceController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Face::findOne($id)) !== null) {
+        if (($model = \reception\entities\Face::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -140,10 +156,9 @@ class FaceController extends Controller
      */
     public function actionDetectFace($photoImageId){
 
-        $photoImage = PhotoImage::findOne($photoImageId);
+        $photoImage = Photo::findOne($photoImageId);
         if ($photoImage) {
-            $recognizedImage = new PhotoImageRecognition($photoImage);
-            $recognizedImage->recognize();
+            $photoImage->extractFace();
             return $this->redirect(['photo-image/view', 'id' => $photoImageId]);
         }
         throw new ServerException('Could not find Photoimage with this id'.$photoImageId );
@@ -156,16 +171,35 @@ class FaceController extends Controller
     public function actionDetectFaceFromDocument($documentId){
 
         $document = Document::findOne($documentId);
-
+        $list =[];
         if ($document) {
             foreach ($document->images as $photoImage) {
                 $recognizedImage = new PhotoImageRecognition($photoImage);
-                $recognizedImage->recognize(true); //признак того, что распознаем документ
+                $list[]=$recognizedImage->recognize(true); //признак того, что распознаем документ
             }
             return $this->redirect(['document/view', 'id' => $documentId]);
         }
-        throw new ServerException('Could not find Document photo with this id'.$documentPhotoId );
+        throw new ServerException('Could not find Document photo with this id'.$documentId );
     }
+    /**
+     * Making recognition all photos in an existing Booking model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionRecognize($bookingId)
+    {
+        $booking = Booking::findOne($bookingId);
+
+        $model = $this->findModel($id);
+
+        $this->service->compareFaces($booking,$model);
+        $this->service->analyzingResultOfComparing($booking, $model);
+
+        return $this->redirect(['view', 'id' => $model->id]);
+
+    }
+
 
     /**
      * @param integer $photoImageId
@@ -195,14 +229,14 @@ class FaceController extends Controller
                 foreach ($data['result'] as $id=>$result){
                     $faceComparation = FaceComparation::find()->where([
                         'origin_id'=>$faceImage->id,
-                        'face_id'=>key($result),
+                        'face_id'=>face($result),
                     ])->one();
                     $flag=true;
                     if (!isset($faceComparation)) {
                         $faceComparation = new FaceComparation([
                             'origin_id' => $faceImage->id,
-                            'face_id' => key($result),
-                            'probability' => $result[key($result)],
+                            'face_id' => face($result),
+                            'probability' => $result[face($result)],
                         ]);
                         $flag = $flag && $faceComparation->save();
                     }

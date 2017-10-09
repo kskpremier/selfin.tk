@@ -10,6 +10,7 @@ namespace reception\entities\Booking;
 
 use backend\models\Country;
 use backend\models\DocumentType;
+use backend\models\Face;
 use reception\entities\Booking\Photo;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
@@ -147,6 +148,7 @@ class Document extends \yii\db\ActiveRecord
     }
 
 
+
     /**
      * @inheritdoc
      */
@@ -158,6 +160,18 @@ class Document extends \yii\db\ActiveRecord
                 'relations' => ['guest','documentType','citizenship','birthCitizenship','birthCountry','images'],
             ],
         ];
+    }
+
+    public function  getTheMostSimilarFaceMatchedProbability($image, $repositoryComparation) {
+        $probability = 0;$comparation=null;
+        foreach ($this->images as $documentImages)
+            foreach ($documentImages->faces as $documentFace){
+                foreach ($image->faces as $imageFace)
+                    $comparation = $repositoryComparation->findMax($documentFace->id, $imageFace->face_id);
+                    if ($comparation && $comparation->probability < $probability)
+                        $probability = $comparation->probability;
+        }
+        return $probability;
     }
 
 }

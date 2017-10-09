@@ -51,6 +51,7 @@ class eVisitorForm extends Model
     public $address;
 
     public $bookingId;
+    public $booking;
 
     public function __construct(array $config = [])
     {
@@ -69,7 +70,8 @@ class eVisitorForm extends Model
 
                 [['identityData'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['identityData'=>'code'],'message'=>'Type of  Document ID should exist'],
                 [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
-
+                 [['country'],'validateCountry','message'=>'Country set on default value - hrv'],
+                [['identityData'],'validateType','message'=>'Type of document set on default value - 027'],
                 [['bookingId'],'validateBooking','message'=>'Booking with this ID should exist']
             ]
         );
@@ -88,7 +90,22 @@ class eVisitorForm extends Model
             'status'=>'Status'
         ];
     }
+    public function validateCountry(){
 
+        $country = Country::find()->where(['code'=>$this->country])->one();
+        if (!isset($country)){
+            $this->country = "hrv"; //Croatia byDefault
+        }
+
+    }
+    public function validateType(){
+
+        $type = DocumentType ::find()->where(['code'=>$this->identityData])->one();
+        if (!isset($type)){
+            $this->identityData = "027"; //Osobna iskaznica (strana) by default
+        }
+
+    }
 
     public function validateBooking(){
         if (!isset($this->bookingId)){
@@ -98,54 +115,12 @@ class eVisitorForm extends Model
         if (!isset($booking)){
             $this->addError('Wrong ID of Booking');
         }
+        $this->booking= $booking;
     }
-//    public function beforeValidate(): bool
-//    {
-//        if (parent::beforeValidate()) {
-//            $this->files = UploadedFile::getInstances($this, 'files');
-//            return true;
-//        }
-//        return false;
-//    }
-//    public function load($data, $formName = null)
-//    {
-//        parent::load($data,$formName);
-//        $scope = $formName === null ? $this->formName() : $formName;
-//        if ($scope === '' && !empty($data)) {
-//            $this->setAttributes($data);
-//
-//            return true;
-//        } elseif (isset($data[$scope])) {
-//            $this->setAttributes($data[$scope]);
-//
-//            return true;
-//        }
-//        return false;
-//    }
-//    public function setAttributes($values, $safeOnly = true)
-//    {
-//        if (is_array($values)) {
-//            $attributes = array_flip($safeOnly ? $this->safeAttributes() : $this->attributes());
-//            foreach ($values as $name => $value) {
-//                if (isset($attributes[$name])) {
-//                    $this->$name = $value;
-//                } elseif ($safeOnly) {
-//                    $this->onUnsafeAttribute($name, $value);
-//                }
-//            }
-//        }
-//        else if (is_string($values)){
-//            $result = json_decode($values,true);
-//            $attributes = array_flip($safeOnly ? $this->safeAttributes() : $this->attributes());
-//            foreach ($result as $name => $value) {
-//                if (isset($attributes[$name])) {
-//                    $this->$name = $value;
-//                } elseif ($safeOnly) {
-//                    $this->onUnsafeAttribute($name, $value);
-//                }
-//            }
-//        }
-//    }
+
+    public function getCountry(){
+        return Country::find()->where(['code'=>$this->country])->one();
+    }
 
 
 }

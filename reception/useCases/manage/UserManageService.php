@@ -43,7 +43,7 @@ class UserManageService
         );
        // $this->transaction->wrap(function () use ($user, $form) {
             $this->repository->save($user);
-            $this->roles->assign($user->id, $form->role);
+            $this->roles->assignRoles($user->id, $form->role);
            // $this->newsletter->subscribe($user->email);
       //  });
         return $user;
@@ -58,8 +58,10 @@ class UserManageService
 //            $form->phone
         );
    //     $this->transaction->wrap(function () use ($user, $form) {
+           // $this->roles->assign($user->id, $form->existRoles);
+            $this->roles->assignRoles($user->id, $form->existRoles);
             $this->repository->save($user);
-            $this->roles->assign($user->id, $form->role);
+           // $this->roles->assign($user->id, $form->role);
   //      });
     }
 
@@ -67,6 +69,10 @@ class UserManageService
     {
         $user = $this->repository->get($id);
         $this->roles->assign($user->id, $role);
+    }
+    public function getRoles($id)
+    {
+        return $this->roles->getRoles($id);
     }
 
     public function remove($id): void

@@ -2,7 +2,11 @@
 
 namespace backend\controllers;
 
+use reception\entities\Booking\Booking;
+use reception\repositories\Booking\FaceComparationRepository;
+use reception\useCases\manage\Booking\FaceComparationManageService;
 use Yii;
+use yii\data\ArrayDataProvider;
 use backend\models\FaceComparation;
 use backend\models\FaceComparationSearch;
 use yii\web\Controller;
@@ -14,6 +18,17 @@ use yii\filters\VerbFilter;
  */
 class FaceComparationController extends Controller
 {
+    private $service;
+    private $repository;
+
+    public function __construct($id, $module, FaceComparationManageService $service, FaceComparationRepository $faceComparationRepository, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+        $this->repository = $faceComparationRepository;
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -38,6 +53,30 @@ class FaceComparationController extends Controller
         $searchModel = new FaceComparationSearch();
         $searchModel->origin_id = ($origin_id!=null) ? $origin_id : $searchModel->origin_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    /**
+     * Lists all FaceComparation models with maximun probability
+     * @return mixed
+     */
+    public function actionBookingIndex($id)
+    {
+        $booking = Booking::findOne($id);
+
+        $searchModel = new FaceComparationSearch();
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $this->repository->getByBooking ($booking),
+            'sort' => [
+                'attributes' => ['origin_id', 'face_id', 'probability'],
+            ],
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);;
 
         return $this->render('index', [
             'searchModel' => $searchModel,

@@ -34,7 +34,6 @@ class DocumentManageService
     public function addDocument($form): Document
     {
 
-        $booking = Booking::findByBookingIdentity($form->bookingId);
         $guest = Guest::find()->where([
             'first_name' => $form->firstName,
             'second_name' => $form->secondName,
@@ -43,7 +42,7 @@ class DocumentManageService
             $guest = Guest::addToBookingGuestList(
                 $form->firstName,
                 $form->secondName,
-                $booking
+                $form->booking
             );
         }
         $document = $this->documentRepository->isDocumentExist($form->firstName, $form->secondName, $form->numberOfDocument, $form->country, $form->dateOfBirth);
@@ -57,7 +56,8 @@ class DocumentManageService
             $document = Document::create($form->firstName,
                                         $form->secondName,
                                         (DocumentType::find()->where(['code'=>$form->identityData])->one())->id,
-                                        $form->numberOfDocument, $form->gender,
+                                        $form->numberOfDocument,
+                                        $form->gender,
                                         $citizen,
                                         $form->city,
                                         $birthCountry,
@@ -79,12 +79,14 @@ class DocumentManageService
         //обработка и добавление семантики документа гостя
         $document = $this->addDocument($form->eVisitorForm);
         //обработка и добавление фотографий
-        foreach ($form->PhotosForm->files as $image){
-            $photo = new DocumentPhoto();
-            $photo=$photo->create($image, $document->id);
-            $images[]=$photo;
+        if (isset($form->PhotosForm)) {
+            foreach ($form->PhotosForm->files as $image) {
+                $photo = new DocumentPhoto();
+                $photo = $photo->create($image, $document->id);
+                $images[] = $photo;
+            }
+            $document->images = $images;
         }
-        $document->images = $images;
         $this->documentRepository->save($document);
         return $document;
     }

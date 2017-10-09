@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
@@ -16,6 +17,17 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'password')->passwordInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'email')->textInput() ?>
     <?= $form->field($model, 'role')->dropDownList($model->rolesList()) ?>
+    <?= $form->field($model, 'role')->widget(Select2::className(),[
+            'data'=> $model->rolesList(),
+            'value' => $model->rolesList(),
+            'options' => ['placeholder' => 'Select an apartment ...','multiple' => true],
+            'pluginOptions' => [
+                'tags' => true,
+                'tokenSeparators' => [',', ' '],
+                'maximumInputLength' => 10
+            ],
+        ]
+    )->label('Apartments of owner'); ?>
 
 
     <div class="form-group">

@@ -55,10 +55,13 @@ class GuestPhotoForm extends CompositeForm
     public $longitude;
     public $latitude;
 
+    public $booking;
+
     public function __construct(array $config = [])
     {
         $this->PhotosForm = new PhotosForm();
         parent::__construct($config);
+
     }
 
     public function rules(): array
@@ -84,5 +87,6 @@ class GuestPhotoForm extends CompositeForm
         if (!isset($booking)){
             $this->addError('Wrong ID of Booking');
         }
+        $this->booking = $booking;
     }
 }

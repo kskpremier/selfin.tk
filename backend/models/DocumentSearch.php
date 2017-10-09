@@ -20,8 +20,8 @@ class DocumentSearch extends Document
     public function rules()
     {
         return [
-            [['id', 'photo_document_face_id', 'document_type_id', 'country_id', 'photo_document_id', 'guest_id'], 'integer'],
-            [['first_name', 'second_name', 'number', 'seria', 'date_of_issue', 'valid_before','bookingId'], 'safe'],
+            [[ 'photo_document_face_id', 'document_type_id', 'country_id', 'photo_document_id', 'guest_id'], 'integer'],
+            [['first_name', 'second_name', 'number', 'date_of_issue', 'valid_before', 'bookingId','id'], 'safe'],
         ];
     }
 
@@ -76,7 +76,6 @@ class DocumentSearch extends Document
         $query->andFilterWhere(['like', 'first_name', $this->first_name])
             ->andFilterWhere(['like', 'second_name', $this->second_name])
             ->andFilterWhere(['like', 'number', $this->number])
-            ->andFilterWhere(['like', 'seria', $this->seria])
             ->andFilterWhere(['like', 'date_of_issue', $this->date_of_issue]);
 
         return $dataProvider;

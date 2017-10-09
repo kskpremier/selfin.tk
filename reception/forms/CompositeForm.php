@@ -32,9 +32,9 @@ abstract class CompositeForm extends Model//ModelForParsingJSON
                 $success = Model::loadMultiple($form, $data, $formName === null ? null : $name) && $success;
             } else {
               if (array_key_exists($name,$data) && !is_array($data[$name]))
-                    $dataArrayFromJson[$name] = json_decode($data[$name],true); //если в качестве содержимого фомы передается оыщт объект то надо его распарсить в массив
+                    $dataArrayFromJson[$name] = json_decode($data[$name],true); //если в качестве содержимого фомы передается json объект то надо его распарсить в массив
 
-                $success = $form->load( is_array($dataArrayFromJson)?$dataArrayFromJson:$data , $formName !== '' ? null : $name) && $success; // если распарсился удачно, подставиться массив иначе начальные данные $data
+                $success = $form->load( is_array($dataArrayFromJson)? $dataArrayFromJson : $data , $formName !== '' ? null : $name) && $success; // если распарсился удачно, подставиться массив иначе начальные данные $data
             }
         }
         return $success;

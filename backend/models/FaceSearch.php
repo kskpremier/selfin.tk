@@ -5,7 +5,7 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Face;
+use reception\entities\Face;
 
 /**
  * FaceSearch represents the model behind the search form about `backend\models\Face`.
@@ -18,7 +18,7 @@ class FaceSearch extends Face
     public function rules()
     {
         return [
-            [['id', 'photo_image_id'], 'integer'],
+            [['id', 'photo_image_id','photo_document_id'], 'integer'],
             [['face_id'], 'safe'],
             [['x', 'y', 'width', 'angle'], 'number'],
         ];
@@ -66,6 +66,7 @@ class FaceSearch extends Face
             'width' => $this->width,
             'angle' => $this->angle,
             'photo_image_id' => $this->photo_image_id,
+            'photo_document_id'=>$this->photo_document_id,
         ]);
 
         $query->andFilterWhere(['like', 'face_id', $this->face_id]);

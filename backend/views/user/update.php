@@ -5,7 +5,9 @@
 /* @var $user reception\entities\User */
 
 use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use kartik\select2\Select2;
 
 $this->title = 'Update User: ' . $user->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
@@ -19,7 +21,19 @@ $this->params['breadcrumbs'][] = 'Update';
     <?= $form->field($model, 'username')->textInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'email')->textInput(['maxLength' => true]) ?>
     <?php //echo $form->field($model, 'phone')->textInput(['maxLength' => true]) ?>
-    <?= $form->field($model, 'role')->dropDownList($model->rolesList()) ?>
+
+    <?= $form->field($model, 'existRoles')->widget(Select2::className(),[
+            'data'=> $model->rolesList(),
+            'value' =>  $model->userRolesList(),
+            'options' => ['placeholder' => 'Select roles for assignment ...','multiple' => true],
+            'pluginOptions' => [
+                'tags' => true,
+                'tokenSeparators' => [',', ' '],
+                'maximumInputLength' => 10
+            ],
+        ]
+    )->label('Permissions'); ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-primary']) ?>

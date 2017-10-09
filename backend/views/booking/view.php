@@ -5,7 +5,7 @@ use yii\widgets\DetailView;
 use backend\models\KeySearch;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Booking */
+/* @var $model reception\entities\Booking\Booking */
 
 $this->title = "Booking #".$model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Bookings', 'url' => ['index']];
@@ -24,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a('Recognition analysis', ['recognize', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?php echo DetailView::widget([
@@ -87,6 +88,27 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ?>
     <?= Html::a('Add New Image', ['photo-image/create','bookingId'=>$model->id], ['class' => 'btn btn-success']) ?>
+
+    <?php
+
+    $searchModel = new \backend\models\DocumentSearch();
+    $documents=[];
+    foreach($model->guests as $guest){
+        foreach($guest->documents as $document) {
+            $documents[] = $document->id;
+        }
+
+    }
+    $config = array_merge(Yii::$app->request->queryParams,['id'=>$documents]);
+    $dataProvider = $searchModel->search($config);?>
+
+    <?php echo $this->render('/document/index', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+    ]);
+
+    ?>
+
 
 
 </div>

@@ -10,13 +10,19 @@
 
 namespace reception\useCases\manage\Booking;
 
+
 use reception\entities\Apartment\Apartment;
 use reception\entities\Booking\Booking;
+use reception\entities\Booking\FaceComparation;
+use reception\entities\Booking\DocumentPhoto;
 use reception\entities\Booking\Guest;
 use reception\forms\BookingForm;
 use reception\helpers\TTLHelper;
+use reception\repositories\Booking\AbstractImageRepository;
 use reception\repositories\Booking\BookingRepository;
 use reception\entities\DoorLock\KeyboardPwd;
+use reception\repositories\Booking\FaceComparationRepository;
+use reception\repositories\Booking\FaceRepository;
 use reception\useCases\BusinessException;
 
 use reception\entities\User\User;
@@ -27,10 +33,16 @@ use yii\web\ServerErrorHttpException;
 class BookingManageService
 {
     private $bookingRepository;
+    private $imageRepository;
+    private $faceRepository;
+    private $faceCompareRepository;
 
-    public function __construct(BookingRepository $bookingRepository)
+    public function __construct(BookingRepository $bookingRepository, AbstractImageRepository $imageRepository, FaceRepository $faceRepository, FaceComparationRepository $faceCompareRepository)
     {
         $this->bookingRepository = $bookingRepository;
+        $this->imageRepository = $imageRepository;
+        $this->faceRepository = $faceRepository;
+        $this->faceCompareRepository = $faceCompareRepository;
     }
 
     public function create($form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
@@ -121,6 +133,59 @@ class BookingManageService
                 throw new BusinessException('Can not get keyboard password for this door lock identity: ' . $doorLock->id);
             }
         }
+    }
+
+    /**
+     * Making comparation all images from booking from one side with
+     * all guest's document images from other side
+     *
+     * Return array of probabilities matching faces in compared sets
+     * like this
+     * [document_id][face_id]=0.97
+     * [2][face-swbkozgnwkggcso]=>0,97,
+     * [2][face-sz5r6zk78u804s4]=>0,64
+     * @param $booking
+     */
+
+    public function compareFaces($booking)
+    {
+        $documentFaceList = [];
+        $imageFaceList = [];
+        $probabilityList =[[]];
+        $comparation=[];
+        //выполняем распознавание всех лиц с реальных фото, заносим их в $imageFaceList[]
+        foreach ($booking->photoImages as $image) {
+            $imageFaceList = array_merge($imageFaceList, $image->extractFace());
+            $this->imageRepository->save($image);
+        }
+        //выполняем detect всех лиц с документов туристов, заносим их в $documentFaceList[]
+        foreach ($booking->guests as $guest)
+            foreach ($guest->documents as $document)
+                foreach ($document->images as $documentPhoto) {
+                    $documentFaceList = array_merge($documentFaceList,$documentPhoto->extractFace());
+                    $this->imageRepository->save($documentPhoto);
+                    foreach ($documentFaceList as $documentFace) {
+                        //выполняем сравнение и поиск наиболее подходящей фото для фото с паспорта
+                        $matchedFace = $documentFace->faceMatch($imageFaceList);
+                        $this->faceRepository->save($documentFace); // сохраняем результаты сравнений
+                        $comparation = $this->faceCompareRepository->get($documentFace->id,$matchedFace->face_id);
+                    }
+                }
+        return $comparation;
+    }
+
+    public function analyzingResultOfComparing($booking)
+    {
+        $notMatchedDocumentList=[];
+        $finalProbability=0;
+        foreach ($booking->guests as $guest)
+            foreach ($guest->documents as $document)
+                foreach ($booking->photoImages as $image) {
+                    $probability = $document->getTheMostSimilarFaceMatchedProbability($image, $this->faceCompareRepository);
+                    if ($finalProbability < $probability)
+                        $finalProbability = $probability;
+                }
+        return $finalProbability;
     }
 
 }

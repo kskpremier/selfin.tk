@@ -24,18 +24,6 @@ return [
         'Facematica' => [
             'class' => 'backend\modules\faces\FaceRecognition',
         ],
-//        'OCR' => [
-//            'class' => 'backend\modules\documents\DocumentRecognition',
-//        ],
-//        'yii2images' => [
-//            'class' => 'rico\yii2images\Module',
-//            //be sure, that permissions ok
-//            //if you cant avoid permission errors you have to create "images" folder in web root manually and set 777 permissions
-//            'imagesStorePath' => dirname(__DIR__).'/../web/uploads/images/real_photos',//images/store', //path to origin images
-//            'imagesCachePath' => dirname(__DIR__).'/../web/uploads/images/real_photos/cash',//'images/cache', //path to resized copies
-//            'graphicsLibrary' => 'GD', //but really its better to use 'Imagick'
-//            'placeHolderPath' => '@webroot/uploads/images/real_photos/real_2.jpg', // if you want to get placeholder when image not exists, string will be processed by Yii::getAlias
-//        ],
     ],
     'components' => [
         'formatter' => [
@@ -113,10 +101,6 @@ return [
             ],
         ],
     ],
-//    'request' => [
-//        'parsers' => [
-//            'application/json' => 'yii\web\JsonParser',
-//        ]
-//    ],
+
     'params' => $params,
 ];

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use reception\useCases\manage\Booking\DocumentPhotoManageService;
 use Yii;
 use reception\entities\Booking\DocumentPhoto;
 use backend\models\PhotoDocumentSearch;
@@ -15,6 +16,14 @@ use yii\web\UploadedFile;
  */
 class PhotoDocumentController extends Controller
 {
+    private $service;
+
+    public function __construct($id, $module, DocumentPhotoManageService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     /**
      * @inheritdoc
      */
@@ -81,7 +90,26 @@ class PhotoDocumentController extends Controller
             ]);
         }
     }
+    /**
+     * Detect faces on Image and create a new Face models.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionDetectFace($id)
+    {
+        $model = $this->findModel($id); $faces=[];
+        if ($model) {
+            $faces=$this->service->extractFaces($model);
+            if ($faces && (count($model->faces)>0)) {
+                Yii::$app->session->setFlash('success', 'Faces detected');
+                return $this->redirect(['view', 'id' => $model->id]);
 
+            } else {
+                Yii::$app->session->setFlash('error', 'No one face was detected');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+    }
     /**
      * Updates an existing PhotoDocument model.
      * If update is successful, the browser will be redirected to the 'view' page.

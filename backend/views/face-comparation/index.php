@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use reception\entities\Face;
+use backend\widgets\grid\ProbabilityColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\FaceComparationSearch */
@@ -23,10 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'origin_id',
+            //'origin_id',
             [   'attribute'=> 'origin_id',
                 'value'=> function($model) {
-                    return Yii::getAlias('@imageUrl') . '/' . $model->origin->face_id . '.jpg';
+                    return $model->origin->getImageUrl();
                 },
                 'format'=>['image'
                     , [
@@ -34,10 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     ],
             ],
-                'face_id',
+             //   'face_id',
                 [   'attribute'=> 'face_id',
                     'value'=> function($model) {
-                        return Yii::getAlias('@imageUrl') . '/' . $model->face_id . '.jpg';
+                                $face = Face :: find()->where(['face_id'=>$model->face_id])->one();
+                                if ($face)
+                                    return $face->getImageUrl();
+                                else return '-';
                     },
                     'format'=>['image'
                         , [
@@ -45,11 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                     ],
                 ],
+['class' => ProbabilityColumn::class,
+    'attribute' =>'probability',],
 
-            'probability',
             'created_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            //['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 </div>

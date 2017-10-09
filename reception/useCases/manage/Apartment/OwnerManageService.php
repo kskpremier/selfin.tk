@@ -10,19 +10,20 @@ use reception\forms\OwnerUpdateForm;
 use reception\repositories\Apartment\ApartmentRepository;
 use reception\repositories\Apartment\OwnerRepository;
 use reception\entities\User\User;
-
+use reception\services\RoleManager;
 
 
 class OwnerManageService
 {
     private $ownerRepository;
-
+    private $roles;
     private $apartmentRepository;
 
-    public function __construct(OwnerRepository $ownerRepository, ApartmentRepository $apartmentRepository)
+    public function __construct(OwnerRepository $ownerRepository, ApartmentRepository $apartmentRepository,   RoleManager $roles)
     {
         $this->ownerRepository = $ownerRepository;
         $this->apartmentRepository = $apartmentRepository;
+        $this->roles = $roles;
 
     }
 // create new Owner and new User for mobile application
@@ -41,6 +42,7 @@ class OwnerManageService
                     $password
                     // TODO add auto connecting with role -"owner"
                 );
+
             }
             $owner = Owner::create(
                 $form->externalId ,
@@ -49,6 +51,7 @@ class OwnerManageService
             );
 
             $this->ownerRepository->save($owner);
+            $this->roles->assignRoles($user->id,['owner','tourist']);
             return $owner;
         }
 

@@ -3,6 +3,7 @@
 namespace backend\models;
 
 
+use reception\entities\Booking\Photo;
 use yii\web\BadRequestHttpException;
 use Yii;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
@@ -115,7 +116,7 @@ class Booking extends \yii\db\ActiveRecord
      */
     public function getPhotoImages()
     {
-        return $this->hasMany(Photo::className(), ['booking_id' => 'id']);
+        return $this->hasMany(Photo ::className(), ['booking_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery

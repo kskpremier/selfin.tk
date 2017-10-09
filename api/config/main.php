@@ -117,6 +117,7 @@ return [
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-photo',
                 'POST document' => 'document/guest-add',
+                'POST mrz' => 'document/create',
                // 'POST document' => 'document/create',
                 'POST booking-old' => 'booking/create-old',
                 'POST booking' => 'booking/create-for-owner',

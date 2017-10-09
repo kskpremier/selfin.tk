@@ -2,8 +2,10 @@
 
 namespace backend\controllers;
 
+use reception\useCases\manage\Booking\BookingManageService;
+use Symfony\Component\Yaml\Tests\B;
 use Yii;
-use backend\models\Booking;
+use reception\entities\Booking\Booking;
 use backend\models\BookingSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -14,6 +16,14 @@ use yii\filters\VerbFilter;
  */
 class BookingController extends Controller
 {
+    private $service;
+
+    public function __construct($id, $module, BookingManageService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     /**
      * @inheritdoc
      */
@@ -108,6 +118,27 @@ class BookingController extends Controller
     }
 
     /**
+     * Making recognition all photos in an existing Booking model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionRecognize($id)
+    {
+        $model = $this->findModel($id);
+
+       $this->service->compareFaces($model);
+       $probability = $this->service->analyzingResultOfComparing($model);
+       if ($probability < Booking::BOOKING_RECOCNITION_LOWREST_PROBABILITY){
+           Yii::$app->session->setFlash('success', 'All registered guest Id and photo matched well');
+       }
+       else{
+           Yii::$app->session->setFlash('error', "Some guest Id and photo does't matched" );
+       }
+       return $this->redirect(['face-comparation/booking-index', 'id' => $model->id]);
+
+    }
+    /**
      * Deletes an existing Booking model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -129,7 +160,7 @@ class BookingController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Booking::findOne($id)) !== null) {
+        if (($model = Booking ::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -3,6 +3,8 @@
 namespace backend\controllers;
 
 
+use reception\forms\GuestPhotoForm;
+use reception\useCases\manage\Booking\PhotoManageService;
 use Yii;
 use reception\entities\Booking\Photo;
 use backend\models\PhotoImageSearch;
@@ -16,6 +18,15 @@ use yii\web\UploadedFile;
  */
 class PhotoImageController extends Controller
 {
+    private $service;
+
+    public function __construct($id, $module, PhotoManageService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -65,78 +76,37 @@ class PhotoImageController extends Controller
      */
     public function actionCreate($bookingId=null)
     {
-        $model = new \backend\models\PhotoImage();
-        $model->booking_id = $bookingId;
+        $form = new GuestPhotoForm(['booking_id'=>$bookingId,'user_id'=>Yii::$app->user->id]);
 
-        if ($model->load(Yii::$app->request->post()) ) {
-            $model->user_id = Yii::$app->getUser()->id;
-            $model->date = date('Y-m-d H:i:s');
-            $model->save();
-            $image = UploadedFile::getInstance($model,'file_name');
-            if ($model->album_id == \backend\models\Album::ALBUM_DOCUMENTS){
-                $imageName = 'doc_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-            }
-            elseif($model->album_id == \backend\models\Album::ALBUM_FACES) {
-                $imageName = 'face_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-            }
-            else $imageName = 'photo_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-            $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
-            $model->file_name = $imageName;
-            $model->save();
+        if ($form->load(Yii::$app->request->post(),'') && $form->validate()) {
+            $model=$this->service->create($form);
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
-                'model' => $model,
+                'model' => $form,
             ]);
         }
     }
 
-//    /**
-//     * Creates a new PhotoImage model using RestApi controller
-//     * If creation is successful, the browser will be redirected to the 'view' page.
-//     * @return mixed
-//     */
-//    public function actionCreateRest($bookingId=Null)
-//    {
-//        $model = new \backend\models\PhotoImage();
-//        $model->booking_id = $bookingId;
-//
-//        if ($model->load(Yii::$app->request->post()) ) {
-//
-//            $model->user_id = Yii::$app->getUser()->id;
-//            $model->date = date('Y-m-d H:i:s');
-//            $image = UploadedFile::getInstance($model, 'file_name');
-//
-//            $model->save();
-//            if ($model->album_id == \backend\models\Album::ALBUM_DOCUMENTS){
-//                $imageName = 'doc_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-//            }
-//            elseif($model->album_id == \backend\models\Album::ALBUM_FACES) {
-//                $imageName = 'face_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-//            }
-//            else $imageName = 'photo_' . $model->id . '_' . $model->user_id . '.' . $image->getExtension();
-//            $image->saveAs(Yii::getAlias('@imagePath').'/'.$imageName);
-//            $model->file_name = $imageName;
-//            $model->save();
-//
-//            $response = $model->postPhotoImage();
-//
-//            if ($response->isOk) {
-//                Yii::$app->session->setFlash('success', 'Photo was successfully uploaded - ' . $model->file_name);
-//                return $this->redirect(['view', 'id' => $model->id]);
-//            } else {
-//                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administrator : '. $response);
-//                return $this->render('create', [
-//                    'model' => $model,
-//                ]);
-//            }
-//        }
-//        else {
-//            return $this->render('create', [
-//                'model' => $model,
-//            ]);
-//        }
-//    }
+    /**
+     * Detect faces on Image and create a new Face models.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionDetectFace($id)
+    {
+        $model = $this->findModel($id); $faces=[];
+        if ($model) {
+            if ($faces=$this->service->extractFaces($model) && (count($faces)>0)) {
+                Yii::$app->session->setFlash('success', 'Faces detected');
+                return $this->redirect(['view', 'id' => $model->id]);
+
+            } else {
+                Yii::$app->session->setFlash('error', 'No one face was detected');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+    }
 
     /**
      * Updates an existing PhotoImage model.
@@ -167,13 +137,13 @@ class PhotoImageController extends Controller
     {
         $model = $this->findModel($id);
         //надо грохнуть этот файл с диска
-        if (unlink(Yii::getAlias('@imagePath').'/'.$model->file_name)) {
+        if (unlink($model->getFileName())) {
             $model->delete();
         }
         else new NotFoundHttpException('The requested file does not exist.');
 
         Yii::$app->session->setFlash('success', 'Photo was successfully deleted');
-        return (!empty(Yii::$app->request->referrer)) ? Yii::$app->request->referrer : $this->redirect(['index']);
+        $this->redirect(['index']);
     }
 
     /**

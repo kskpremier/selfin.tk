@@ -62,6 +62,20 @@ class FACEMATIKA extends ActiveRecord
         else return $token->findOne(['expires'=>$expiresString])->token;
     }
 
+    public static function faceCompare($post,$face_id){
+        $token = self::token();
+        $client = new Client();
+        $response = $client->createRequest()
+        ->setMethod('post')
+        ->setUrl(FACEMATIKA::FACEMATIKA_URL_TO_FACE_MATCH . '/' . $face_id . '/match')
+        ->setHeaders([
+        'Authorization: bearer ' . $token,
+        'Content-Type: application/json'])
+        ->setContent($post)
+        ->send();
+        return $response;
+    }
+
     public static function tableName()
     {
         return '{{%facematika}}';

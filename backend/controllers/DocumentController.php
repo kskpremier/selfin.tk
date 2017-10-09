@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use reception\useCases\manage\Booking\PhotoManageService;
 use Yii;
 use reception\entities\Booking\Document;
 use backend\models\DocumentSearch;
@@ -14,6 +15,15 @@ use yii\filters\VerbFilter;
  */
 class DocumentController extends Controller
 {
+
+    private $service;
+
+    public function __construct($id, $module, PhotoManageService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     /**
      * @inheritdoc
      */
@@ -23,7 +33,7 @@ class DocumentController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+//                    'delete' => ['POST'],
                 ],
             ],
         ];
@@ -73,6 +83,7 @@ class DocumentController extends Controller
             ]);
         }
     }
+
 
     /**
      * Updates an existing Document model.

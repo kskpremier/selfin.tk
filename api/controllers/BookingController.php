@@ -234,6 +234,8 @@ class  BookingController extends Controller
             $user = User::findOne(Yii::$app->user->id);
                 $response = MyRent::getBookingsForOwner($user->owner->external_id);
                 //в ответе должен быть массив Json  c букингами - их надо разобрать
+                if ($response==="NoContent")
+                    return $bookings;
                 $response= \GuzzleHttp\json_decode($response,true);
                 foreach ($response as $rentInfo) {
                     //$rentInfo = \GuzzleHttp\json_decode($rentInfo,true);

@@ -28,6 +28,6 @@ class UserCreateForm extends Model
 
     public function rolesList(): array
     {
-        return ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description');
+        return ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name');
     }
 }

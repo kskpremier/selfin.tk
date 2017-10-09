@@ -2,47 +2,34 @@
 
 namespace reception\entities\Booking;
 
+use reception\entities\Face;
+use reception\entities\AbstractImage;
+use reception\entities\ImageInterface;
 use reception\services\WaterMarker;
 use yii\db\ActiveRecord;
 use yii\web\UploadedFile;
 use reception\entities\User\User;
 use yiidreamteam\upload\ImageUploadBehavior;
+use yii\helpers\ArrayHelper;
+use Yii;
 
 /**
- * @property string   $file
- * @property integer  $sort
- * @property integer  $id
- * @property string   $date
- * @property integer  $camera_id
- * @property integer  $album_id
- * @property string   $file_name
  * @property integer  $booking_id
- * @property integer  $user_id
- * @property integer  $size
- * @property string   $uploaded
- * @property string   $type
- * @property string   $dimensions
- * @property string   $facematika_id
- * @property integer  $status
- * @property double   $altitude
- * @property double   $longitude
- * @property double   $latitude
- *
  * @property Album $album
  * @property PhotoRealFace[] $photoRealFaces
  * @property Booking $booking
  *
  * @mixin ImageUploadBehavior
  */
-class Photo extends ActiveRecord
+class Photo  extends AbstractImage
 {
-    const ALBUM_REAL_IMAGES = 2;
+    //public $booking_id;
 
-    public static function create($file, $album_id, $booking_id, $user_id): self
+    public static function create(UploadedFile $file, $album_id, $booking, $user_id): self
     {
         $photo = new static();
         $photo->file_name =  $file;
-        $photo->booking_id = $booking_id;
+        $photo->booking_id = $booking->id;
         $photo->user_id =  $user_id;
         $photo->date = date("Y-m-d H:i",time());
         $photo->album_id = $album_id;
@@ -51,13 +38,12 @@ class Photo extends ActiveRecord
 
     }
 
-    public function edit(Photo $photo, $album_id, $booking_id, $user_id, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
+    public function edit(AbstractImage $photo, $album_id, $booking, $user_id, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
     {
-        $photo->booking_id = $booking_id;
+        $photo->booking_id = $booking->id;
         $photo->user_id =  $user_id;
         $photo->date = date("Y-m-d H:i",time());
         $photo->album_id = $album_id;
-        $photo->booking_id =  $booking_id;
         $photo->size =  $size;
         $photo->uploaded =  $uploaded;
         $photo->type =  $type;
@@ -71,41 +57,42 @@ class Photo extends ActiveRecord
         return $photo;
     }
 
-    public function setSort($sort): void
-    {
-        $this->sort = $sort;
-    }
-
-    public function isIdEqualTo($id): bool
-    {
-        return $this->id == $id;
-    }
-
+//    public function extractFace() : array //
+//    {
+//        parent::extractFace();
+//    }
     public static function tableName(): string
     {
         return '{{%photo_image}}';
     }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFaces()
+    {
+        return $this->hasMany(Face::className(), ['photo_image_id' => 'id']);
+    }
 
     public function behaviors(): array
     {
-        return [
-                    [
-                        'class' => ImageUploadBehavior::className(),
+        return ArrayHelper::merge(parent::behaviors(),[
+                    [   'class' => ImageUploadBehavior::className(),
                         'attribute' => 'file_name',
                         'createThumbsOnRequest' => true,
-
-                        'filePath' => '@documentPath/[[attribute_album_id]]/[[attribute_booking_id]]/[[id]].[[extension]]',
-                        'fileUrl' => '@documentUrl/[[attribute_album_id]]/[[attribute_booking_id]]/[[id]].[[extension]]',
-                        'thumbPath' => '@documentPath/cache/[[attribute_album_id]]/[[attribute_booking_id]]/[[profile]]_[[id]].[[extension]]',
-                        'thumbUrl' => '@documentUrl/cache/[[attribute_album_id]]/[[attribute_booking_id]]/[[profile]]_[[id]].[[extension]]',
-
-
+                        'filePath' => '@imagePath/[[attribute_album_id]]/[[attribute_booking_id]]/[[id]].[[extension]]',
+                        'fileUrl' => '@imageUrl/[[attribute_album_id]]/[[attribute_booking_id]]/[[id]].[[extension]]',
+                        'thumbPath' => '@imagePath/cache/[[attribute_album_id]]/[[attribute_booking_id]]/[[profile]]_[[id]].[[extension]]',
+                        'thumbUrl' => '@imageUrl/cache/[[attribute_album_id]]/[[attribute_booking_id]]/[[profile]]_[[id]].[[extension]]',
                         'thumbs' => [
-                            'thumb' => ['width' => 350, 'height' => 250],
-
+                            'thumb' => ['width' => 150, 'height' => 100],
                         ],
-
                     ],
-        ];
+        ]);
+    }
+    public function getFileName(){
+         return Yii::getAlias('@imagePath') . '/' . $this->album_id. '/'.$this->booking_id .'/'. $this->id. '.jpg';
+    }
+    public function getFilePath(){
+        return Yii::getAlias('@imagePath') . '/' . $this->album_id. '/'.$this->booking_id .'/';
     }
 }
