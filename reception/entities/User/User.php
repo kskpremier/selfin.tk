@@ -1,9 +1,12 @@
 <?php
 namespace reception\entities\User;
 
+use reception\entities\Apartment\Receptionist;
+use reception\entities\Booking\Guest;
 use reception\entities\EventTrait;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Owner;
+use reception\forms\MyRent\MyRentUserForm;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -32,6 +35,11 @@ use yii\db\ActiveRecord;
  * @property integer $updated_at
  * @property string $temporaryPassword
  * @property string $password write-only password
+ * @property string $myrent_update
+ * @property string $guid
+ * @property string $contact_name
+ * @property integer $external_id
+ * @property string $contact_tel
  *
  * @property Network[] $networks
  * @property WishlistItem[] $wishlistItems
@@ -47,7 +55,7 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
 
     private $temporaryPassword = null;
 
-    public static function create(string $username, string $email, string $password): self
+    public static function create(string $username, string $email, string $password, $contact_name=null, $contact_tel=null, $user_id=null, $guid=null, $updated=null): self
     {
         $user = User::find()->where(['username'=>$username,'email'=>$email])->one();
         if ($user)
@@ -62,6 +70,11 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
             $user->status = self::STATUS_ACTIVE;
             $user->auth_key = Yii::$app->security->generateRandomString();
             $user->temporaryPassword =$password;
+            $user->contact_name = $contact_name;
+            $user->contact_tel = $contact_tel;
+            $user->external_id = $user_id;
+            $user->myrent_update = ($updated)?$updated:time();
+            $user->guid = $guid;
             //толи хак, толи так надо я пока не понимаю
             $user->save();
 
@@ -69,6 +82,8 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
             return $user;
         }
     }
+
+
 
     public function edit(string $username, string $email): void
     {
@@ -149,7 +164,10 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
     {
         return $this->status === self::STATUS_ACTIVE;
     }
-
+    public function saveUpdate ($time)
+    {
+        $this->myrent_update = $time;
+    }
 
     public function getNetworks(): ActiveQuery
     {
@@ -160,7 +178,14 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
     {
         return $this->hasOne(Owner::className(), ['user_id' => 'id']);
     }
-
+    public function getReceptionist(): ActiveQuery
+    {
+        return $this->hasOne(Receptionist::className(), ['user_id' => 'id']);
+    }
+    public function getGuest(): ActiveQuery
+    {
+        return $this->hasOne(Guest::className(), ['user_id' => 'id']);
+    }
 
 
     /**
@@ -180,7 +205,7 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
             TimestampBehavior::className(),
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['networks', 'guest'],
+                'relations' => ['networks', 'guest','receptionist','owner'],
             ],
         ];
     }

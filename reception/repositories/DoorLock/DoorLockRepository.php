@@ -28,6 +28,22 @@ class DoorLockRepository
         return $doorLock;
     }
 
+    public function findByExternalId($id): DoorLock
+    {
+        if (!$doorLock = DoorLock::findOne(['external_id' => $id])) {
+            throw new NotFoundException('DoorLock is not found.');
+        }
+        return $doorLock;
+    }
+
+    public function findByMyrRentId($id)
+    {
+        if (!$doorLock = DoorLock::findOne(['external_id' => $id])) {
+            return null;
+        }
+        return $doorLock;
+    }
+
     public function save(DoorLock $doorLock): void
     {
         if (!$doorLock->save()) {

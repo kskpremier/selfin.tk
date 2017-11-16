@@ -8,9 +8,12 @@
 
 namespace reception\entities\DoorLock;
 
+use backend\models\DOMOUPRAV;
+use reception\entities\Booking\Booking;
 use reception\entities\User\User;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use yii\httpclient\Client;
 
 /**
  * @property integer $id
@@ -38,7 +41,7 @@ class Key extends ActiveRecord
                                    $door_lock_id, $user_id, $remarks) :self
     {
         $key = new static();
-        $key->start_date = $start_date;
+        $key->start_date = ($start_date > time()+60*60) ? $start_date: time()+60*60; // понять формат в котором с формы приходит дата
         $key->end_date = $end_date;
         $key->type = $type;
         $key->booking_id = $booking_id;
@@ -76,7 +79,7 @@ class Key extends ActiveRecord
      */
     public function getBooking()
     {
-        return $this->hasOne(\backend\models\Booking::className(), ['id' => 'booking_id']);
+        return $this->hasOne(Booking::className(), ['id' => 'booking_id']);
     }
 
     /**
@@ -96,15 +99,7 @@ class Key extends ActiveRecord
 
     public function sendEKeyByLocal(){
         //тут надо сформировать запрос и послать его на наш сервер
-        $client = $client = new Client([
-            'baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,
-//            'requestConfig' => [
-//                'format' => Client::FORMAT_JSON
-//            ],
-//            'responseConfig' => [
-//                'format' => Client::FORMAT_JSON
-//            ],
-        ]);
+        $client = $client = new Client(['baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,]);
         $response = $client->createRequest()
             ->setMethod('post')
             ->setHeaders(['content-type' => 'application/json'])
@@ -118,7 +113,6 @@ class Key extends ActiveRecord
                 'start_date'=>($this->type == '2')?  '0' : strtotime($this->start_date),
                 'end_date'=>($this->type == '2')?  '0' : strtotime( $this->end_date), //2 - это на период, надеюсь
                 'email'=> 'doorlockuser1@domouprav.hr',//$this->guest->contact_email,
-//                'accessToken'=> DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN
             ])
             ->send();
         if ($response->isOk) {

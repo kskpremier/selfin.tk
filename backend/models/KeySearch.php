@@ -5,7 +5,7 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Key;
+use reception\entities\DoorLock\Key;
 
 /**
  * KeySearch represents the model behind the search form about `backend\models\Key`.
@@ -15,6 +15,8 @@ class KeySearch extends Key
     public $userId;
     public $doorLockName;
     public $username;
+    public $bookingId;
+
     /**
      * @inheritdoc
      */
@@ -22,7 +24,7 @@ class KeySearch extends Key
     {
 
         return [
-            [['id', 'booking_id','door_lock_id','userId'], 'integer'],
+            [['id', 'booking_id','door_lock_id','userId','bookingId'], 'integer'],
             [['type'],'string','max' => 15],
             [['start_date', 'end_date','doorLockName','username'], 'safe'],
         ];
@@ -50,6 +52,10 @@ class KeySearch extends Key
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+//        if ($bookingId) {
+//
+//        }
+
         $this->load($params);
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -60,6 +66,7 @@ class KeySearch extends Key
         $query->joinWith('doorLock');
         $query->joinWith('booking');
         $query->andFilterWhere(['like', 'booking.id', $this->booking_id])
+              ->andFilterWhere(['like', 'booking.id', $this->bookingId])
               ->andFilterWhere(['like', 'door_lock.lock_alias', $this->doorLockName])
               ->andFilterWhere(['like', 'users.id', $this->userId])
               ->andFilterWhere(['like', 'users.username', $this->username]);

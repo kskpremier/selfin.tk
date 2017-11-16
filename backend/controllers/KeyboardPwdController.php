@@ -8,6 +8,7 @@
 
 namespace backend\controllers;
 
+use reception\forms\KeyboardPasswordForm;
 use Yii;
 use reception\entities\DoorLock\KeyboardPwd;
 use reception\forms\KeyboardPwdForm;
@@ -123,10 +124,10 @@ class KeyboardPwdController extends Controller
 
     public function actionCreate($booking_id  = null, $doorLockId = null)
     {
+//        $booking = \reception\entities\Booking\Booking::findOne($booking_id);
+//        $doorLocks = $booking->apartment->getDoorLocks()->one();
+        $model = new KeyboardPasswordForm(['bookingId'=>$booking_id,'doorLockId'=>$doorLockId]);//($doorLockId)?$doorLockId:$doorLocks->id]);
 
-        $booking = \reception\entities\Booking\Booking::findOne($booking_id);
-        $doorLocks = $booking->apartment->getDoorLocks()->one();
-        $model = new KeyboardPwdForm(['bookingId'=>$booking_id,'doorLockId'=>($doorLockId)?$doorLockId:$doorLocks->id]);
         if ($model->load(Yii::$app->request->post() ) && $model->validate() ) {
             $keyboardPwd =  $this->service->generate($model);
             if ($response = $this->service->getKeyboardPwdValueFromChina($keyboardPwd)) {

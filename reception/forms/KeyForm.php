@@ -9,7 +9,7 @@
 namespace reception\forms;
 
 use reception\entities\DoorLock\DoorLock;
-use backend\models\Guest;
+use reception\entities\Booking\Guest;
 use reception\entities\User\User;
 use yii\helpers\ArrayHelper;
 use yii\base\Model;
@@ -60,7 +60,7 @@ class KeyForm extends Model
     }
     public function getDoorLockName()
     {
-        return DoorLock::findOne(['id'=>$this->doorLockId])->lock_name;
+        return DoorLock::findOne(['id'=>$this->doorLockId])->lock_alias;
     }
 
     public function validateDates(){

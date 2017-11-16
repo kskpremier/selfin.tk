@@ -67,7 +67,7 @@ class eVisitorForm extends Model
                 [['firstName', 'secondName','country','city','address',
                     'identityData','numberOfDocument','gender','countryOfBirth','cityOfBirth','dateOfBirth','citizenshipOfBirth'], 'string'],
                 [['validBefore'],'integer'],
-
+                [['firstName', 'secondName'], 'validateNames'],
                 [['identityData'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['identityData'=>'code'],'message'=>'Type of  Document ID should exist'],
                 [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
                  [['country'],'validateCountry','message'=>'Country set on default value - hrv'],
@@ -77,19 +77,7 @@ class eVisitorForm extends Model
         );
         return $rules;
     }
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'startDate' => 'Arrival Date',
-            'endDate' => 'Depature Date',
-            'apartmentId' => 'Apartment ID',
-            'numberOfTourist' => 'Number Of Tourists',
-            'status'=>'Status'
-        ];
-    }
+
     public function validateCountry(){
 
         $country = Country::find()->where(['code'=>$this->country])->one();
@@ -104,6 +92,15 @@ class eVisitorForm extends Model
         if (!isset($type)){
             $this->identityData = "027"; //Osobna iskaznica (strana) by default
         }
+
+    }
+
+    public function validateNames(){
+
+        $this->firstName = str_replace('1', 'I',$this->firstName);
+        $this->secondName = str_replace('1', 'I',$this->secondName);
+        $this->firstName = str_replace('5', 'S',$this->firstName);
+        $this->secondName = str_replace('5', 'S',$this->secondName);
 
     }
 

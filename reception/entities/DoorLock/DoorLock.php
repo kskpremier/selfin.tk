@@ -33,7 +33,10 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property String $hardware_revision
  * @property String  $firmware_revision
  * @property String $model_number
+ * @property string $external_id
  * @property int $date
+ * @property int $user_id
+ * @property int $myrent_update
  *
  * @property LockVersion $lockVersion
  * @property Apartment $apartment
@@ -47,7 +50,7 @@ class DoorLock extends ActiveRecord
                                   $deletePwd, $pwdInfo, $timestamp, $specialValue,
                                   $timezoneRawOffset,
                                    $lockVersion, $modelNumber,
-                                   $hardwareRevision, $firmwareRevision, $electricQuantity, $date) :self
+                                   $hardwareRevision, $firmwareRevision, $electricQuantity, $date, $user_id=null) :self
     {
         $doorLock = new static();
         $doorLock->lock_name = $lockName;
@@ -69,6 +72,7 @@ class DoorLock extends ActiveRecord
         $doorLock->firmware_revision = $firmwareRevision;
         $doorLock->electric_quantity = $electricQuantity;
         $doorLock->date = $date;
+        $doorLock->user_id = $user_id;
 
 
         return $doorLock;
@@ -77,7 +81,7 @@ class DoorLock extends ActiveRecord
     public function edit( $lockName, $lockAlias, $lockMac, $lockKey,
                          $lockFlagPos, $aesKeyStr, $adminPwd, $noKeyPwd,
                          $deletePwd, $pwdInfo, $timestamp, $specialValue,
-                         $timezoneRawOffset, $modelNumber, $hardwareRevision, $firmwareRevision, $electricQuantity)
+                         $timezoneRawOffset, $modelNumber, $hardwareRevision, $firmwareRevision, $electricQuantity,$user_id=null)
     {
         $this->lock_name = $lockName;
         $this->lock_alias = $lockAlias;
@@ -97,6 +101,8 @@ class DoorLock extends ActiveRecord
         $this->hardware_revision = $hardwareRevision;
         $this->firmware_revision = $firmwareRevision;
         $this->electric_quantity = $electricQuantity;
+        $this->user_id = $user_id;
+
     }
 
     public function changeLockVersion($lockVersion): void
@@ -106,8 +112,16 @@ class DoorLock extends ActiveRecord
     public function setElectricQuantity($electricQuantity){
         $this->electric_quantity = $electricQuantity;
     }
-    public function setApartment(Apartment $apartment){
+    public function setApartment(Apartment $apartment, $user_id){
         $this->apartment = $apartment;
+        $this->user_id = $user_id;
+    }
+    public function installInApartment($apartmentId, $name, $id, $user_id,$updateTime){
+        $this->apartment_id = $apartmentId;
+        $this->lock_alias = $name;
+        $this->external_id = $id;
+        $this->user_id = $user_id;
+        $this->myrent_update = $updateTime;
     }
 
     public static function tableName(): string

@@ -9,12 +9,14 @@
 namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\DoorLock\Key;
-use backend\models\Booking;
+use reception\entities\Booking\Booking;
+use reception\forms\KeyEditForm;
 use reception\forms\KeyForm;
 use reception\forms\KeyForBookingForm;
 use reception\helpers\TTLHelper;
 use reception\repositories\DoorLock\KeyRepository;
 use reception\useCases\BusinessException;
+use reception\useCases\manage\TTL\TTL;
 
 
 class KeyManageService
@@ -40,9 +42,29 @@ class KeyManageService
         $this->keyRepository->save($key);
         return $key;
     }
-    public function edit(KeyEditForm $form): void
+    public function create(Booking $booking,$userId): array
     {
-        $key = Key::edit(
+        $keys=[];
+        foreach ($booking->apartment->doorLocks as $lock){
+            $key = Key::create (
+                strtotime($booking->start_date),
+                strtotime($booking->end_date),
+                TTL::TTL_KEY_PERIOD_TYPE,
+                $booking->id,
+                $lock->id,
+                $userId,
+                'robot'
+            );
+        $this->keyRepository->save($key);
+           // $response=$key->sendEKeyByLocal();
+        $keys[]=$key;
+        }
+        return $keys;
+    }
+
+    public function edit(KeyEditForm $form, Key $key): void
+    {
+        $key->edit(
             strtotime($form->startDate),
             strtotime($form->endDate),
             $form->type,

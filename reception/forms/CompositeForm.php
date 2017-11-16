@@ -12,9 +12,9 @@ namespace reception\forms;
 
 use yii\helpers\ArrayHelper;
 use yii\base\Model;
-//use reception\forms\ModelForParsingJSON;
 
-abstract class CompositeForm extends Model//ModelForParsingJSON
+
+abstract class CompositeForm extends Model
 {
     /**
      * @var Model[]|array[]

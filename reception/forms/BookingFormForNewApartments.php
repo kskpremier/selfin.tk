@@ -16,13 +16,17 @@
  * @property integer $apartmentId
  * @property integer $numberOfTourist
  * @property string $apartmentName
- * @property integet $status
+ * @property integer $status
+ * @property integer $user_id
+ * @property integer $owner_id
+ * @property integer $worker_id
  * @property boolean $eKey
  *
  * @property Apartment $apartment
  */
 namespace reception\forms;
 
+use reception\entities\Booking\Booking;
 use reception\entities\Booking\Guest;
 use reception\entities\Apartment\Apartment;
 use reception\entities\User\User;
@@ -46,7 +50,9 @@ class BookingFormForNewApartments extends FormWithDates
     public $numberOfTourist;
     public $externalId;
     public $status;
-    public $owner;
+    public $owner_id;
+    public $user_id;
+    public $worker_id;
     public $eKey;
 
     public $apartment;
@@ -56,11 +62,27 @@ class BookingFormForNewApartments extends FormWithDates
      * BookingForm constructor.
      * @param array $config
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], $rentInfo=null, $user_id=null, $owner_id=null, $worker_id=null)
     {
+        if (isset($rentInfo)) {
+            $config['externalId'] = $rentInfo["id"];
+            $config['startDateTimestamp'] = strtotime($rentInfo["from_date"]);
+            $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
+            $config['externalApartmentId'] = $rentInfo["object_id"];
+            $config['apartmentName'] = $rentInfo["object_name"];//$object->external_id;
+            $names = explode(' ', $rentInfo["contact_name"]);
+            $config['firstName'] = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
+            $config['secondName'] = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+            $config['contactEmail'] = $rentInfo["contact_email"];
+            $config['user_id'] = $user_id;
+            $config['worker_id'] = $worker_id;
+            $config['owner_id'] = $owner_id;
+            $config['numberOfTourist'] = $rentInfo["rent_adults"] + $rentInfo["rent_children"];
+            $config['status'] = ($rentInfo["active"]==="Y")?Booking::STATUS_ACTIVE: Booking::STATUS_NONE;
+        }
         parent::__construct($config);
         $this->guests = new GuestForm();
-        $this->status = self::STATUS_ACTIVE;
+       // $this->status = self::STATUS_ACTIVE;
     }
 
     /**

@@ -23,7 +23,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property string $second_name
  * @property string $number
  * @property integer $country_id
- *
+ * @property string $valid_before
  * @property string $type
  * @property string $gender
  * @property string $city
@@ -31,7 +31,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property integer $citizenship_of_birth_id
  * @property string $city_of_birth
  * @property string $date_of_birth
-  * @property string $address
+ * @property string $address
  * @property integer $document_type_id
  *
  *
@@ -65,9 +65,25 @@ class Document extends \yii\db\ActiveRecord
             $document->number = $numberOfDocument;
             $document->country_id = $country;
             $document->address = $address;
-            $document->valid_before = date("Y-m-d H:i:s",$validBefore/1000);
+            $document->valid_before = date("Y-m-d",$validBefore/1000);
 
         return $document;
+    }
+    public function edit(    $identityData, $gender, $country,  $city,
+                                    $countryOfBirth,$citizenshipOfBirth,
+                                    $cityOfBirth, $validBefore, $address) :self
+    {
+        $this->document_type_id = $identityData;
+        $this->gender = $gender;
+        $this->city = $city;
+        $this->country_of_birth_id = $countryOfBirth;
+        $this->citizenship_of_birth_id = $citizenshipOfBirth;
+        $this->city_of_birth = $cityOfBirth;
+        $this->country_id = $country;
+        $this->address = $address;
+        $this->valid_before = date("Y-m-d",$validBefore/1000);
+
+        return $this;
     }
 
 
@@ -93,7 +109,7 @@ class Document extends \yii\db\ActiveRecord
             "document_type"=>$this->documentType->code,
             "residence_country" => $this->citizenship->code,
             "residence_adress"  =>$this->address,
-
+            "residence_city"=> $this->city,
             "arrival_organisation" => "I",
             "offered_service_type" => "noćenje",
             "tt_payment_category"  => "14"

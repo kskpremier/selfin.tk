@@ -20,7 +20,7 @@ use yii\base\Model;
  * @property String $password;
  * @property integer $id;
  */
-class OwnerForm extends Model
+class OwnerForm extends CompositeForm
 {
     public $firstName;
     public $secondName;
@@ -47,6 +47,11 @@ class OwnerForm extends Model
         if (isset( $this->firstName) && isset( $this->firstName) && isset( $this->contactEmail) )
             return false;
         return true;
+    }
+
+    protected function internalForms(): array
+    {
+        return ['apartments'];
     }
 
 }

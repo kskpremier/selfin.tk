@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use kartik\date\DatePicker;
+use reception\helpers\BookingHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\BookingSearch */
@@ -23,10 +24,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
             [   'attribute'=>'id',
-                'label'=>'Number'
+                'label'=>'Number',
+            ],
+            [   'attribute'=>'external_id',
+                'label'=>'MyRent #',
             ],
             ['attribute'=>'start_date',
                 'label'=>'From',
@@ -71,7 +74,13 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [   'attribute'=> 'apartmentName',
                 'label'=> 'Apartment',
-                'value'=> 'apartment.name'
+                'format' => 'raw',
+                'value' => function($model){
+
+                        return Html::a($model->apartment->name,
+                                ['apartment/view', 'id' => $model->apartment->id],
+                                ['class' => '']);
+                },
             ],
             [   'attribute'=>'Guests',
                 'value'=>function($model){
@@ -81,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
-                'label'=>'List of guest',
+                'label'=>'Guests',
 
                 'format' => 'raw',
                 'value' => function($model){
@@ -97,15 +106,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 },
             ],
+
+//            [
+//                'attribute'=>'author',
+//                'format' => 'raw',
+//                'value'=> function($guest){
+//                    return (isset($guest->author))?Html::a($guest->author->second_name. ' '. $guest->author->first_name,
+//                        ['guest/view', 'id' => $guest->id],
+//                        ['class' => '']):'';
+//                },
+//                'label'=>'Author'
+//            ],
             [
-                'attribute'=>'author',
-                'format' => 'raw',
-                'value'=> function($guest){
-                    return (isset($guest->author))?Html::a($guest->author->second_name. ' '. $guest->author->first_name,
-                        ['guest/view', 'id' => $guest->id],
-                        ['class' => '']):'';
+                'attribute' => 'status',
+                'filter' => BookingHelper ::statusList(),
+                'value' => function (\reception\entities\Booking\Booking $model) {
+                    return BookingHelper::statusLabel($model->getCurrentStatus());
                 },
-                'label'=>'Author'
+                'format' => 'raw',
             ],
 
             [
@@ -114,16 +132,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'key' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-phone"></span>',
-                            ['key/create-for-booking', 'bookingId' => $model->id ],
-                            ['class' => (isset ($model->apartment->doorLock))?'':'btn disabled',
-                                'title'=>'Send E-key for guest',
-                                'disable'=>(isset ($model->apartment->doorlocks))?false:true]
+                            ['key/create-for-booking', 'booking_id' => $model->id ],
+                            ['class' => (isset ($model->apartment->doorLocks))?'btn':'btn disabled',
+                                'title'=>'Send E-key for guest']//,
+                                //'disabled'=>(isset ($model->apartment->doorlocks))?false:true]
                         );
                     },
                     'pin' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th"></span>',
                             ['keyboard-pwd/create', 'booking_id' => $model->id ],
-                            ['class' => (isset ($model->apartment->doorLock))?'':'btn disabled',
+                            ['class' => (isset ($model->apartment->doorLocks))?'btn':'btn disabled',
                                 'title'=>'Get Keyboard password',
                                ]
                         );

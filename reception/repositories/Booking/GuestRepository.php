@@ -9,6 +9,7 @@
 namespace reception\repositories\Booking;
 
 use reception\entities\Booking\Guest;
+use reception\forms\MyRent\ContactForm;
 use reception\repositories\NotFoundException;
 
 class GuestRepository
@@ -23,6 +24,14 @@ class GuestRepository
     public function isGuestExist($firstName, $secondName,$contactEmail): mixed
     {
         if ($guest = Guest::findOne(['first_name' => $firstName,'second_name'=>$secondName,'contact_email'=>$contactEmail])) {
+            return $guest;
+        }
+        return false;
+    }
+
+    public function findByMyRent(ContactForm $form)
+    {
+        if ($guest = Guest::findOne(['contact_name' => $form->contact_name, 'contact_email'=>$form->contact_email])) {
             return $guest;
         }
         return false;

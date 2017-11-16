@@ -42,6 +42,12 @@ class Owner extends ActiveRecord
         $this->apartments = $apartments;
     }
 
+    public function saveUpdate ($time)
+    {
+        $this->update = $time;
+        $this->save();
+    }
+
     public static function tableName(): string
     {
         return '{{%owner}}';

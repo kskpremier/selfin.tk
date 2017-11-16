@@ -63,7 +63,7 @@ class KeyboardPwdController extends Controller
                 [
                     'allow' => true,
                     // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['admin','receptionist'],
+                    'roles' => ['admin','receptionist','owner','mrz'],
                 ],
             ],
         ];
@@ -148,7 +148,7 @@ class KeyboardPwdController extends Controller
     public function serialize($resultOfGenerating)
     {
         $result =[];
-        if (KeyboardPwd::className() instanceof $resultOfGenerating) {
+        if ( !($resultOfGenerating instanceof KeyboardPwd) ) {
             foreach ($resultOfGenerating as $keyboardPwd) {
                 $result[] = $keyboardPwd->serializeKeyboardPwd();
             }

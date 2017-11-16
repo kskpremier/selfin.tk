@@ -190,7 +190,7 @@ class Calculator extends \yii\base\Model
         $priceDouble = 3.0;
         $priceKids = 3.0;
 
-        $priceForOneLinen = $priceSingle*$single+$priceDouble*$double+$kids*$priceKids;
+        $priceForOneLinen = $priceSingle*$single + $priceDouble*$double + $kids*$priceKids;
         //$beds = $double+$single+$kids; // пока так
         return  $priceForOneLinen ;
         //return 3.0*$beds;//(19300/5500 - 1.5*$volumeOfBooking/5500)/100;

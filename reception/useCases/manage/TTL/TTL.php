@@ -22,6 +22,7 @@ class TTL extends ActiveRecord {
     public const TTL_DOOR_LOCK_ADMIN_USERNAME = "admin";
     public const TTL_DOOR_LOCK_USERNAME = "doorlockuser1";
     public const TTL_CLIENT_ID = "7946f0d923934a61baefb3303de4d132";
+    public const TTL_CLIENT_SECRET = "56d9721abbc3d22a58452c24131a5554";
 
     public static function getToken($userId){
 

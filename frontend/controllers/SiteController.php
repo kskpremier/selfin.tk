@@ -240,6 +240,25 @@ class SiteController extends Controller
             ]);
         }
     }
+
+    /**
+     * Displays Calculate page.
+     *
+     * @return mixed
+     */
+    public function actionStatistics()
+    {
+        //echo dirname(__DIR__);
+        require_once 'Classes/PHPExcel.php';
+        $pExcel = PHPExcel_IOFactory::load('test.xls');
+
+// Цикл по листам Excel-файла
+        foreach ($pExcel->getWorksheetIterator() as $worksheet) {
+            // выгружаем данные из объекта в массив
+            $tables[] = $worksheet->toArray();
+        }
+    }
+
     /**
      * Displays chart page.
      *

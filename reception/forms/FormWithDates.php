@@ -49,9 +49,9 @@ abstract class FormWithDates extends CompositeForm
 //            if (strtotime($this->startDate) < (time()-60) ){
 //                $this->addError('Start Date must be bigger then current time');
 //            }
-            if (strtotime($this->endDate) < (time()) ){
-                $this->addError('Start Date must be bigger then current time');
-            }
+//            if (strtotime($this->endDate) < (time()) ){
+//                $this->addError('Start Date must be bigger then current time');
+//            }
             if (strtotime($this->endDate) < strtotime($this->startDate) ){
                 $this->addError( 'End Date must be bigger then Start Date');
             }

@@ -32,13 +32,14 @@ use reception\services\MyRent\MyRent;
  */
 class DocumentController extends Controller
 {
-    private $document;
+    //private $document;
     private $service;
 
-    public function __construct($id, $module, DocumentManageService $service, DocumentRepository $document, $config = [])
+//    public function __construct($id, $module, DocumentManageService $service, DocumentRepository $document, $config = [])
+    public function __construct($id, $module, DocumentManageService $service, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->document = $document;
+       // $this->document = $document;
         $this->service = $service;
 
     }
@@ -61,7 +62,7 @@ class DocumentController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin','tourist'],
+                    'roles' => ['receptionist','admin','tourist','mrz'],
                 ],
             ],
         ];

@@ -11,8 +11,12 @@ namespace api\controllers;
 
 use reception\forms\BookingForm;
 use reception\forms\BookingFormForNewApartments;
+use reception\forms\MyRent\ApartmentForm;
+use reception\forms\MyRent\ContactForm;
+use reception\forms\MyRent\RentForm;
 use reception\repositories\Booking\BookingRepository;
 use reception\useCases\manage\Booking\BookingManageService;
+use reception\useCases\manage\Myrent\MyRentManageService;
 use Yii;
 use reception\entities\Booking\Booking;
 use reception\services\MyRent\MyRent;
@@ -39,14 +43,15 @@ class  BookingController extends Controller
 {
     private $booking;
     private $service;
+    private $myRentService;
 
 
-    public function __construct($id, $module, BookingManageService $service, BookingRepository $booking, $config = [])
+    public function __construct($id, $module, BookingManageService $service, MyRentManageService $myRentService, BookingRepository $booking, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->booking = $booking;
         $this->service = $service;
-
+        $this->myRentService = $myRentService;
     }
 
     /**
@@ -228,53 +233,54 @@ class  BookingController extends Controller
      */
     public function actionBookings()
     {
+        $request = Yii::$app->request;
+        $user = User::findOne(Yii::$app->user->id);
+        $from = (!$request->get('date'))? date("Y-m-d", time()):$request->get('date') ;
+        $to = $request->get('to');
+        $to = ($to)? $to:$from;
         $bookings=[];
-        if (Yii::$app->user->can('owner',[])) {
-            //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
-            $user = User::findOne(Yii::$app->user->id);
-                $response = MyRent::getBookingsForOwner($user->owner->external_id);
-                //в ответе должен быть массив Json  c букингами - их надо разобрать
-                if ($response==="NoContent")
-                    return $bookings;
-                $response= \GuzzleHttp\json_decode($response,true);
-                foreach ($response as $rentInfo) {
-                    //$rentInfo = \GuzzleHttp\json_decode($rentInfo,true);
-                    $config['externalId'] = $rentInfo["id"];
-                    $config['startDateTimestamp'] = strtotime($rentInfo["from_date"]);
-                    $config['endDateTimestamp'] = strtotime($rentInfo["until_date"]);
-                    $config['externalApartmentId'] = $rentInfo["object_id"];
-                    $config['apartmentName'] = $rentInfo["object_name"];//$object->external_id;
-                    $names = explode(' ', $rentInfo["contact_name"] );
-                    $config['firstName'] = (is_array($names) && array_key_exists (1,$names))? $names[1]:'';
-                    $config['secondName'] = (is_array($names) && array_key_exists (0,$names))? $names[0]:'';
-                    $config['contactEmail'] = $rentInfo["contact_email"];
-                    $config['owner'] = (isset($user->owner))?$user->owner : null;
-                    $config['numberOfTourist'] = $rentInfo["total_guests"];
-                    $config['status']=  ($rentInfo["total_guests"]=="Y")?Booking::STATUS_ACTIVE:Booking::STATUS_CANCELLED;
-
-                    $bookingForm = new BookingFormForNewApartments ( $config);
-                    if ($bookingForm->load($bookingForm, '') && $bookingForm->validate()) {
-                        try {
-                            $bookings[] = $this->service->create($bookingForm,false,false, false); //ни писем, ни пользователей
-                        } catch (\DomainException $e) {
-                            throw new BadRequestHttpException($e->getMessage(), null, $e);
-                        }
-                    } else {
-                        throw new ServerErrorHttpException('Failed to create the object => ' . \GuzzleHttp\json_encode($bookingForm->getFirstErrors()));
+        $updateTime = time();
+        $lastUpdate =  $user->myrent_update;
+        //если пользователь владелец или рецепционист, то обновим его апартаменты и букинги
+        if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) ) {
+            if (($updateTime - $user->myrent_update) > MyRent::MyRent_UPDATE_INTERVAL) {
+                //обновляем апартаменты
+                try {
+                 if  ( Yii::$app->user->can('mobile',[]) ){
+                        $this->myRentService->updateMyRentUser($user);
+                        $rentList = MyRent::getBookingsUpdateForUser($user->external_id, date("Y-m-d H:i:s",$lastUpdate));
+                        $owner_id=null;
                     }
-                }
-
-
+                    else {
+                        //$this->myRentService->updateMyRentUser($user);
+                        $owner_id = $user->owner->external_id;
+                        $rentList = MyRent::getBookingsUpdateForOwner($owner_id, date("Y-m-d H:i:s",$lastUpdate));
+                    }
+                //Запускаем длинный процесс получения заявок из MyRenta -> добавление букингов в базу и выдачу
+                foreach ($rentList as $rentInfo) {
+                    $rent = new RentForm($rentInfo);
+                    $rent->load($rentInfo, '');
+                    try {
+                        if ($rent->validate()) {
+                            $this->service->updateBookings($rent, $user->id, $updateTime, $owner_id);
+                            } else throw new \DomainException ('Failed to create the object => ' . json_encode($rent->getFirstErrors()));
+                        } catch  (\DomainException $e) { Yii::$app->errorHandler->logException($e); }
+                    }
+                } catch (\DomainException $e) { Yii::$app->errorHandler->logException($e); }
+                $this->myRentService->saveUpdateTime($user, $updateTime);
+            }
+            //найти все букинге в базе, независимо от статуса на дату запроса для owner или receptionist
+            $bookings = ( Yii::$app->user->can('mobile',[]) )? $this->booking->getBookingsByMobileUser($user->id,$from,$to) :
+                $this->booking->getBookingsByOwner($user->owner->external_id,$from,$to);
         }
-       else {
+
+       { // иначе запрашивающий просто турист
+           //найти все букинги , со статусом Активные для данного гостя (?)
            $guest = Guest::find()->where(['user_id' => Yii::$app->user->getId()])->one();
-           if ($guest) {
-               $bookings = \backend\models\Booking::find()
-                   ->where(['>=', 'end_date', date("Y-m-d", time()) . " 00:00:01"])
-                   ->andWhere(['guest_id' => $guest->id])->all();
-           }
+           if ($guest)
+            $bookings = $this->booking->getBookingsByGuest($guest,$from,$to);
        }
-        return $bookings;
+       return $bookings;
     }
 
     public function actionMyRent()
@@ -343,6 +349,7 @@ class  BookingController extends Controller
     {
         return $this->findModel($id);
     }
+
 
     /**
      * @SWG\Get(
@@ -474,6 +481,28 @@ class  BookingController extends Controller
             'password' => $booking->temporary_password, //$booking->author->user->getNewReadablePassword(),
             'keyboardPwds' => $keyboardPwds,
         ];
+    }
+
+    /**
+     * Give a unique link on a new User portal model for external MyRent User
+
+     * @return string
+     */
+    public function actionGetLink()
+    {
+        $user = User::findOne(Yii::$app->user->id);
+        if ( Yii::$app->user->can('mobile',[]) )
+            return ["url"=>"https://app.my-rent.net/users/login?id=".$user->guid];
+        elseif ( Yii::$app->user->can('owner',[]) )
+            return ["url"=>"https://ow.my-rent.net/".$user->owner->guid];
+       elseif ( Yii::$app->user->can('tourist',[]) ){
+            $bookings = $this->service->getGuestBooking($user->guest->id);
+            if (count ($bookings) ==0){
+                return["url"=>"https://app.my-rent.net"];
+            }
+            else return ["url"=>"https://ow.my-rent.net/".$bookings[0]->guid];
+       }
+//        else return $form;
     }
 
     public function serializeBooking($booking): array

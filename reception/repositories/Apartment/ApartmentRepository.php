@@ -28,6 +28,14 @@ class ApartmentRepository
         }
     }
 
+    public function findByMyRentId($id)
+    {
+        if (!$doorLock = Apartment::findOne(['external_id' => $id])) {
+            return null;
+        }
+        return $doorLock;
+    }
+
     public function remove(Apartment $apartment): void
     {
         if (!$apartment->delete()) {

@@ -27,6 +27,7 @@ use reception\forms\FormWithDates;
 class KeyboardPasswordForm extends FormWithDates
 {
     public $doorLockId;
+    public $bookingId;
     public $externalApartmentId;
     public $type;
     public $keyboardPwdVersion = 4; // по умолчанию равно 4
@@ -47,7 +48,7 @@ class KeyboardPasswordForm extends FormWithDates
             [['type'],'validateTypes','message'=>'Type of password should be known. Unknown one is given.'],
             [['externalApartmentId'],'validateApartment','message'=>'wrong apartment or door lock ID'],
             [['doorLockId'],'validateDoorLock','message'=>'wrong door lock id'],
-            [['doorLockId','keyboardPwdVersion'],'integer'],
+            [['doorLockId','keyboardPwdVersion','bookingId'],'integer'],
         ];
     }
 

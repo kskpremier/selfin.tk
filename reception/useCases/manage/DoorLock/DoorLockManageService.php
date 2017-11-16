@@ -104,10 +104,12 @@ class DoorLockManageService
         }
     }
 
-    public function installInApartment($id, Apartment $apartment){
+    public function installInApartment($id, Apartment $apartment, $user_id){
         $doorLock = $this->doorLockRepository->get($id);
         $doorLock->setApartment($apartment);
+        $doorLock->user_id = $user_id;
         $this->doorLockRepository->save($doorLock);
+
     }
 
 }

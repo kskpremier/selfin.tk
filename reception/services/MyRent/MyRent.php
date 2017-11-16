@@ -8,6 +8,7 @@
 
 namespace reception\services\MyRent;
 
+use reception\entities\Booking\Document;
 use reception\forms\BookingForm;
 use yii\httpclient\Client;
 use yii\db\ActiveRecord;
@@ -18,9 +19,14 @@ use yii\web\ServerErrorHttpException;
 class MyRent extends ActiveRecord
 {
     public const MyRent_User_ID = "611";
+    public const MyRent_UPDATE_INTERVAL = 600; //100 минут на обновление
     public const MyRent_URL_TO_TOKEN = "https://api.my-rent.net/account/login";
     public const MyRent_URL_TO_GUEST_ADD = "https://api.my-rent.net/guests/add_evizitor/".MyRent::MyRent_User_ID;
+    public const MyRent_URL_TO_RENTS_FROM_TO = "https://api.my-rent.net/rents/rents_from_to";
     public const MyRent_URL_TO_BOOKINGS_LIST = "https://api.my-rent.net/rents/list";
+    public const MyRent_URL_TO_APARTMENTS_LIST = "https://api.my-rent.net/objects/list";
+    public const MyRent_URL_TO_UPDATE_BOOKINGS_FOR_USER = "https://api.my-rent.net/rents/list_change";
+    public const MyRent_URL_TO_UPDATE_BOOKINGS_FOR_OWNER = "https://api.my-rent.net/rents/list_change_owner";
     public const MyRent_URL_TO_ARRIVALS_LIST = "https://api.my-rent.net/rents/arrivals";
     public const RENT_TIME_PERIOD = 3600*24;
     public const MyRent_ACCESS_TOKEN = "bc8da49e-2b11-11e7-b171-0050563c3009"; // test
@@ -81,6 +87,24 @@ class MyRent extends ActiveRecord
         return $response->content;
     }
 
+    public static function getBookingsFromTo($userId,$from,$to=null)
+    {
+//        $token = MyRent::token();
+        $from = (isset($from))? date("Y-m-d",time()):$from;
+        $to=(isset($to))?$to:$from;
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('get')
+            ->setUrl(MyRent::MyRent_URL_TO_RENTS_FROM_TO . "?from=" . $from."&to=".$to."&user_id=".$userId)
+//            ->setHeaders([
+//                'Authorization:' . $token,
+//                'Content-Type: application/json'])
+//            ->setData(['﻿from' => $from, '﻿to' => $to])
+            ->send();
+        //обработка ответа и укладка данных в базу
+        return $response->content;
+    }
+
     /**
      * MyRent constructor.
      * @param $_token
@@ -120,5 +144,31 @@ class MyRent extends ActiveRecord
     public static function tableName()
     {
         return '{{%MyRent}}';
+    }
+
+    public static function getBookingsUpdateForUser($userId,$date=null)
+    {
+        $client = new Client();
+        $date = ($date)? $date : date("Y-m-d H:i:s",time());
+        $response = $client->get(MyRent::MyRent_URL_TO_UPDATE_BOOKINGS_FOR_USER . "/".$userId, ['date'=>$date],[],[])->send();
+        if ($response->content != "NoContent" && is_array($rentsList = json_decode($response->content, true)))
+            return $rentsList;
+        else return [];
+    }
+    public static function getBookingsUpdateForOwner($ownerId,$date=null)
+    {
+        $client = new Client();
+        $date = ($date)? $date : date("Y-m-d H:i:s",time());
+        $response = $client->get(MyRent::MyRent_URL_TO_UPDATE_BOOKINGS_FOR_OWNER. "/".$ownerId, ['date'=>$date],[],[])->send();
+        if ($response->content != "NoContent" && is_array($rentsList = json_decode($response->content, true)))
+            return $rentsList;
+        else return [];
+    }
+    public static function getApartmentsForUser($userId):array
+    {
+        $client = new Client();
+        $response = $client->get(MyRent::MyRent_URL_TO_APARTMENTS_LIST . "/".$userId,[],[],[])->send();
+        $result = is_string ($response->content)? json_decode($response->content, true): [];
+        return $result;
     }
 }

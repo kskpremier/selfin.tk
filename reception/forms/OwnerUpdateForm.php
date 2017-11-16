@@ -11,7 +11,7 @@ namespace reception\forms;
 
 use reception\entities\Apartment\Apartment;
 use reception\entities\User\User;
-use reception\forms\manage\ApartmentForm;
+use reception\forms\manage\ApartmentsForm;
 use reception\forms\CompositeForm;
 //use reception\forms\manage\MetaForm;/**/
 
@@ -45,7 +45,7 @@ class OwnerUpdateForm extends CompositeForm
         $this->secondName = (array_key_exists (0,$names) )? $names[0] : '';
         $this->contactEmail = $owner->user->email;
         $this->externalId = $owner->external_id;
-        $this->apartments =  new ApartmentForm($owner);
+        $this->apartments =  new ApartmentsForm($owner);
         $this->id = $owner->id;
         $this->userId = $owner->user->id;
         parent::__construct($config);

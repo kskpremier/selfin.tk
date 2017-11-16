@@ -2,11 +2,16 @@
 
 namespace reception\useCases\manage;
 
+use reception\entities\Apartment\Apartment;
+use reception\entities\DoorLock\DoorLock;
 use reception\entities\User\User;
+use reception\forms\auth\MyRentUserForm;
 use reception\forms\manage\User\UserCreateForm;
 use reception\forms\manage\User\UserEditForm;
+use reception\forms\MyRent\ApartmentForm;
 use reception\repositories\UserRepository;
 //use reception\services\newsletter\Newsletter;
+use reception\services\MyRent\MyRent;
 use reception\services\RoleManager;
 //use reception\services\TransactionManager;
 
@@ -23,14 +28,14 @@ class UserManageService
     public function __construct(
         UserRepository $repository,
         RoleManager $roles//,
-   //     TransactionManager $transaction//,
-      //  Newsletter $newsletter
+        //     TransactionManager $transaction//,
+        //  Newsletter $newsletter
     )
     {
         $this->repository = $repository;
         $this->roles = $roles;
-   //     $this->transaction = $transaction;
-       // $this->newsletter = $newsletter;
+        //     $this->transaction = $transaction;
+        // $this->newsletter = $newsletter;
     }
 
     public function create(UserCreateForm $form): User
@@ -41,13 +46,34 @@ class UserManageService
 //            $form->phone,
             $form->password
         );
-       // $this->transaction->wrap(function () use ($user, $form) {
-            $this->repository->save($user);
-            $this->roles->assignRoles($user->id, $form->role);
-           // $this->newsletter->subscribe($user->email);
-      //  });
+        // $this->transaction->wrap(function () use ($user, $form) {
+        $this->repository->save($user);
+        $this->roles->assignRoles($user->id, $form->role);
+        // $this->newsletter->subscribe($user->email);
+        //  });
         return $user;
     }
+
+//    public function createMyRentUser(MyRentUserForm $form): User
+//    {
+//        $user = User::create($form->username, $form->contact_email, $form->password,
+//            $form->contact_name, $form->contact_tel, $form->id,
+//            $form->guid, $form->changed);
+//        // $this->transaction->wrap(function () use ($user, $form) {
+//        $this->repository->save($user);
+//
+//        if ($form->role === "user") {
+//            $user->roles->assignRoles($user->id, 'owner');
+//            $this->updateMyRentUser($user);
+//        }
+//        else {
+//            $user->roles->assignRoles($user->id, 'tourist');
+//            //наверное следует создать гостя ???
+////            Guest::create();
+//        }
+//        $this->repository->save($user);
+//        return $user;
+//    }
 
     public function edit($id, UserEditForm $form): void
     {

@@ -18,7 +18,7 @@ return [
     'bootstrap' => [
         'log',
         'common\bootstrap\SetUp',
-        'backend\bootstrap\SetUp',
+        'api\bootstrap\SetUp',
     ],
     'modules' => [
         'Facematica' => [
@@ -31,10 +31,10 @@ return [
             'decimalSeparator' => ',',
             'thousandSeparator' => ' ',
             'currencyCode' => 'EUR',
-            'numberFormatterOptions' => [
-                NumberFormatter::MIN_FRACTION_DIGITS => 0,
-                NumberFormatter::MAX_FRACTION_DIGITS => 2,
-            ]
+//            'numberFormatterOptions' => [
+//                NumberFormatter::MIN_FRACTION_DIGITS => 0,
+//                NumberFormatter::MAX_FRACTION_DIGITS => 2,
+//            ]
         ],
         'request' => [
             'csrfParam' => '_csrf-backend',

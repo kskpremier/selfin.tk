@@ -9,7 +9,7 @@ use reception\useCases\manage\DoorLock\KeyManageService;
 use Yii;
 use reception\entities\DoorLock\Key;
 use backend\models\KeySearch;
-use backend\models\Booking;
+use reception\entities\Booking\Booking;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use reception\entities\DoorLock\DoorLock;
@@ -51,9 +51,9 @@ class KeyController extends Controller
      * Lists all Key models.
      * @return mixed
      */
-    public function actionIndex($userId=null)
+    public function actionIndex($userId=null,$bookingId=null)
     {
-        $searchModel = new KeySearch(['userId'=>$userId]);
+        $searchModel = new KeySearch(['userId'=>$userId, 'bookingId'=>$bookingId]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -91,14 +91,15 @@ class KeyController extends Controller
               // $modelsKeyList[]=$modelKey;
       //       }
        } else {
-           $model = new Key();
-           $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->door_lock_id;
+           $model = new KeyForm();
+           $model->doorLockId = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?Yii::$app->request->queryParams['door_lock_id']:$model->doorLockId;
        }
 
-        if ($model->load(Yii::$app->request->post()) ) {
-            if ($response=$model->sendEKeyByLocal()) {
-                Yii::$app->session->setFlash('success', 'E-Key was successfully generated and sent by email');
-                return $this->redirect(['view', 'id' => $response]);
+        if ($model->load(Yii::$app->request->post()) && $model->validate() ) {
+                $key = $this->service->generate($model);
+            if ($key) {
+                Yii::$app->session->setFlash('success', 'E-Key was successfully generated');
+                return $this->redirect(['view', 'id' => $key->id]);
             }
             else {
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
@@ -111,6 +112,32 @@ class KeyController extends Controller
             return $this->render('create', [
                 'model' => $model,
             ]);
+        }
+    }
+
+    /**
+     * Creates a new Key model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateForBooking($booking_id)
+    {
+        $booking = Booking::findOne($booking_id);
+        if (isset($booking)) {
+            $keys = $this->service->create($booking, Yii::$app->user->id);
+
+            if (isset($keys)) {
+                Yii::$app->session->setFlash('success', 'E-Key was successfully generated');
+                return $this->redirect(['index', '$bookingId' => $booking_id]);
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                return $this->goBack((!empty(Yii::$app->request->referrer) ? Yii::$app->request->referrer : null));
+            }
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Booking is not set correctly');
+            return $this->goBack((!empty(Yii::$app->request->referrer) ? Yii::$app->request->referrer : null));
         }
     }
 
@@ -143,7 +170,7 @@ class KeyController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreateForBooking($bookingId)
+    public function actionCreateKeyForBooking($bookingId)
     {
         $booking = Booking::findOne(['id'=>$bookingId]);
         if (!isset($booking)){
@@ -173,8 +200,8 @@ class KeyController extends Controller
     {
         $model = $this->findModel($id);
         $form = new KeyEditForm($model);
-        if ($form->load(Yii::$app->request->post()) && $form->save()) {
-            $this->service->edit($form);
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->service->edit($form, $model);
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('_update', [

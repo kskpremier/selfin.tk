@@ -79,4 +79,15 @@ class KeyEditForm extends Model
     {
         return ($this->doorLockId)?DoorLock::findOne(['id'=>$this->doorLockId])->lock_name: "unknown";
     }
+
+    public function validateDates(){
+        if ($this->type != "2"){
+            if (strtotime($this->startDate) < (time()-60) ){
+                $this->addError('Start Date must be bigger then current time');
+            }
+            if (strtotime($this->endDate) < strtotime($this->startDate) ){
+                $this->addError( 'End Date must be bigger then Start Date');
+            }
+        }
+    }
 }

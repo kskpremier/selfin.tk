@@ -29,6 +29,13 @@ class OwnerRepository
         }
     }
 
+    public function saveMyRentOwner(\reception\entities\MyRent\Owner $owner): void
+    {
+        if (!$owner->save()) {
+            throw new \RuntimeException('Saving error.');
+        }
+    }
+
     public function remove(Owner $owner): void
     {
         if (!$owner->delete()) {

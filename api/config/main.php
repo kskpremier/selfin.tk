@@ -16,6 +16,8 @@ return [
     ],
     'bootstrap' => [
         'log',
+        'common\bootstrap\SetUp',
+        'api\bootstrap\SetUp',
         [
             'class' => 'yii\filters\ContentNegotiator',
             'formats' => [
@@ -143,6 +145,8 @@ return [
                 'POST key/generate' => 'key/create-for-booking',
                 'POST password/create' => 'keyboard-pwd/create',
                 'request-password' => 'site/request-password',
+                'POST add-mobile-user' => 'mobile/create',
+                'GET portal-link' => 'booking/get-link',
 //                'PUT,PATCH password' => 'keyboard-pwd/update',
 //                'GET password' => 'keyboard-pwd/view',
 //                'PUT,PATCH password/delete' => 'keyboard-pwd/delete',

@@ -17,12 +17,15 @@ use reception\entities\Booking\FaceComparation;
 use reception\entities\Booking\DocumentPhoto;
 use reception\entities\Booking\Guest;
 use reception\forms\BookingForm;
+use reception\forms\MyRent\RentForm;
 use reception\helpers\TTLHelper;
+use reception\repositories\Apartment\ApartmentRepository;
 use reception\repositories\Booking\AbstractImageRepository;
 use reception\repositories\Booking\BookingRepository;
 use reception\entities\DoorLock\KeyboardPwd;
 use reception\repositories\Booking\FaceComparationRepository;
 use reception\repositories\Booking\FaceRepository;
+use reception\repositories\Booking\GuestRepository;
 use reception\useCases\BusinessException;
 
 use reception\entities\User\User;
@@ -36,13 +39,22 @@ class BookingManageService
     private $imageRepository;
     private $faceRepository;
     private $faceCompareRepository;
+    private $guestRepository;
+    private $apartmentRepository;
 
-    public function __construct(BookingRepository $bookingRepository, AbstractImageRepository $imageRepository, FaceRepository $faceRepository, FaceComparationRepository $faceCompareRepository)
+    public function __construct(BookingRepository $bookingRepository,
+                                AbstractImageRepository $imageRepository,
+                                FaceRepository $faceRepository,
+                                FaceComparationRepository $faceCompareRepository,
+                                GuestRepository $guestRepository,
+                                ApartmentRepository $apartmentRepository)
     {
         $this->bookingRepository = $bookingRepository;
         $this->imageRepository = $imageRepository;
         $this->faceRepository = $faceRepository;
         $this->faceCompareRepository = $faceCompareRepository;
+        $this->guestRepository = $guestRepository;
+        $this->apartmentRepository = $apartmentRepository;
     }
 
     public function create($form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
@@ -84,25 +96,27 @@ class BookingManageService
         $guestList = ($form->guests->isEmpty())?  $author : Guest::createGuestList($form->guests);
         //ищем, есть ли такие апартаменты
         $apartment = Apartment::find()->where(['external_id'=>$form->externalApartmentId])->one();
-        if (!isset($apartment)){
-            $apartment = Apartment::create("",$form->apartmentName,$form->externalApartmentId,$form->owner);
+        if (!isset($apartment)) {
+            $apartment = Apartment::create('',$form->name,$form->externalId,$form->owner,$form->latitude,$form->longitude, $form->city_name, $form->adress, $form->object_color,$form->guid,
+                $form->user->user_id, '', $form->country, $form->doorlocks);
         }
         //ищем , есть ли уже такой букинг
 
-        $booking = $this->bookingRepository->isBookingExist($form->externalId, $form->startDate, $form->endDate, $form->status, $apartment->id) ;
+        $booking = $this->bookingRepository->findByMyRentId($form->externalId);
         if (!$booking) {
             $booking = Booking::create(
-                $form->startDate,
-                $form->endDate,
-                $apartment, //$form->getApartmentId(), //договариваемся, что апартаменты с таким  ID должны быть
-                $author,
-                $form->numberOfTourist,
-                $form->externalId,
-                Booking::STATUS_ACTIVE, //$form->status,
-                $guestList
-            );
+               $form->startDate,$form->endDate,
+               $apartment,
+               $author,
+               $form->numberOfGuest,$form->externalId,Booking::STATUS_ACTIVE,
+               $guestList,
+               $form->guid,$form->rent_status,$form->from_time,$form->until_time,$form->price,$form->exchange,
+               $form->label,$form->price_local,$form->paid,$form->created,$form->changed);
         }
         else {
+            $booking->edit($form->startDate,$form->endDate,$form->numberOfGuest,$form->status,
+                $form->rent_status,$form->from_time,$form->until_time,$form->price,$form->exchange,
+                $form->label,$form->price_local,$form->paid,$form->created,$form->changed=null);
             $booking->guests = $guestList;
         }
         $this->bookingRepository->save($booking);
@@ -114,6 +128,47 @@ class BookingManageService
         }
         return $booking;
     }
+
+    public function updateBookings(RentForm $form, $user_id, $updateTime, $owner_id=null)
+    {
+
+        if ($form->active ==="Y") {
+            //ищем апартамент
+            $apartment = $this->apartmentRepository->findByMyRentId($form->property->object_id);
+            if (!$apartment)
+                $apartment = Apartment::createProperty($form->property, $user_id, $updateTime, $owner_id);
+            else $apartment->edit($form->property, $user_id, $updateTime, $owner_id);
+            $this->apartmentRepository->save($apartment);
+            //ищем автора
+            $author = $this->guestRepository->findByMyRent($form->contact);
+            if (!$author)
+                $author = Guest::createContact($form->contact, $updateTime);
+            else $author->updateContact($form->contact, $updateTime);
+            $this->guestRepository->save($author);
+            //букинг
+            $booking = $this->bookingRepository->findByMyRentId($form->id);
+            if (!$booking)
+                $booking = Booking::createBooking($form, $updateTime, $apartment->id, $author->id);
+            else $booking->edit($form, $updateTime, $apartment->id, $author->id);
+            $this->bookingRepository->save($booking);
+//            throw new \DomainException ('Failed to save booking object => ' . ($booking->external_id));
+            return $booking;
+        }
+        elseif ($form->active ==="N"){
+            //букинг ищем
+            $booking = $this->bookingRepository->findByMyRentId($form->id);
+            if ($booking) {
+                $booking->deleteBooking($booking);
+                $this->bookingRepository->save($booking);
+                return $booking;
+            }
+        }
+    }
+
+    public function getGuestBooking($guestId) {
+        return $this->bookingRepository->getByGuestId($guestId);
+    }
+
     
     public function generateKeyboardPwdForBooking($booking) {
         foreach ($booking->apartment->doorLocks as $doorLock) {
@@ -122,7 +177,6 @@ class BookingManageService
                 strtotime($booking->end_date), //ключ на весь период действия букинга
                 TTLHelper::TTL_KEYBOARD_PERIOD_TYPE,
                 4,//пока так, потом из модели $doorLock->keyboard_pwd_version,
-
                 $doorLock->id,
                 $booking->id
             );

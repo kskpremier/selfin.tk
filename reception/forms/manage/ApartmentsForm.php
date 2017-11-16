@@ -7,7 +7,7 @@ use reception\entities\Apartment\Owner;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
-class ApartmentForm extends Model
+class ApartmentsForm extends Model
 {
     public $exist = [];
     public $others = [];

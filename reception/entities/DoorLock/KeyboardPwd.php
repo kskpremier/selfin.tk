@@ -129,6 +129,11 @@ class KeyboardPwd extends ActiveRecord
      * */
 
     public function getKeyboardPwdFromChina(){
+        $dateTimeZone = new \DateTimeZone(date_default_timezone_get ());
+        $date = new \DateTime(null, new \DateTimeZone(date_default_timezone_get ()));
+        $offset = $dateTimeZone->getOffset($date);
+
+
         $token = TTL::getToken((User::find()->where(['username'=>TTL::TTL_DOOR_LOCK_ADMIN_USERNAME])->one())->id);
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_HTTPHEADER, array('Content-type: application/x-www-form-urlencoded'));
@@ -140,8 +145,10 @@ class KeyboardPwd extends ActiveRecord
                 'clientId' =>  TTL::TTL_CLIENT_ID,
                 'date'=> 1000*time(),
                 'accessToken'=>$token->access_token,
-                'startDate'=> (gettype($this->start_date)==='integer')?$this->start_date*1000:strtotime($this->start_date)*1000, //китайцы добавляют милисекунды
-                'endDate'=> ($this->keyboard_pwd_type == 2)?  0 : (gettype($this->end_date)==='integer')?$this->end_date*1000:strtotime($this->end_date)*1000,//китайцы добавляют милисекунды
+                'startDate'=> (gettype($this->start_date)==='integer')?($this->start_date+$this->getSummerWinterDoorLockInit()+$offset)*1000
+                    :(strtotime($this->start_date)+$this->getSummerWinterDoorLockInit()+$offset)*1000, //китайцы добавляют милисекунды
+                'endDate'=> ($this->keyboard_pwd_type == 2)?  0 : (gettype($this->end_date)==='integer')? ($this->end_date+$this->getSummerWinterDoorLockInit()+$offset)*1000:
+                    (strtotime($this->end_date)+$this->getSummerWinterDoorLockInit()+$offset)*1000,//китайцы добавляют милисекунды
                 'keyboardPwdVersion'=>$this->keyboard_pwd_version,
                 'lockId'=>$this->doorLock->lock_id,
                 'keyboardPwdType'=>$this->keyboard_pwd_type
@@ -168,6 +175,31 @@ class KeyboardPwd extends ActiveRecord
             return json_encode($data);
         }
         else throw new ServerErrorHttpException('Problems with request '. $response);
+    }
+
+    /**
+     Исправляем китайский косяк - определяем сколько секунд надо добавить к дате начала или окончания действия замка,
+     * в зависимости от того в какое время был инициализирован замок и генерируется ключ
+     * Пока по умолчанию считаем, что время берется в европейской тайм зоне с переходом на летнее/зимнее
+     */
+    public function getSummerWinterDoorLockInit()
+    {
+        $doorLockInitTime = $this->doorLock->date/1000;
+        $doorLockTimeZone = 'Europe/Zurich'; /** TODO разобраться с временной зоной замка */ //$this->doorLock->timeZone;
+        $currentTime = time();
+        if (date('I', $doorLockInitTime) && date('I', $currentTime)) {
+            //оба времени летние или зимние
+            return 0;
+        } elseif (date('I', $doorLockInitTime)) //замок летом, ключ зимой => надо вычитать час ??
+            {
+            return -1*$this->getWinterSummerTimeDifference($doorLockTimeZone,$currentTime);
+             }
+        return 1*$this->getWinterSummerTimeDifference($doorLockTimeZone,$currentTime);
+    }
+    /** Возвращает разницу в летнем и зимнем времени в зависимости от TimeZone и времени
+     */
+    private function getWinterSummerTimeDifference($timezone, $time){
+        return 3600;
     }
 
     /**

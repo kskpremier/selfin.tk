@@ -21,7 +21,7 @@ class BookingSearch extends Booking
     public function rules()
     {
         return [
-            [['id', 'apartment_id', 'number_of_tourist', 'guest_id'], 'integer'],
+            [['id', 'external_id','apartment_id', 'number_of_tourist', 'guest_id','status'], 'integer'],
             [['start_date', 'end_date','apartmentName','guestName','author'], 'safe'],
         ];
     }
@@ -51,6 +51,22 @@ class BookingSearch extends Booking
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+        $dataProvider->setSort([
+            'attributes' => [
+                'id'=> [
+                    'asc' => ['id' => SORT_ASC],
+                    'desc' => ['id' => SORT_DESC],
+                    'label' => 'Booking #',
+                    'default' => ['id' => SORT_DESC]
+                ],
+                'external_id'=> [
+                    'asc' => ['external_id' => SORT_ASC],
+                    'desc' => ['external_id' => SORT_DESC],
+                    'label' => 'MyRent #',
+                    'default' => ['external_id' => SORT_DESC]
+                ]
+            ]
+        ]);
 
         $this->load($params);
 
@@ -68,13 +84,16 @@ class BookingSearch extends Booking
         // grid filtering conditions
         $query->andFilterWhere([
             'booking.id' => $this->id,
+            'booking.external_id' => $this->external_id,
             'number_of_tourist' => $this->number_of_tourist,
         ]);
         $query->andFilterWhere(['like', 'apartment.name', $this->apartmentName]);
         //$query->andFilterWhere(['like', 'guest.name', $this->guestName]);
         $query->andFilterWhere(['like', 'guest.name', $this->author]);
 
-
+        $query->andFilterWhere([
+            'status' => $this->status,
+        ]);
 
         $query->andFilterWhere(['>=', 'booking.start_date', date("Y-m-d H:i:s",$this->start_date ? strtotime($this->start_date . ' 00:00:00'):null)])
         ->andFilterWhere(['<=', 'booking.end_date', date("Y-m-d H:i:s",$this->end_date ? strtotime($this->end_date . ' 23:59:59'):null)]);

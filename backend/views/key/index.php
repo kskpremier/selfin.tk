@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'model' => $searchModel,
                     'attribute' => 'start_date',
                     'value'=> function($model){
-                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                        return ($model->start_date == 0)? '': date('yyyy-M-dd', $model->start_date);
                     },
                    // 'attribute2' => 'date_to',
                     'type' => DatePicker::TYPE_INPUT,
@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 //'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->start_date == 0)? '': date('d-m-Y h:i', $model->start_date);
+                    return ($model->start_date == 0)? '': date('Y-m-d h:i', $model->start_date);
                 }
             ],
             ['attribute'=>'end_date',
@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'model' => $searchModel,
                     'attribute' => 'end_date',
                     'value'=> function($model){
-                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                        return ($model->start_date == 0)? '': date('yyyy-M-dd', $model->start_date);
                     },
                     // 'attribute2' => 'date_to',
                     'type' => DatePicker::TYPE_INPUT,
@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                // 'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->end_date == 0)? '': date('d-m-Y h:i', $model->end_date);
+                    return ($model->end_date == 0)? '': date('Y-m-d h:i', $model->end_date);
                 },
 
             ],
