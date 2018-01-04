@@ -36,7 +36,7 @@ class BookingHelper
             case Booking::STATUS_REGISTERED:
                 $class = 'label label-success';
                 break;
-            case Booking::STATUS_ATTATION:
+            case Booking::STATUS_WARNING:
                 $class = 'label label-danger';
                 break;
             default:

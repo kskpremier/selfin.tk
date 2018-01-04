@@ -8,10 +8,12 @@ class m171104_213536_my_rent_worker_owner_user_update_duble2 extends Migration
     {
         $this->addColumn('{{users}}','external_id', $this->string(20));
         $this->addColumn('{{users}}','contact_name', $this->string(255));
+        $this->addColumn('{{users}}','contact_tel', $this->string(20));
         $this->addColumn('{{users}}','myrent_update', $this->integer(15));
         $this->addColumn('{{users}}','guid', $this->string(255));
         $this->addColumn('{{worker}}','guid', $this->string(255));
         $this->addColumn('{{owner}}','guid', $this->string(255));
+        //$this->addColumn('{{owner}}','country_id', $this->string(5));
         $this->addColumn('{{worker}}','myrent_update', $this->integer(15));
     }
 
@@ -19,8 +21,10 @@ class m171104_213536_my_rent_worker_owner_user_update_duble2 extends Migration
     {
         echo "m171104_213536_my_rent_worker_owner_user_update_duble2 cannot be reverted.\n";
         $this->dropColumn('{{users}}','guid');
+        $this->dropColumn('{{users}}','contact_tel');
         $this->dropColumn('{{worker}}','guid');
         $this->dropColumn('{{owner}}','guid');
+        //$this->dropColumn('{{owner}}','country_id');
         $this->dropColumn('{{users}}','external_id');
         $this->dropColumn('{{worker}}','myrent_update');
         $this->dropColumn('{{users}}','contact_name');

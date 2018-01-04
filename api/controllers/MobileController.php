@@ -11,6 +11,7 @@ namespace api\controllers;
 use reception\entities\User\User;
 use reception\forms\MyRent\MyRentUserForm;
 use reception\repositories\UserRepository;
+use reception\useCases\manage\Booking\BookingManageService;
 use reception\useCases\manage\MyRent\MyRentManageService;
 use reception\useCases\manage\UserManageService;
 use Yii;
@@ -25,14 +26,16 @@ class MobileController extends Controller
 {
     private $user;
     private $service;
+    private $bookingService;
 //    private $serviceUser;
 
 
-    public function __construct($id, $module, MyRentManageService $service, /*UserManageService $serviceUser,*/UserRepository $user, $config = [])
+    public function __construct($id, $module, MyRentManageService $service, BookingManageService $bookingService,UserRepository $user, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->user = $user;
         $this->service = $service;
+        $this->bookingService = $bookingService;
 //        $this->serviceUser = $serviceUser;
 
     }

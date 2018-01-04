@@ -1,5 +1,6 @@
 <?php
 
+use reception\helpers\ImageHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -24,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
         <?php echo  Html::a('Send image for faces recognition',
-            ['document/detect-face', 'id' => $model->id],
+            ['document/process', 'id' => $model->id],
             ['class' => 'btn btn-primary']); ?>
     </p>
 
@@ -55,11 +56,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=> function ($model) {
                 return $model->valid_before; },
             ],
+//            [
+//                'attribute'=>'status',
+//                'format' => 'raw',
+//                'value' => function($model) {
+//
+//                }
+//            ],
+            [ "attribute"=>'maxprobability',
+                'format' => 'raw',
+                'value' => function($model) {
+                    return ImageHelper::statusRecognition($model->maxprobability);
+                }
+                ],
             [   'attribute'=>'images',
                 'format' => 'raw',
                 'value'=>function($model) {
                     $imageBlock='';
-                    foreach($model->images as $image) {
+                    foreach($model->documentImages as $image) {
 
                         $imageBlock = $imageBlock. Html::tag('span',
                             Html::a(
@@ -74,25 +88,43 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     return $imageBlock;
                 },
-                'label'=>'Preview'
+                'label'=>'DocumentImages'
             ],
             [   'attribute'=>'faces',
                 'format' => 'raw',
                 'value'=>function($model) {
                     $imageBlock='';
-                    foreach($model->images as $image) {
-                        foreach ($image->faces as $face) {
+                    foreach($model->selfys as $image) {
+
                             $imageBlock = $imageBlock . Html::tag('span',
                                     Html::a(
-                                        Html::img(Yii::getAlias('@documentPath') . '/' . $face->face_id . '.jpg'),
-                                        ['face/view', 'id' => $face->id],
+                                        Html::img($image->getThumbFileUrl('file_name', 'thumb')),
+                                        $image->getUploadedFileUrl('file_name'),
                                         ['class' => 'thumbnail', 'target' => '_blank'])
-                                    , ['class' => 'row']) . PHP_EOL;
-                        }
+                                    ,['class'=>'row']).PHP_EOL;
+
                     }
                     return $imageBlock;
                 },
-                'label'=>'Preview'
+                'label'=>'Selfie'
+            ],
+            [   'attribute'=>'faces',
+                'format' => 'raw',
+                'value'=>function($model) {
+                    $imageBlock='';
+                    foreach($model->faceImages as $image) {
+
+                            $imageBlock = $imageBlock . Html::tag('span',
+                                    Html::a(
+                                        Html::img($image->getFaceFileUrl(),['height'=>"120", 'width'=>"100"]),
+                                        $image->getFaceFileUrl(),
+                                        ['class' => 'image', 'target' => '_blank'])
+                                    ,['class'=>'row']).PHP_EOL;
+                        }
+
+                    return $imageBlock;
+                },
+                'label'=>'Faces'
             ],
 
 

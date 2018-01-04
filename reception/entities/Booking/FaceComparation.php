@@ -23,10 +23,6 @@ use reception\entities\Face;
 
 class FaceComparation extends \yii\db\ActiveRecord
 {
-//    public $face_id;
-//    public $origin_id;
-//    public $probability;
-//    public $created_at;
 
     /**
      * @inheritdoc
@@ -42,6 +38,10 @@ class FaceComparation extends \yii\db\ActiveRecord
             $faceComparation = new static();
             $faceComparation->face_id = $face_id;
             $faceComparation->origin_id = $origin_id;
+            $faceComparation->probability = $probability;
+            $faceComparation->created_at = date('Y-m-d H:i:s', time());
+        }
+        else {
             $faceComparation->probability = $probability;
             $faceComparation->created_at = date('Y-m-d H:i:s', time());
         }

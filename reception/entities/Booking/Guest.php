@@ -68,10 +68,14 @@ class Guest extends \yii\db\ActiveRecord
 
     public static function createContact( ContactForm $form, $updatetime) :self
     {
+        $names = explode(' ', $form->contact_name);
+        $first_name = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+        $second_name = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
+        $guest = Guest::find()->where(['first_name'=>$first_name,'second_name'=>$second_name,'contact_email'=>$form->contact_email])->one();
+        if (!isset($guest)) {
             $guest = new static();
-            $names = explode(' ', $form->contact_name);
-            $guest->first_name = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
-            $guest->second_name = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+            $guest->first_name = $first_name;
+            $guest->second_name = $second_name;
             $guest->contact_email = $form->contact_email;
             $guest->contact_tel = $form->contact_tel;
             $guest->contact_name = $form->contact_name;
@@ -79,7 +83,8 @@ class Guest extends \yii\db\ActiveRecord
             $guest->contact_country_code1 = $form->contact_country_code1;
             $guest->guid = $form->guid;
             $guest->myrent_update = $updatetime;
-
+        }
+        else $guest->updateContact( $form, $updatetime);
         return $guest;
     }
 

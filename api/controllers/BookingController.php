@@ -16,7 +16,7 @@ use reception\forms\MyRent\ContactForm;
 use reception\forms\MyRent\RentForm;
 use reception\repositories\Booking\BookingRepository;
 use reception\useCases\manage\Booking\BookingManageService;
-use reception\useCases\manage\Myrent\MyRentManageService;
+use reception\useCases\manage\MyRent\MyRentManageService;
 use Yii;
 use reception\entities\Booking\Booking;
 use reception\services\MyRent\MyRent;
@@ -243,7 +243,7 @@ class  BookingController extends Controller
         $lastUpdate =  $user->myrent_update;
         //если пользователь владелец или рецепционист, то обновим его апартаменты и букинги
         if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) ) {
-            if (($updateTime - $user->myrent_update) > MyRent::MyRent_UPDATE_INTERVAL) {
+            if (($updateTime - $user->updated_at) > MyRent::MyRent_UPDATE_INTERVAL) {
                 //обновляем апартаменты
                 try {
                  if  ( Yii::$app->user->can('mobile',[]) ){
@@ -500,9 +500,8 @@ class  BookingController extends Controller
             if (count ($bookings) ==0){
                 return["url"=>"https://app.my-rent.net"];
             }
-            else return ["url"=>"https://ow.my-rent.net/".$bookings[0]->guid];
+            else return ["url"=>"https://rent.my-rent.net/".$bookings[0]->guid];
        }
-//        else return $form;
     }
 
     public function serializeBooking($booking): array

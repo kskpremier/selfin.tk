@@ -26,6 +26,8 @@ use reception\entities\DoorLock\KeyboardPwd;
 use reception\repositories\Booking\FaceComparationRepository;
 use reception\repositories\Booking\FaceRepository;
 use reception\repositories\Booking\GuestRepository;
+use reception\repositories\UserRepository;
+use reception\services\TransactionManager;
 use reception\useCases\BusinessException;
 
 use reception\entities\User\User;
@@ -41,13 +43,17 @@ class BookingManageService
     private $faceCompareRepository;
     private $guestRepository;
     private $apartmentRepository;
+    private $transaction;
+    private $userRepository;
 
     public function __construct(BookingRepository $bookingRepository,
                                 AbstractImageRepository $imageRepository,
                                 FaceRepository $faceRepository,
                                 FaceComparationRepository $faceCompareRepository,
                                 GuestRepository $guestRepository,
-                                ApartmentRepository $apartmentRepository)
+                                ApartmentRepository $apartmentRepository,
+                                UserRepository $userRepository,
+                                TransactionManager $transaction)
     {
         $this->bookingRepository = $bookingRepository;
         $this->imageRepository = $imageRepository;
@@ -55,6 +61,8 @@ class BookingManageService
         $this->faceCompareRepository = $faceCompareRepository;
         $this->guestRepository = $guestRepository;
         $this->apartmentRepository = $apartmentRepository;
+        $this->transaction = $transaction;
+        $this->userRepository = $userRepository;
     }
 
     public function create($form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
@@ -132,7 +140,11 @@ class BookingManageService
     public function updateBookings(RentForm $form, $user_id, $updateTime, $owner_id=null)
     {
 
-        if ($form->active ==="Y") {
+        //здесь по хорошему надо бы делать транзакцию
+        $this->transaction->wrap(function () use ($form, $user_id, $updateTime, $owner_id){
+            $user = $this->userRepository->get($user_id);
+            $user->setUpdateTime($updateTime);
+        if ($form->active === "Y") {
             //ищем апартамент
             $apartment = $this->apartmentRepository->findByMyRentId($form->property->object_id);
             if (!$apartment)
@@ -153,8 +165,7 @@ class BookingManageService
             $this->bookingRepository->save($booking);
 //            throw new \DomainException ('Failed to save booking object => ' . ($booking->external_id));
             return $booking;
-        }
-        elseif ($form->active ==="N"){
+        } elseif ($form->active === "N") {
             //букинг ищем
             $booking = $this->bookingRepository->findByMyRentId($form->id);
             if ($booking) {
@@ -163,6 +174,8 @@ class BookingManageService
                 return $booking;
             }
         }
+            $this->userRepository->save($user);
+        });
     }
 
     public function getGuestBooking($guestId) {

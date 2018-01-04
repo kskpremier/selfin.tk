@@ -33,15 +33,12 @@ class Draw {
     public function DrawRectangleFaceDetected()  {
         $mime = ($this->mime)?$this->mime : mime_content_type(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
         if ($mime == 'image/jpeg') {
-//            $imageSrc = imagecreatefromjpeg(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
             $imageSrc = imagecreatefromjpeg($this->filename);
         }
         elseif ($mime == 'image/png') {
-//            $imageSrc = imagecreatefrompng(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
             $imageSrc = imagecreatefrompng($this->filename);
         }
         elseif ($mime == 'image/bmp') {
-//            $imageSrc = imagecreatefromwbmp(Yii::getAlias('@imagePath') . '/' . $this->photoImage->file_name);
             $imageSrc = imagecreatefromwbmp($this->filename);
         }
         else {
@@ -58,18 +55,14 @@ class Draw {
 
     public function getFaceRectangleImage(Face $face) {
         //определяем геометрические размеры лица
-
         $faceWidth = $face->width*100/46; //исходим из того, что расстояние между зрачками равно 46% от ширины лица
         $faceWidth *=1.15; // добавляем 15% на резерв
-        $faceHieght= $faceWidth*1.4; // высота лица будет больша на 40%
-
+        $faceHeight= $faceWidth*1.4; // высота лица будет больша на 40%
         //координаты и ширина лица
-
          $x = $face->x  - $faceWidth/2; //+$face->width/2
-         $y = $face->y - $faceHieght/2;
+         $y = $face->y - $faceHeight/2;
 
         //создаем файл или октрываем существующий для изменения
-//        $info = new SplFileInfo(Yii::getAlias('@imagePath').'/'.$this->photoImage->file_name);
         $mime = ($this->mime)?$this->mime : mime_content_type($this->photoImage->getThumbFilePath('file_name'));
 
         if ($mime == 'image/jpeg') {
@@ -85,8 +78,8 @@ class Draw {
             throw new ServerErrorHttpException('Unknown file mime type.');
         }
         //рисуем рамку и заливаем туда лицо
-        $imgDest  =    imagecreatetruecolor ( $faceWidth, $faceHieght );
-        $rectangle = imagecopy( $imgDest, $imageSrc, 0, 0, $x, $y , $faceWidth, $faceHieght);
+        $imgDest  =    imagecreatetruecolor ( $faceWidth, $faceHeight );
+        $rectangle = imagecopy( $imgDest, $imageSrc, 0, 0, $x, $y , $faceWidth, $faceHeight);
         return ($rectangle)? $imgDest: false;
     }
 }

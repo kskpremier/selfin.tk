@@ -13,6 +13,10 @@ use backend\models\DocumentType;
 use backend\models\Face;
 use reception\entities\Booking\Photo;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use reception\entities\EventTrait;
+use reception\entities\Booking\queries\DocumentQuery;
+use reception\entities\Image\AbstractImage;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -43,6 +47,15 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  */
 class Document extends \yii\db\ActiveRecord
 {
+    public const DOCUMENT_CREATED = 10;
+    public const DOCUMENT_FACE_DETECTED = 11;
+    public const SELFY_FACE_DETECTED = 12;
+    public const FACED_MATCHED = 13;
+    public const DOCUMENT_REGISTERED_MATCHED = 23;
+    public const DOCUMENT_REGISTERED = 20;
+
+    use EventTrait;
+
     public static function create(  $firstName, $secondName, 
                                     $identityData,
                                     $numberOfDocument, $gender,
@@ -113,8 +126,6 @@ class Document extends \yii\db\ActiveRecord
             "arrival_organisation" => "I",
             "offered_service_type" => "noćenje",
             "tt_payment_category"  => "14"
-
-
         ];
     }
 
@@ -156,11 +167,36 @@ class Document extends \yii\db\ActiveRecord
         return $this->hasOne(DocumentType::className(), ['id' => 'document_type_id']);
     }
     /**
+     * Return all Images, connected with this Document
      * @return \yii\db\ActiveQuery
      */
     public function getImages()
     {
-        return $this->hasMany(DocumentPhoto::className(), ['document_id' => 'id']);
+        return $this->hasMany(AbstractImage::className(), ['document_id' => 'id']);
+    }
+    /**
+     * * Return all face selfy or camera Images, connected with this Document
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSelfys()
+    {
+        return $this->hasMany(AbstractImage::className(), ['document_id' => 'id'])->andWhere(["album_id"=>AbstractImage::ALBUM_IMAGES]);
+    }
+    /**
+     * * Return all document Images, connected with this Document
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDocumentImages()
+    {
+        return $this->hasMany(AbstractImage::className(), ['document_id' => 'id'])->andWhere(["album_id"=>AbstractImage::ALBUM_DOCUMENT]);
+    }
+    /**
+     * * Return all document Images, connected with this Document
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFaceImages()
+    {
+        return $this->hasMany(AbstractImage::className(), ['document_id' => 'id'])->andWhere(["album_id"=>AbstractImage::ALBUM_FACES]);
     }
 
 

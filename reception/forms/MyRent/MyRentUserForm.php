@@ -14,16 +14,23 @@ namespace reception\forms\MyRent;
  * @property string $guid
  * @property string $country_id
  * @property string $user_id
+ *
+ * @property RentForm $rent
+ * @property ApartmentForm $apartments
  */
 
 
 
+use reception\forms\BookingForm;
+use reception\forms\BookingFormForNewApartments;
 use reception\forms\CompositeForm;
 use reception\forms\MyRent\ApartmentForm;
 use reception\forms\MyRent\WorkerForm;
 use reception\forms\MyRent\OwnerForm;
 use reception\entities\User\User;
+use reception\services\MyRent\MyRent;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Signup form
@@ -42,7 +49,7 @@ class MyRentUserForm extends CompositeForm
     public $guid;
     public $country_id;
     public $user_id; //при добавлении Ownera  требуется
-
+    public $rent_id; //при добавлении Tourist требуется
     /**
      * BookingForm constructor.
      * @param array $config
@@ -51,7 +58,8 @@ class MyRentUserForm extends CompositeForm
     {
         parent::__construct($config);
         $this->apartments = new ApartmentForm();
-//        $this->workers = new WorkerForm();
+      //  if ($this->role === "tourist")
+   //         $this->rent = new RentForm();
 //        $this->owners = new OwnerForm();
     }
 
@@ -78,28 +86,45 @@ class MyRentUserForm extends CompositeForm
 
             [['id'],'integer'],
             ['id', 'required'],
+            [['id'],'validateUser','skipOnError' => true,'message'=>'There is some problem with parameters user_id or rent_id.'],
 
             [['contact_tel','contact_name','country_id'], 'string'],
-            ['role','string'],
+            //['role','string'],
             ['role','required'],
 
-            ['user_id', 'required'],
-            [['user_id'],'validateUser','skipOnError' => true,'message'=>'There is no one User for creating Owner. Check user_id']
+            //['user_id', 'required'],
+            [['user_id'],'validateUser','skipOnError' => true,'message'=>'There is no one User for creating Owner. Check user_id'],
+            [['rent_id'],'string','skipOnError' => true,'message'=>'There is no one Rent for creating Tourist. Check rent_id']
         ];
     }
 
     protected function internalForms(): array
     {
         //return ['apartments','owners','workers'];
-        return ['apartments'];
+        return ['apartments', 'rent'];
     }
 
-    public function validateUser(){
+    public function validateUser()
+    {
         if ($this->role === "owner") {
             $owner = User::find()->where(['external_id' => $this->user_id])->one();
             if (!isset($owner)) {
-                $this->addError('No one User with id='.$this->user_id);
+                $this->addError('No one User with id=' . $this->user_id);
             }
         }
+        if ($this->role === "tourist") {
+
+            $bookingData = MyRent::getRent($this->rent_id);
+            if (count($bookingData) == 0) {
+                $this->addError('No one Rent with id=' . $this->rent_id);
+            } else {
+                $this->rent = new RentForm($bookingData[0]);
+                $this->rent->load($bookingData[0], '');
+            }
+        }
+    }
+    public function rolesList(): array
+    {
+        return ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name');
     }
 }

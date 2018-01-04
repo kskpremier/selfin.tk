@@ -15,7 +15,9 @@ use reception\forms\eVisitorForm;
 use reception\entities\Booking\Booking;
 
 /**
- * @property LockVersionForm $lockVersion
+ * @property eVisitorForm $eVisitorForm
+ * @property PhotosForm $PhotosForm
+ * @property SelfyForm $SelfyForm
  */
 class GuestDocumentAddForm extends CompositeForm
 {
@@ -24,6 +26,7 @@ class GuestDocumentAddForm extends CompositeForm
     {
         $this->eVisitorForm = new eVisitorForm();
         $this->PhotosForm = new PhotosForm();
+        $this->SelfyForm = new SelfyForm();
         parent::__construct($config);
     }
 
@@ -38,7 +41,7 @@ class GuestDocumentAddForm extends CompositeForm
     }
     protected function internalForms(): array
     {
-        return ['PhotosForm','eVisitorForm'];
+        return ['PhotosForm','eVisitorForm','SelfyForm'];
     }
     public function validateBooking(){
         if (!isset($this->bookingId)){

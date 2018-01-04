@@ -1,7 +1,10 @@
 <?php
 
-namespace backend\models;
+namespace reception\entities\Image;
 
+use reception\entities\Booking\DocumentPhoto;
+use reception\entities\Booking\Photo;
+use reception\entities\Image\AbstractImage;
 use Yii;
 
 /**
@@ -33,7 +36,7 @@ class Album extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'string', 'max' => 255],
+            [['name','description'], 'string', 'max' => 255],
         ];
     }
 
@@ -45,6 +48,7 @@ class Album extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'description'=>'Description'
         ];
     }
 
@@ -53,7 +57,7 @@ class Album extends \yii\db\ActiveRecord
      */
     public function getPhotoDocuments()
     {
-        return $this->hasMany(PhotoDocument::className(), ['album_id' => 'id']);
+        return $this->hasMany(DocumentPhoto::className(), ['album_id' => 'id']);
     }
 
     /**
@@ -78,5 +82,12 @@ class Album extends \yii\db\ActiveRecord
     public function getPhotoRealFaces()
     {
         return $this->hasMany(PhotoRealFace::className(), ['album_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImages()
+    {
+        return $this->hasMany(AbstractImage::className(), ['album_id' => 'id']);
     }
 }

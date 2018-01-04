@@ -2,6 +2,9 @@
 
 namespace backend\controllers;
 
+use reception\forms\GuestDocumentAddForm;
+use reception\useCases\manage\Booking\DocumentManageService;
+use reception\useCases\manage\Image\ImageProcessManagement;
 use reception\useCases\manage\Booking\PhotoManageService;
 use Yii;
 use reception\entities\Booking\Document;
@@ -15,13 +18,16 @@ use yii\filters\VerbFilter;
  */
 class DocumentController extends Controller
 {
-
+    private $processing;
+    private $documentService;
     private $service;
 
-    public function __construct($id, $module, PhotoManageService $service, $config = [])
+    public function __construct($id, $module, PhotoManageService $service, ImageProcessManagement $processing, DocumentManageService $documentService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->processing = $processing;
+        $this->documentService = $documentService;
     }
 
     /**
@@ -73,17 +79,40 @@ class DocumentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Document() ;
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
+        $model = new GuestDocumentAddForm() ;
+//        $model->load(Yii::$app->request->post());
+        if (  $model->load(Yii::$app->request->post(),'') && $model->validate()) {
+            $document=$this->documentService->addDocumentDataWithPhoto($model);
+            return $this->redirect(['view', 'id' => $document->id]);
+        }
+        else {
             return $this->render('create', [
                 'model' => $model,
             ]);
         }
     }
 
+    /**
+     * Making recognition of existing document .
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionProcess($id)
+    {
+        $document=$this->findModel($id);
+        if ($document) {
+            try {
+                $probability = $this->processing->processDocumentImages($document);
+                Yii::$app->session->setFlash('success', "Comparation result : probability = ".$probability);
+                return $this->redirect(['view', 'id' => $document->id]);
+            } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
+        Yii::$app->session->setFlash('error', "No one document with this Id");
+        return $this->redirect(['index']);
+    }
 
     /**
      * Updates an existing Document model.
@@ -94,12 +123,12 @@ class DocumentController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $form = new GuestDocumentAddForm() ;
+        if ($form->load(Yii::$app->request->post(),'') && $form->validate()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
-                'model' => $model,
+                'form' => $model,
             ]);
         }
     }

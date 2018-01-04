@@ -186,6 +186,7 @@ class GuestController extends Controller
     public function actionIndex()
     {
         $searchModel = new GuestSearch();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $models = $dataProvider->getModels();
@@ -297,7 +298,7 @@ class GuestController extends Controller
             'external_apartment_id' => $guest->apartment->external_id,
             'username' => $guest->author->user->username,
             'password' => $guest->temporary_password, //$guest->author->user->getNewReadablePassword(),
-            'keyboardPwds' => $keyboardPwds,
+            //'keyboardPwds' => $guest->bookings->keyboardPwds,
         ];
     }
 

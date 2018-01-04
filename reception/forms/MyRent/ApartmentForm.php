@@ -60,7 +60,8 @@ class ApartmentForm extends CompositeForm
         if (isset($rentInfo) ){
             $this->load($rentInfo,'');
         }
-        $this->doorlocks = [new DoorLockInstallForm()];
+//        $this->doorlocks = [new DoorLockInstallForm()];
+        $this->doorlocks = new DoorLockInstallForm();
     }
 
     /**

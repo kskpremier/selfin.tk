@@ -26,9 +26,9 @@ Interface ImageInterface
     const IMAGE_RAW = 0;
 
 
-    public static function create(UploadedFile $file, $album_id, $booking_id, $user_id);
+    public static function create(UploadedFile $file, $album_id=null, $document = null, $booking_id=null);
 
-    public function edit(AbstractImage $photo, $album_id, $booking_id, $user_id, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude );
+    public function edit(AbstractImage $photo, $album_id=null, $booking_id=null, $user_id=null, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude );
 
     public function extractFace():array;
 

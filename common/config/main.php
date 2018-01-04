@@ -2,8 +2,10 @@
 return [
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'bootstrap' => [
-//        'queue',
+        'queue',
+//        'monitor',
     ],
+
     'aliases'=>[
         '@bower' =>'@vendor/bower-asset',
         '@npm'=>'@vendor/mpm-asset',
@@ -12,11 +14,13 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
             'cachePath' => '@common/runtime/cache',
+         //   'class' => 'yii\redis\Cache',
         ],
 //        'authManager' => [
 ////            'class' => 'yii\rbac\PhpManager',
 //            'class' => 'yii\rbac\DbManager',
 //        ],
+
 
     //заменил как в shop
         'authManager' => [
@@ -28,8 +32,12 @@ return [
             'defaultRoles' => ['tourist']
         ],
         'queue' => [
-            'class' => 'yii\queue\redis\Queue',
+//            'class' => 'yii\queue\redis\Queue',
+            'class' => \yii\queue\redis\Queue::class,
+            'redis' => 'redis', // Redis connection component or its config
+            'channel' => 'queue', // Queue channel key
             'as log' => 'yii\queue\LogBehavior',
+//            'as monitor' => \zhuravljov\yii\queue\monitor\Behavior::class,
         ],
 
     ],

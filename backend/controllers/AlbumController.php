@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\Album;
+use reception\entities\Image\Album;
 use backend\models\AlbumSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

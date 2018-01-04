@@ -28,6 +28,7 @@ namespace reception\forms;
 use backend\models\Country;
 use backend\models\DocumentType;
 use reception\entities\Booking\Booking;
+use function strtotime;
 use yii\base\Model;
 //use yii\web\UploadedFile;
 //
@@ -50,6 +51,8 @@ class eVisitorForm extends Model
     public $validBefore;
     public $address;
 
+    public $eVisitor;
+
     public $bookingId;
     public $booking;
 
@@ -64,9 +67,9 @@ class eVisitorForm extends Model
     {
         $rules = array_merge(
             parent::rules(),[
-                [['firstName', 'secondName','country','city','address',
+                [['firstName', 'secondName','country','city','address', "eVisitor",
                     'identityData','numberOfDocument','gender','countryOfBirth','cityOfBirth','dateOfBirth','citizenshipOfBirth'], 'string'],
-                [['validBefore'],'integer'],
+                [['validBefore'],'validateExpireDate'],
                 [['firstName', 'secondName'], 'validateNames'],
                 [['identityData'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['identityData'=>'code'],'message'=>'Type of  Document ID should exist'],
                 [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
@@ -86,6 +89,13 @@ class eVisitorForm extends Model
         }
 
     }
+
+    public function validateExpireDate(){
+        if (is_string ($this->validBefore) ) {
+            $this->validBefore = strtotime($this->validBefore);
+        }
+    }
+
     public function validateType(){
 
         $type = DocumentType ::find()->where(['code'=>$this->identityData])->one();

@@ -5,6 +5,7 @@ namespace api\controllers;
 
 
 use backend\models\DocumentSearch;
+use Book;
 use reception\entities\Booking\Booking;
 use reception\forms\eVisitorForm;
 use reception\forms\GuestDocumentAddForm;
@@ -32,14 +33,13 @@ use reception\services\MyRent\MyRent;
  */
 class DocumentController extends Controller
 {
-    //private $document;
+    private $documentRepository;
     private $service;
 
-//    public function __construct($id, $module, DocumentManageService $service, DocumentRepository $document, $config = [])
-    public function __construct($id, $module, DocumentManageService $service, $config = [])
+    public function __construct($id, $module, DocumentManageService $service, DocumentRepository $documentRepository, $config = [])
     {
         parent::__construct($id, $module, $config);
-       // $this->document = $document;
+        $this->documentRepository = $documentRepository;
         $this->service = $service;
 
     }
@@ -62,7 +62,7 @@ class DocumentController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin','tourist','mrz'],
+                    'roles' => ['receptionist','admin','tourist','mrz','owner','mobile'],
                 ],
             ],
         ];
@@ -116,7 +116,7 @@ class DocumentController extends Controller
      */
 
     /**
-     * Creates a new Document model.
+     * Creates a new Document model. without any photos
      * If creation is successful, return Response as Json string
      * @return mixed
      */
@@ -144,19 +144,23 @@ class DocumentController extends Controller
             }
         }
     }
-
-    public function actionGuestAdd()
+    /**
+     * Creates a new Document model. without any photos
+     * If creation is successful, return Response as Json string
+     * @return mixed
+     */
+    public function actionCreateDocumentWithPhotos()
     {
         $form = new GuestDocumentAddForm();
         $form->load(Yii::$app->request->post(), '');
         if ($form->validate()) {
             try {
-                $document = $this->service->addGuest($form);
+                $document = $this->service->addDocumentDataWithPhoto($form);
                 Yii::$app->getResponse()->setStatusCode(201);
                 if ($document) {
                     $booking = Booking::findByBookingIdentity($form->eVisitorForm->bookingId);
 
-                    $result = MyRent::addGuest($document, $booking);
+                    $result = MyRent::addGuest($document, $booking, $form->eVisitorForm->eVisitor);
                 }
                 return $this->serializeDocument($document);
             } catch (\DomainException $e) {
@@ -204,7 +208,29 @@ class DocumentController extends Controller
         return $result;
 
     }
+    /**
+     * Displays all documents model for booking($id)
+     * @return array
+     */
+    public function actionGetBookingDocuments($id):array
+    {
+        $iDs =[];
+        $result=[];
+        $booking_id = (isset($id))?$id: Yii::$app->request->get()['id'];
+        $booking = Booking::findOne($booking_id);
 
+        if (isset($booking) && ( $booking->apartment->user_id==Yii::$app->user->id ) || ($booking->apartment->owner_id==Yii::$app->user->id )) {
+            foreach ($booking->guests as $guest ) {
+                $iDs[]=$guest->id;
+            }
+            $documents = $this->documentRepository->getForGuests($iDs);
+            foreach ($documents as $model){
+                $result[]= $this->serializeDocument($model);
+            }
+        }
+        return $result;
+
+    }
 
 
     /**
@@ -241,9 +267,9 @@ class DocumentController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($externalId)
+    public function actionDelete($id)
     {
-        return $this->findModelExternal($externalId)->delete();
+        return $this->findModel($id)->delete();
     }
 
     /**
@@ -286,10 +312,19 @@ class DocumentController extends Controller
                 $urls[]=$image->getUploadedFileUrl('file_name');
             }
         return [
-            'first_name' => $document->first_name,
-            'second_name' => $document->second_name,
+            'firstName' => $document->first_name,
+            'secondName' => $document->second_name,
             'id' => $document->id,
-            'birth_date' => $document->date_of_birth,
+            'numberOfDocument'=>$document->number,
+            'city' =>$document->city,
+            'gender' =>$document->gender,
+            'date_of_issue' =>$document->date_of_issue,
+            'validBefore' =>$document->valid_before,
+            'country' =>$document->citizenship->name,
+            'identityData' =>$document->document_type_id,
+            'citizenshipOfBirth'=>$document->birthCitizenship->name,
+            'address' =>$document->address,
+            'dateOfBirth' => $document->date_of_birth,
             //'image_files'=>$images,
             'image_urls'=>$urls,
             'eVisitorID'=>$result

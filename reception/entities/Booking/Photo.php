@@ -25,7 +25,7 @@ class Photo  extends AbstractImage
 {
     //public $booking_id;
 
-    public static function create(UploadedFile $file, $album_id, $booking, $user_id): self
+    public static function create(UploadedFile $file, $album_id=null, $booking=null, $user_id=null): self
     {
         $photo = new static();
         $photo->file_name =  $file;
@@ -38,7 +38,7 @@ class Photo  extends AbstractImage
 
     }
 
-    public function edit(AbstractImage $photo, $album_id, $booking, $user_id, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
+    public function edit(AbstractImage $photo, $album_id=null, $booking=null, $user_id=null, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
     {
         $photo->booking_id = $booking->id;
         $photo->user_id =  $user_id;

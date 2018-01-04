@@ -18,8 +18,7 @@ class m171116_151019_my_rent_owner_extended_fields extends Migration
         $this->addColumn('{{owner}}','country_id', $this->string(5));
         $this->addColumn('{{owner}}','created', $this->integer(15));
         $this->addColumn('{{owner}}','changed', $this->integer(15));
-        $this->addColumn('{{guest}}','guid', $this->string(255));
-        $this->addColumn('{{guest}}','country_id', $this->string(5));
+
     }
 
     public function safeDown()
@@ -30,13 +29,12 @@ class m171116_151019_my_rent_owner_extended_fields extends Migration
         $this->dropColumn('{{owner}}','myrent_update');
         $this->dropColumn('{{owner}}','guid');
         $this->dropColumn('{{owner}}','contact_tel');
-        $this->addColumn('{{owner}}','contact_name');
+        $this->dropColumn('{{owner}}','contact_name');
         $this->dropColumn('{{owner}}','created');
         $this->dropColumn('{{owner}}','changed');
         $this->dropColumn('{{owner}}','country_id');
         $this->dropColumn('{{owner}}','update');
-        $this->dropColumn('{{guest}}','guid');
-        $this->dropColumn('{{guest}}','country_id');
+
         return false;
     }
 

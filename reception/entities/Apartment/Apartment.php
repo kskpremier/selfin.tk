@@ -65,7 +65,7 @@ class Apartment extends ActiveRecord
 
     public static function createProperty(ApartmentForm $form, $user_id = null, $updateTime = null, $owner_id=null)
     {
-        $apartment = new static();
+        $apartment = new static(); //$doorlocks=[];
         
         $apartment->name = ($form->name)?$form->name:$form->object_name;
         $apartment->latitude = $form->latitude;
@@ -79,8 +79,13 @@ class Apartment extends ActiveRecord
         $apartment->user_id = $user_id;
         $apartment->owner_id = $owner_id;
         $apartment->myrent_update = ($updateTime)? $updateTime : time();
-//надо делать функцию по удалению старых и назначению новых замков по идеее
-        $apartment->doorLocks = $form->doorlocks;
+////надо делать функцию по удалению старых и назначению новых замков по идеее
+//        foreach($form->doorlocks as $form){
+//            $doorLock = $this->doorLock->findByID($form->id);
+//            if ($doorLock)
+//                $doorlocks[]= DoorLock::create($form);
+//        }
+//        $apartment->doorLocks = $doorlocks;
 
         return $apartment;
     }
@@ -101,7 +106,7 @@ class Apartment extends ActiveRecord
             $this->owner_id = $owner_id;
             $this->myrent_update = ($updateTime)? $updateTime : time();
 //надо делать функцию по удалению старых и назначению новых замков по идеее
-            $this->doorLocks = $form->doorlocks;
+//            $this->doorLocks = $form->doorlocks;
 //        }
         return $this;
     }

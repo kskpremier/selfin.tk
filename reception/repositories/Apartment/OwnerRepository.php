@@ -6,7 +6,7 @@
  * Time: 16:25
  */
 
-namespace reception\repositories\apartment;
+namespace reception\repositories\Apartment;
 
 use reception\entities\Apartment\Owner;
 use reception\entities\User\User;

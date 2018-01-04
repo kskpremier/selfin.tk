@@ -34,7 +34,6 @@ return [
             'imagesStorePath' => dirname(__DIR__).'/../web/uploads/images/real_photos',//images/store', //path to origin images
             'imagesCachePath' => dirname(__DIR__).'/../web/uploads/images/real_photos/cash',//'images/cache', //path to resized copies
             'graphicsLibrary' => 'GD', //but really its better to use 'Imagick'
-//            'placeHolderPath' => '@webroot/uploads/images/real_photos/real_2.jpg', // if you want to get placeholder when image not exists, string will be processed by Yii::getAlias
         ],
         'oauth2' => [
             'class' => 'filsh\yii2\oauth2server\Module',
@@ -118,13 +117,15 @@ return [
 //                'PATCH photoimage' => 'photo-image/update',
                 'send' => 'site/send-post',
                 'POST photoimage' => 'photo-image/create-photo',
-                'POST document' => 'document/guest-add',
+                'POST document' => 'document/create-document-with-photos',
+                'GET document/delete'=>'document/delete',
                 'POST mrz' => 'document/create',
                // 'POST document' => 'document/create',
                 'POST booking-old' => 'booking/create-old',
                 'POST booking' => 'booking/create-for-owner',
                 'GET bookings' => 'booking/bookings',
                 'GET booking/view' => 'booking/view',
+                'GET booking/documents' =>'document/get-booking-documents',
                 'GET booking/view-external' => 'booking/view-external',
                 'DELETE booking/delete' => 'booking/delete',
                 'POST myrent'=>'booking/my-rent',

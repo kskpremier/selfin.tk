@@ -55,17 +55,6 @@ class PhotoImageController extends ActiveController
         return $behaviors;
     }
 
-//    public function checkAccess($action, $model = null, $params = [])
-//    {
-//        if (in_array($action, ['update', 'delete','view','create'])) {
-//            if (in_array($params,['start_date','end_date'])) {
-//
-//
-//                throw  new ForbiddenHttpException('Forbidden.');
-//            }
-//        }
-//    }
-
     public function actions()
     {
         $actions = parent::actions();
@@ -78,7 +67,8 @@ class PhotoImageController extends ActiveController
  * Upload photo with POST Request
  * @parameter in request
  * { "booking_id":"2",
- *   "user_id":"1"
+ *   "user_id":"1",
+ *   "document_number":"12345"
  * }
  *
  *  multipart/form-data
@@ -201,12 +191,13 @@ class PhotoImageController extends ActiveController
     public function actionCreatePhoto()
     {
         $form = new GuestPhotoForm();
-        $form->load(Yii::$app->request->post(), '');
+//        $form->load(Yii::$app->request->post(), '');
+        $form->load (Yii::$app->request->getBodyParams(), '');
         if ($form->validate()) {
             try {
                 $form->user_id = Yii::$app->user->id;
                 $photo = $this->service->create($form);
-                if ($photo) {
+                if (!isset($photo) ) {
                     Yii::$app->getResponse()->setStatusCode(201);
                 }
                 return $this->serializePhoto($photo);
@@ -216,7 +207,7 @@ class PhotoImageController extends ActiveController
         }
         else {
             Yii::$app->getResponse()->setStatusCode(501);
-            throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->PhotosForm->getErrors()));
+            throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->SelfyForm->getErrors()));
         }
     }
 

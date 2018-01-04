@@ -37,8 +37,8 @@ class DoorLockInstallForm extends Model
             //[['id'], 'integer'],
         ];
     }
-    protected function internalForms(): array
-    {
-        return [];
-    }
+//    protected function internalForms(): array
+//    {
+//        return [];
+//    }
 }

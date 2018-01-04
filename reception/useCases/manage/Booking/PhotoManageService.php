@@ -9,12 +9,14 @@
 
 namespace reception\useCases\manage\Booking;
 
-use reception\entities\AbstractImage;
+use reception\entities\Booking\events\DocumentAddRequested;
+use reception\entities\Image\AbstractImage;
 use reception\entities\Booking\Photo;
-//use reception\forms\GuestPhotoAddForm;
-//use reception\forms\GuestPhotoForm;
-//use reception\repositories\Booking\AbstractImageRepository;
+
+use reception\forms\GuestPhotoForm;
 use reception\repositories\Booking\AbstractImageRepository;
+use reception\repositories\Booking\DocumentRepository;
+use reception\useCases\manage\Image\ImageProcessManagement;
 
 
 /**
@@ -22,35 +24,49 @@ use reception\repositories\Booking\AbstractImageRepository;
  *
  */
 
-class PhotoManageService extends ImageManageService
+class PhotoManageService
 {
-//    private $photoRepository;
-//
-//    public function __construct(PhotoRepository $photoRepository)
-//    {
-//        $this->photoRepository = $photoRepository;
-//
-//    }
+    private $photoRepository;
+    private $documentRepository;
+    private $processing;
 
-    public function create($form): AbstractImage
+    public function __construct(AbstractImageRepository $photoRepository, DocumentRepository $documentRepository, ImageProcessManagement $processing )
     {
-        foreach ($form->PhotosForm->files as $image) {
+        $this->photoRepository = $photoRepository;
+        $this->documentRepository = $documentRepository;
+        $this->processing = $processing;
 
-            $photo = Photo::create($image, Photo::ALBUM_REAL_IMAGES, $form->booking, $form->user_id);
-            $this->imageRepository->save($photo);
+    }
+
+    public function create(GuestPhotoForm $form): AbstractImage
+    {
+        $images=[];
+        foreach ($form->SelfyForm->files as $image) {
+            $document = $this->documentRepository->get($form->document_number);
+            //Создаем Image
+            $photo = AbstractImage::create($image, AbstractImage:: ALBUM_IMAGES, $document, $form->booking_id, $form->user_id);
+            //Распознаем лица на имадже
+            $this->photoRepository->save($photo);
+            $this->processing->getDetectedFaces($photo);
+
             $images[]=$photo;
         }
-        return $photo;
+        //Генерируем событие о том, что создано дополнительное фото к документу
+        $document->recordEvent(new DocumentAddRequested($document,null, $form->SelfyForm));
+        $this->documentRepository->save($document);
+        return $images;
     }
 
     public function update(AbstractImage $photo, $form): AbstractImage
     {
         $photo ->edit($photo,
-                        Photo::ALBUM_REAL_IMAGES,
+            AbstractImage::ALBUM_REAL_IMAGES,
                         $form->booking->id,
                         $form->user_id,
-                        $form->size,$form->uploaded,
-                        $form->type,$form->dimensions,
+                        $form->size,
+                        $form->uploaded,
+                        $form->type,
+                        $form->dimensions,
                         $form->facematika_id,
                         $form->status,
                         $form->altitude,

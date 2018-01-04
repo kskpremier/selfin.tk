@@ -5,6 +5,7 @@ namespace reception\helpers;
 use reception\entities\User\User;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use reception\services\MyRent\MyRent;
 use Yii;
 
 class UserHelper
@@ -16,10 +17,23 @@ class UserHelper
             User::STATUS_ACTIVE => 'Active',
         ];
     }
+    public static function statusUpdateList(): array
+    {
+        return [
+            false => 'Ok',
+            true => ' ',
+        ];
+    }
 
     public static function statusName($status): string
     {
-        return ArrayHelper::getValue(self::statusList(), $status);
+        return "Active";
+        //return ArrayHelper::getValue(self::statusUpdateList(), $status);
+    }
+
+    public static function statusUpdate($needToUpdate): string
+    {
+        return ArrayHelper::getValue(self::statusList(), $needToUpdate);
     }
 
     public static function statusLabel($status): string
@@ -47,5 +61,22 @@ class UserHelper
             $rolesArray[] = ArrayHelper::getValue($role, 'name');
         }
         return $rolesArray;
+    }
+    public static function getSynchroTime($user){
+        $needToUpdate = ($user->myrent_update == null) || (time() - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL);
+        switch ($needToUpdate) {
+            case true:
+                $class = 'glyphicon glyphicon-refresh label label-danger';
+                break;
+            case false:
+                $class = 'glyphicon glyphicon-refresh label label-success';
+                break;
+            default:
+                $class = 'btn btn-danger';
+        }
+
+        return Html::a(ArrayHelper::getValue(self::statusUpdateList(), $needToUpdate),  ['synchro', 'id' => $user->id], [
+            'class' => $class,
+        ]);
     }
 }

@@ -1,131 +1,182 @@
 <?php
 
-namespace reception\useCases\manage\Myrent;
+namespace reception\useCases\manage\MyRent;
 
 use reception\entities\Apartment\Apartment;
 use reception\entities\Booking\Guest;
 use reception\entities\DoorLock\DoorLock;
+use reception\entities\EventTrait;
 use reception\entities\MyRent\Owner;
+use reception\entities\User\events\UserMobileCreated;
 use reception\entities\User\User;
 use reception\forms\MyRent\MyRentUserForm;
 use reception\forms\manage\User\UserCreateForm;
 use reception\forms\manage\User\UserEditForm;
 use reception\forms\MyRent\ApartmentForm;
+use reception\forms\MyRent\RentForm;
 use reception\repositories\Apartment\ApartmentRepository;
-use reception\repositories\apartment\OwnerRepository;
+use reception\repositories\Apartment\OwnerRepository;
 use reception\repositories\Booking\GuestRepository;
 use reception\repositories\DoorLock\DoorLockRepository;
 use reception\repositories\UserRepository;
 //use reception\services\newsletter\Newsletter;
 use reception\services\MyRent\MyRent;
 use reception\services\RoleManager;
+use reception\services\TransactionManager;
+use reception\useCases\manage\Booking\BookingManageService;
+use yii\base\ErrorHandler;
+
 //use reception\services\TransactionManager;
 
+/**
+ * Class MyRentManageService
+ * @package reception\useCases\manage\MyRent
+ */
 class MyRentManageService
 {
+    use EventTrait;
+
     private $repository;
     private $doorlockRepository;
     private $apartmentRepository;
     private $ownerRepository;
     private $guestRepository;
     private $roles;
-//    private $transaction;
+    private $bookingService;
+    private $transaction;
+    private $errorHandler;
     /**
      * @var Newsletter
      */
   //  private $newsletter;
 
     public function __construct(
+        BookingManageService $bookingService,
         UserRepository $repository,
         DoorLockRepository $doorlockRepository,
         OwnerRepository $ownerRepository,
         ApartmentRepository $apartmentRepository,
         GuestRepository $guestRepository,
-        RoleManager $roles//,
-        //     TransactionManager $transaction//,
+        RoleManager $roles,
+        TransactionManager $transaction,
+        ErrorHandler $errorHandler//,
         //  Newsletter $newsletter
     )
     {
         $this->repository = $repository;
+        $this->bookingService = $bookingService;
         $this->roles = $roles;
         $this->doorlockRepository = $doorlockRepository;
         $this->ownerRepository = $ownerRepository;
         $this->guestRepository = $guestRepository;
         $this->apartmentRepository = $apartmentRepository;
-        //     $this->transaction = $transaction;
-        // $this->newsletter = $newsletter;
+        $this->transaction = $transaction;
+        $this->errorHandler = $errorHandler;
+
     }
 
     public function createMyRentUser(MyRentUserForm $form): User
     {
-        $user = User::create($form->username, $form->contact_email, $form->password,
-            $form->contact_name, $form->contact_tel, $form->id,
-            $form->guid, strtotime($form->changed));
-        // $this->transaction->wrap(function () use ($user, $form) {
+        $user = User::create($form->username, $form->contact_email, $form->password, $form->contact_name, $form->contact_tel, $form->id, $form->guid, strtotime($form->changed));
+        $this->transaction->wrap(function() use ($form, $user) {
+            $owner=null; $guest=null;
         $this->repository->save($user);
-
-        if ($form->role === "user") {
-            $this->roles->assignRoles($user->id, ['mobile','mrz']);
-            $this->updateMyRentUser($user);
-            $this->repository->save($user);
-        }
-        elseif ($form->role === "owner") {
-            $owner = Owner::create($form->id, $form->guid,$form->username, $form->country_id, $form->contact_tel, $form->contact_email,
+        if ($form->role === "owner") {
+            $owner = Owner::create($form->id, $form->guid, $form->username, $form->country_id, $form->contact_tel, $form->contact_email,
                 $form->contact_name, strtotime($form->created), strtotime($form->changed), null, $form->country_id,
-                null, null,  $user->id, $apartments = null);
-            $this->roles->assignRoles($user->id, ['owner','mrz']);
-            $masterUser= $this->repository->getByExternalId($form->user_id);
-            $this->updateMyRentUser($masterUser);
+                null, null, $user->id, $apartments = null);
+            $masterUser = $this->repository->getByExternalId($form->user_id);
             $this->repository->save($masterUser);
             $this->ownerRepository->saveMyRentOwner($owner);
         }
-        else {
-            $this->roles->assignRoles($user->id, ['tourist']);
-            //наверное следует создать гостя ???
-            //$first_name, $second_name, $contact_email, $user=null, $booking=null,$contact_tel=null, $updatetime=null
-            $guest = Guest::create(  '', $form->contact_name, $form->contact_email, $user, $booking=null, $form->contact_tel, time(), $form->guid);
+        if ($form->role === "tourist") {
+            $booking = $this->bookingService->updateBookings($form->rent, $user->id, time());
+            $guest = Guest::create('', $form->contact_name, $form->contact_email, $user, $booking, $form->contact_tel, time(), $form->guid);
             $this->guestRepository->save($guest);
         }
+        if ($form->role === "checkin") {
+        }
+
+        $this->roles->assignRoles($user->id, [$form->role]);
+        $user->recordEvent(new UserMobileCreated($user, $owner, $guest));
+        $this->repository->save($user);
+
+    });
         return $user;
     }
 
-    public function updateMyRentUser($user)
+
+    /**
+     * Making synchronization data with MyRent for user
+     * Get apartments list for user, update every apartment with its door locks
+     * If apartment were disconnect from this user - make unlink
+     * @param User $user
+     */
+    public function updateMyRentUser(User $user)
     {
-        $updateTime = time(); //$apartments=$workers=$owners=$doorLocks=[];
-        if (($user->myrent_update===null) || ($updateTime - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL) ){
-            //запросить список апартаментов
-            $apartmentList = MyRent::getApartmentsForUser($user->external_id);
-            foreach ($apartmentList as $apartmentData) {
-                    $apartmentForm = new ApartmentForm();
-                    $apartmentForm->load($apartmentData,'');
-                    if ($apartmentForm->validate()) {
-                        //ищем уже существующие апартаменты
-                        $apartment = $this->apartmentRepository->findByMyRentId($apartmentForm->object_id);
-                        if (!isset($apartment)) //если не найдены - создаем
-                            $apartment = Apartment::addProperty($apartmentForm, $user->id, $updateTime);
-                        else // если найдены - вносим испраления, если они были
-                            $apartment = $apartment->edit($apartmentForm, $user->id, $updateTime);
-                        $this->apartmentRepository->save($apartment);
-                        foreach($apartmentForm->doorlocks as $doorLockForm) {
-                            if ($doorLockForm) {
-                                $doorlock = $this->doorlockRepository->findByMyrRentId($doorLockForm->id);
-                                if ($doorlock) {
-                                    $doorlock->installInApartment($apartment->id, $doorLockForm->name, $doorLockForm->id, $user->id,$updateTime);
-                                    $this->doorlockRepository->save($doorlock);
-                                }
-                                else throw new \DomainException ('Failed to find door lock with id => ' . $doorLockForm->id);
+
+        $this->transaction->wrap(function () use ($user) {
+            $updateTime = time();
+            if (($user->myrent_update == null) || ($updateTime - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL)) {
+                //запросить список апартаментов на момент обновления в MyRent
+                $apartmentList = MyRent::getApartmentsForUser($user->external_id);
+                //Сохранить список апартаментов из нашей базы
+                $apartmentDBList = $user->apartments;
+                //по каждому из апартаментов по списку сделать или апдейт или криэйт
+                //если к апартаменту присоединен замок -> повторить это же и в базе
+                foreach ($apartmentList as $apartmentData) {
+                    try {$form = new ApartmentForm();
+                        $form->load($apartmentData, '');
+                        if ($form->validate()) {
+                            //ищем уже существующие апартаменты
+                            $apartment = $this->apartmentRepository->findByMyRentId($form->object_id);
+                            $doorLocks = [];
+                            if (!isset($apartment)) {
+                                //если не найдены - создаем
+                                $apartment = Apartment::addProperty($form, $user->id, $updateTime);
                             }
+                            else // если найдены - вносим испраления, если они были
+                            {
+                                $apartment = $apartment->edit($form, $user->id, $updateTime);
+                                //сохраняем замки, которые уже присоеденины к апартаменту
+                                $doorLocks=$apartment->doorLocks;
+                            }
+                            //обновляем замки в апартаменте
+                            if ($apartmentData["door_id"]) {
+                                $doorlock = $this->doorlockRepository->findByMyrRentId($apartmentData["door_id"]);
+                                if ($doorlock) {
+                                    $doorlock->installInApartment($apartment->id, $user->id, $updateTime);
+                                    $this->doorlockRepository->save($doorlock);
+                                } else throw new \DomainException ('Failed to find door lock with id => ' . $apartmentData["door_id"]);
+                            }
+                            else {
+                                foreach ($doorLocks as $lock){
+                                    $lock->uninstallDoorLock($user->id, $updateTime);
+                                    $this->doorlockRepository->save($lock);
+                                }
+                            }
+                            $this->apartmentRepository->save($apartment);
                         }
-                    } else throw new \DomainException ('Failed to create the object => ' . \GuzzleHttp\json_encode($apartmentForm->getFirstErrors()));
-                    //записать owner новое время
+                        else throw new \DomainException ('Failed to create the object => ' . \GuzzleHttp\json_encode($form->getFirstErrors()));
+                    }
+                    catch(\DomainException $e) {
+                        $this->errorHandler->handleException($e);
+                    }
+                }
+                $formerUserApartmentArray = $this->compareInternalExternalApartmentsLists($apartmentDBList, $apartmentList);
+                foreach ($formerUserApartmentArray as $apartment) {
+                    $apartment->user_id = null; //делаем дисконнект апартамента, НО !!! не удаляем его из базы, а просто пишем, что они "ничьи"
+                    $this->apartmentRepository->save($apartment);
+                }
+                $user->setMyRentUpdateTime($updateTime);
+                $this->repository->save($user);
             }
-            $this->saveUpdateTime($user, $updateTime);
-        }
+        });
     }
 
     public function saveUpdateTime(User $user, $updateTime)
     {
-        $user->saveUpdate($updateTime);
+        $user->setUpdateTime($updateTime);
         $this->repository->save($user);
     }
 
@@ -160,6 +211,58 @@ class MyRentManageService
     {
         $user = $this->repository->get($id);
         $this->repository->remove($user);
-       // $this->newsletter->unsubscribe($user->email);
+    }
+
+    private function compareInternalExternalApartmentsLists($internal,$external){
+        $lostList = [];
+        if (is_array($internal) && is_array($external)){
+            foreach ($internal as $apartment){
+                if (!$this->findInList($apartment->external_id, $external) ){
+                    $lostList[]=$apartment;
+                }
+            }
+        }
+        return $lostList;
+    }
+
+    private function findInList($needle,$array){
+        foreach ($array as $element){
+            if (key_exists("id",$element)){
+                if (  $needle == $element["id"])
+                    return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Making synchronization data with MyRent for user
+     * Get bookings list for $user, from $user->myrent_update
+     * $owner_id is used for creating new apartment, if it has not built before
+     * if $owner_id = null , then no link between apartment and owner will be done
+     * Make editing every booking
+     * @param User $user
+
+     * @param integer $owner_id (if this user is onw of the Owner)
+     */
+    public function updateBookings(User $user, $owner_id=null)
+    {
+        $updateTime = time();
+        if (($user->myrent_update == null) || ($updateTime - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL)) {
+            $rentList = MyRent::getBookingsUpdateForUser($user->external_id,  date("Y-m-dTH:i:s",$user->myrent_update));
+            foreach ($rentList as $rentInfo) {
+                $rent = new RentForm($rentInfo);
+                $rent->load($rentInfo, '');
+                try {
+                    if ($rent->validate()) {
+                        if ($rent->until_date > date("Y-m-dTH:i:s",$user->myrent_update))
+                            $this->bookingService->updateBookings($rent, $user->id, $updateTime, $owner_id);
+                    } else throw new \DomainException ('Failed to create the object => ' . json_encode($rent->getFirstErrors()));
+                } catch (\DomainException $e) {
+                    $this->errorHandler->logException($e);
+                }
+            }
+            $user->setMyRentUpdateTime($updateTime);
+            $this->repository->save($user);
+        }
     }
 }

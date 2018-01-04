@@ -2,7 +2,7 @@
 
 namespace reception\entities\Booking;
 
-use backend\models\Album;
+use reception\entities\Image\Album;
 use reception\entities\AbstractImage;
 use reception\entities\Face;
 use reception\entities\ImageInterface;
@@ -22,7 +22,7 @@ class DocumentPhoto extends AbstractImage
 {
    // public $document_id;
 
-    public static function create(UploadedFile $file,  $album_id, $document_id, $user_id): self
+    public static function create(UploadedFile $file,  $album_id=null, $document_id=null, $user_id=null): self
     {
         $photo = new static();
         $photo->file_name =  $file;
@@ -31,7 +31,7 @@ class DocumentPhoto extends AbstractImage
         $photo->album_id=$album_id;
         return $photo;
     }
-    public function edit(AbstractImage $photo, $album_id, $document_id, $user_id, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
+    public function edit(AbstractImage $photo, $album_id=null, $document_id=null, $user_id=null, $size, $uploaded, $type, $dimensions, $facematika_id, $status, $altitude, $longitude, $latitude ): self
     {
         $photo->document_id = $document_id;
         $photo->user_id =  $user_id;

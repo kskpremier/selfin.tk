@@ -7,8 +7,9 @@
  */
 namespace reception\repositories\Booking;
 
-use reception\entities\AbstractImage;
-use reception\entities\ImageInterface;
+use reception\entities\Image\AbstractImage;
+
+use reception\entities\Image\ImageInterface;
 use reception\repositories\NotFoundException;
 
 class AbstractImageRepository
@@ -21,17 +22,17 @@ class AbstractImageRepository
         return $photo;
     }
 
-    public function save(ImageInterface $photo)
+    public function save(ImageInterface $image)
     {
-        if (!$photo->save()) {
+        if (!$image->save()) {
             throw new \RuntimeException('Saving error.');
         }
         return true;
     }
 
-    public function remove(ImageInterface $photo): void
+    public function remove(ImageInterface $image): void
     {
-        if (!$photo->delete()) {
+        if (!$image->delete()) {
             throw new \RuntimeException('Removing error.');
         }
     }

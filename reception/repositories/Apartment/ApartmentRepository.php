@@ -30,10 +30,18 @@ class ApartmentRepository
 
     public function findByMyRentId($id)
     {
-        if (!$doorLock = Apartment::findOne(['external_id' => $id])) {
+        if (!$apartment = Apartment::findOne(['external_id' => $id])) {
             return null;
         }
-        return $doorLock;
+        return $apartment;
+    }
+
+    public function findByUserId($user_id)
+    {
+        if (!$apartment = Apartment::find()->where(['user_id' => $user_id])->all()) {
+            return null;
+        }
+        return $apartment;
     }
 
     public function remove(Apartment $apartment): void

@@ -59,6 +59,8 @@ class Booking extends \yii\db\ActiveRecord
     public const STATUS_REGISTERED=30;
     public const STATUS_WARNING=40;
     public const STATUS_PAST=40;
+
+
     public const BOOKING_RECOCNITION_LOWREST_PROBABILITY = 0.9;
 
     public static function create( $startDate,$endDate,$apartment,$author=null,$numberOfGuest,$externalId,$status,$guests=null,
@@ -200,6 +202,7 @@ class Booking extends \yii\db\ActiveRecord
         return $this->hasMany(Guest::className(), ['id' => 'guest_id'])->viaTable('{{%booking_guest}}', ['booking_id'=>'id']);
     }
 
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -240,19 +243,38 @@ class Booking extends \yii\db\ActiveRecord
      */
     public function fields()
     {
+        $guests = $this->guests;
+        $number_of_guest = count($guests);
+        $duration = intdiv((strtotime( $this->end_date)-strtotime($this->start_date))/24/60,60);
         return [
             'booking_id'=>'id',
             'external_booking_id' => 'external_id',
             'start_date'=>function (){
-                             return date ("Y-m-d H:i", strtotime($this->start_date));
+                             return date ("Y-m-d", strtotime($this->start_date)) . " ". date ("H:i",strtotime($this->from_time));
                             },
-            'end_date'=>function (){return date ("Y-m-d H:i", strtotime( $this->end_date));},
+            'end_date'=>function (){return date ("Y-m-d", strtotime( $this->end_date)) . " ". date ("H:i",strtotime($this->until_time));},
             'apartment_id'=>'apartment_id',
             'apartment_name'=>function (){return $this->apartment->name;},
             'external_apartment_id' => function (){return $this->apartment->external_id;},
-//            'guest'=>'author',
-//           'username'=>function(){ return $this->author->user->username;},
-//            'initial_login'=>'author.user.login',
+            'price'=>function (){ return $this->price. $this->label; },
+            'paid'=>function (){ return  ($this->paid=="N")?false:true;},
+            'duration'=>function (){ $duration = intdiv((strtotime( $this->end_date)-strtotime($this->start_date))/24/60,60);
+//                                    return($duration==1)?$duration." day": $duration." days";},
+                                    return $duration;},
+            'number_of_guests'=>function (){
+//            return ($this->number_of_tourist==1)?$this->number_of_tourist." guest":$this->number_of_tourist." guests";
+                return $this->number_of_tourist;
+            },
+            'address'=>function (){ return $this->apartment->adress.", ".$this->apartment->city_name;},
+            'latitude'=>function (){ return $this->apartment->latitude;},
+            'longitude'=>function (){ return $this->apartment->longitude;},
+            'note'=>function (){ return $this->note;},
+            'contact'=>function (){ return $this->author->contact_name;},
+            'contact_email'=>function (){ return $this->author->contact_email;},
+            'contact_tel'=>function (){ return $this->author->contact_tel;},
+            "contact_country"=>function (){ return $this->author->contact_country;},
+            "contact_country_code"=>function (){ return $this->author->contact_country_code1;}
+
         ];
     }
     public function behaviors(): array

@@ -62,7 +62,7 @@ class PhotoImageRecognition {
             : Yii::getAlias('@imagePath').'/'.$this->photoImage->album_id.'/'.$this->photoImage->booking_id.'/'.$this->photoImage->id.'.jpg';
         //если PhotoImage еще не распознана - Status = 0
         if (!$this->photoImage->status) {
-            //отправка запроса в Facematika
+            //отправка запроса в Facematica
             $response = $this->faceDetect($filename);
             $data = json_decode($response, true);
             //разбор полученного
@@ -125,7 +125,7 @@ class PhotoImageRecognition {
             : Yii::getAlias('@imagePath').'/'.$this->photoImage->album_id.'/'.$this->photoImage->booking_id.'/'.$this->photoImage->id.'.jpg';
         //если PhotoImage еще не распознана - Status = 0
         if (!$this->photoImage->status) {
-            //отправка запроса в Facematika
+            //отправка запроса в Facematica
             $response = $this->faceDetect($filename);
             $data = json_decode($response, true);
             //разбор полученного

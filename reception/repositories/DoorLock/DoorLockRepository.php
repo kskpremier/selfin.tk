@@ -22,7 +22,7 @@ class DoorLockRepository
     public function findByMac($lockMac): DoorLock
     {
         //return DoorLock::findOne(['lock_mac' => $lockMac]);
-        if (!$doorLock = DoorLock::findOne(['lock_mac' => $lockMac])) {
+        if (!$doorLock = DoorLock::find()->where(['lock_mac' => $lockMac])->one()) {
             throw new NotFoundException('DoorLock is not found.');
         }
         return $doorLock;
@@ -30,7 +30,7 @@ class DoorLockRepository
 
     public function findByExternalId($id): DoorLock
     {
-        if (!$doorLock = DoorLock::findOne(['external_id' => $id])) {
+        if (!$doorLock = DoorLock::find()->where(['external_id' => $id])->one()) {
             throw new NotFoundException('DoorLock is not found.');
         }
         return $doorLock;
@@ -38,7 +38,7 @@ class DoorLockRepository
 
     public function findByMyrRentId($id)
     {
-        if (!$doorLock = DoorLock::findOne(['external_id' => $id])) {
+        if (!$doorLock = DoorLock::find()->where(['external_id' => $id])->one()) {
             return null;
         }
         return $doorLock;

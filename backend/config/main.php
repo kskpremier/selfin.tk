@@ -10,22 +10,38 @@ return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
-    'controllerMap' => [
-//        'user'=>[
-//            'class'=>'common\controllers\UserController',
-//        ],
-    ],
+
     'bootstrap' => [
         'log',
         'common\bootstrap\SetUp',
         'api\bootstrap\SetUp',
+        'monitor',
+    ],
+    'container' => [
+        'singletons' => [
+            \zhuravljov\yii\queue\monitor\Env::class => [
+                'cache' => 'cache',
+                'db' => 'db',
+                'pushTableName' => '{{%queue_push}}',
+                'execTableName' => '{{%queue_exec}}',
+            ],
+        ],
     ],
     'modules' => [
-        'Facematica' => [
-            'class' => 'backend\modules\faces\FaceRecognition',
+        'monitor' => [
+            'class' => \zhuravljov\yii\queue\monitor\Module::class,
         ],
     ],
     'components' => [
+        'queue' => [
+////            'class' => 'yii\queue\redis\Queue',
+//            'class' => \yii\queue\redis\Queue::class,
+//            'redis' => 'redis', // Redis connection component or its config
+//            'channel' => 'queue', // Queue channel key
+//            'as log' => 'yii\queue\LogBehavior',*/
+            'as monitor' => \zhuravljov\yii\queue\monitor\Behavior::class,
+        ],
+
         'formatter' => [
             // 'dateFormat' => 'dd.MM.yyyy',
             'decimalSeparator' => ',',

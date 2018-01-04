@@ -32,4 +32,12 @@ class MailChimp implements Newsletter
             throw new \RuntimeException($error);
         }
     }
+
+//    public function notifyError($mail): void
+//    {
+//        $this->client->post();
+//        if ($error = $this->client->getLastError()) {
+//            throw new \RuntimeException($error);
+//        }
+//    }
 }

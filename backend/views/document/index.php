@@ -1,5 +1,6 @@
 <?php
 
+use reception\helpers\ImageHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -27,12 +28,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'first_name',
             'second_name',
             'number',
-
+//            [
+//                'attribute' => 'id',
+//                'filter' => ::statusList(),
+//                'value' => function (User $model) {
+//                    return UserHelper::statusLabel($model->status);
+//                },
+//                'format' => 'raw',
+//            ],
+            [ "attribute"=>'maxprobability',
+                'format' => 'raw',
+                'value' => function($model) {
+                    return ImageHelper::statusRecognition($model->maxprobability);
+                }
+            ],
             [   'attribute'=>'images',
                 'format' => 'raw',
                 'value'=>function($model) {
                     $imageBlock='';
-                    foreach($model->images as $image) {
+                    foreach($model->documentImages as $image) {
 
                         $imageBlock = $imageBlock. Html::tag('span',Html::img($image->getThumbFileUrl('file_name', 'thumb'),
                             ['class' => 'thumbnail', 'target' => '_blank']),['class'=>'row']);

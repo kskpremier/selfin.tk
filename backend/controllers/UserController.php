@@ -4,6 +4,8 @@ namespace backend\controllers;
 
 use reception\forms\manage\User\UserCreateForm;
 use reception\forms\manage\User\UserEditForm;
+use reception\forms\MyRent\MyRentUserForm;
+use reception\useCases\manage\MyRent\MyRentManageService;
 use reception\useCases\manage\UserManageService;
 use Yii;
 use yii\filters\AccessControl;
@@ -19,11 +21,13 @@ use yii\filters\VerbFilter;
 class UserController extends Controller
 {
     private $service;
+    private $myRent;
 
-    public function __construct($id, $module, UserManageService $service, $config = [])
+    public function __construct($id, $module, UserManageService $service, MyRentManageService $myRent, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->myRent = $myRent;
     }
 
     /**
@@ -103,6 +107,54 @@ class UserController extends Controller
         return $this->render('create', [
             'model' => $form,
         ]);
+    }
+    /**
+     * Creates a new User model for MyRent.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateMyrent()
+    {
+        $form = new MyRentUserForm();
+        $form->load(Yii::$app->request->post());
+        if ($form->validate()) {
+            try {
+                $user = $this->myRent->createMyRentUser($form);
+                return $this->redirect(['view', 'id' => $user->id]);
+            } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
+        return $this->render('create_my_rent_user', [
+            'model' => $form,
+        ]);
+    }
+
+    /**
+     * Update User model for MyRent.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionSynchro($id)
+    {
+        $user = $this->findModel($id);
+
+        if ($user) {
+            try {
+                $this->myRent->updateMyRentUser($user);
+                if ($user->owners)
+                foreach ($user->owners as $owner) {
+                    $this->myRent->updateBookings($user,$owner->id);
+                }
+                else $this->myRent->updateBookings($user);
+                return $this->redirect(['view', 'id' => $user->id]);
+            } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
+        return $this->redirect(['view', 'id' => $user->id]);
     }
 
     /**

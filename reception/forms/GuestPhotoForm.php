@@ -9,29 +9,31 @@
 
 namespace reception\forms;
 
+use reception\entities\Booking\Document;
 use reception\forms\CompositeForm;
 use reception\forms\PhotosForm;
 use reception\entities\Booking\Booking;
 
 /**
- * @property PhotosForm $PhotosForm
+ * @property SelfyForm $selfyForm
  * 
- * * @property integer $id;
-* @property String $date;
-* @property integer $camera_id;
-* @property integer $album_id;
-* @property String $file_name;
-* @property integer $booking_id;
-* @property integer $user_id;
-* @property integer $size;
-* @property String $uploaded;
-* @property String $type;
-* @property String $dimensions;
-* @property integer $facematika_id;
-* @property integer $status;
-* @property float $altitude;
-* @property float $longitude;
-* @property float $latitude;
+ * @property integer $id
+* @property String $date
+* @property integer $camera_id
+* @property integer $album_id
+* @property String $file_name
+* @property integer $booking_id
+* @property integer $user_id
+* @property integer $size
+* @property String $uploaded
+* @property String $type
+* @property String $dimensions
+* @property integer $facematika_id
+* @property integer $status
+* @property float $altitude
+* @property float $longitude
+* @property float $latitude
+ * @property string $document_number
  * 
 
  * 
@@ -54,12 +56,14 @@ class GuestPhotoForm extends CompositeForm
     public $altitude;
     public $longitude;
     public $latitude;
+    public $document_number;
 
     public $booking;
 
     public function __construct(array $config = [])
     {
-        $this->PhotosForm = new PhotosForm();
+        $this->SelfyForm = new SelfyForm();
+
         parent::__construct($config);
 
     }
@@ -68,25 +72,38 @@ class GuestPhotoForm extends CompositeForm
     {
         return [
 
-            [['date','file_name','size','uploaded','type',
+            [['date','file_name','size','uploaded','type',"document_number",
             'dimensions','facematika_id','status','altitude',
             'longitude','latitude','album_id','id','user_id'],'safe'],
           //  [['id','user_id',],'integer'],
-            [['booking_id'],'validateBooking','message'=>'Booking with this ID should exist']
+            [['booking_id'],'validateBooking','message'=>'Booking with this ID should exist'],
+            [['booking_id'],'validateDocument','message'=>'Document with this number does\'t exist']
         ];
     }
     protected function internalForms(): array
     {
-        return ['PhotosForm'];
+        return ['SelfyForm'];
     }
     public function validateBooking(){
         if (!isset($this->booking_id)){
-            $this->addError('Booking ID should be set');
+            return $this->addError('Booking ID should be set');
         }
         $booking = Booking::find()->where(['external_id'=>$this->booking_id])->orWhere(['id'=>$this->booking_id])->one();
         if (!isset($booking)){
-            $this->addError('Wrong ID of Booking');
+            return $this->addError('Wrong ID of Booking');
         }
-        $this->booking = $booking;
+        return $this->booking = $booking;
+    }
+    public function validateDocument(){
+        if (!isset($this->document_number)){
+            return $this->addError('Document number should be set');
+        }
+        $doc_number = substr($this->document_number,0,-1);
+        $this->document_number = substr ($doc_number,1);
+        $document = Document::find()->where(['number'=>$this->document_number])->one();
+        if (!isset($document)){
+            return $this->addError('Wrong number of Document');
+        }
+       return $this->document_number = $document->id;
     }
 }

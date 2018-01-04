@@ -17,11 +17,11 @@ namespace reception\entities;
 Interface FaceInterface
 {
 
-    public static function create($face_id,$file_name,$x,$y,$width, $angle, $image=null, $document=null);
+    public static function create($face_id, $file_name, $x, $y, $width, $angle, $document = null, $parentImage = null);
 
     public function edit(FaceInterface $face, $face_id,$file_name,$x,$y,$width, $angle, $image=null, $document=null);
 
-    //скорее бы вынес в абстрактный класс
-//    public function faceDetect();
+    public function remove($face_id);
+
 
 }

@@ -6,7 +6,7 @@ trait EventTrait
 {
     private $events = [];
 
-    protected function recordEvent($event): void
+    public function recordEvent($event): void
     {
         $this->events[] = $event;
     }

@@ -6,7 +6,7 @@ use kartik\date\DatePicker;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use backend\models\Document;
-use backend\models\Album;
+use reception\entities\Image\Album;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\PhotoDocument */

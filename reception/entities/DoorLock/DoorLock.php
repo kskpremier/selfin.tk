@@ -116,10 +116,13 @@ class DoorLock extends ActiveRecord
         $this->apartment = $apartment;
         $this->user_id = $user_id;
     }
-    public function installInApartment($apartmentId, $name, $id, $user_id,$updateTime){
+    public function installInApartment($apartmentId,  $user_id, $updateTime){
         $this->apartment_id = $apartmentId;
-        $this->lock_alias = $name;
-        $this->external_id = $id;
+        $this->user_id = $user_id;
+        $this->myrent_update = $updateTime;
+    }
+    public function uninstallDoorLock($user_id,$updateTime){
+        $this->apartment_id = null;
         $this->user_id = $user_id;
         $this->myrent_update = $updateTime;
     }

@@ -2,7 +2,7 @@
 
 namespace reception\entities;
 
-use backend\models\Album;
+use reception\entities\Image\Album;
 use backend\service\Draw;
 use reception\entities\Booking\FaceComparation;
 use reception\entities\Face;
@@ -31,7 +31,7 @@ use yii\web\ServerErrorHttpException;
  * @property string   $type
  * @property string   $dimensions
  * @property string   $facematika_id
-
+ * @property int   $document_id
  * @property double   $altitude
  * @property double   $longitude
  * @property double   $latitude
@@ -103,7 +103,7 @@ abstract class AbstractImage  extends ActiveRecord implements ImageInterface
         ];
     }
 /**
- * Using Facematika service detect all faces on Image , create sets of Face with new image of face, link them all with Image
+ * Using Facematica service detect all faces on Image , create sets of Face with new image of face, link them all with Image
  * @return array
  * */
 
@@ -122,14 +122,7 @@ abstract class AbstractImage  extends ActiveRecord implements ImageInterface
                     //создаем записи в таблице лиц
                     foreach ($data['filename']['faces'] as $face) {
                         $newFace = Face ::create (
-                             $face['faceid'],
-                             $face['faceid'].'.jpg',
-                             $face['coordinates']['x'],
-                             $face['coordinates']['y'],
-                             $face['coordinates']['width'],
-                             $face['coordinates']['angle'],
-                             ($document)? null : $this,
-                             ($document)? $this: null);
+                            $face['faceid'], $face['faceid'] . '.jpg', $face['coordinates']['x'], $face['coordinates']['y'], $face['coordinates']['width'], $face['coordinates']['angle'], ($document) ? $this : null);
                         //вырезание квадрата лица в новый Image
                         $draw = new Draw($this,$document,$this->getFileName(),mime_content_type($this->getFileName()));
                         $face_image = $draw->getFaceRectangleImage($newFace);

@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create MyRent user', ['create-myrent'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="box">
@@ -27,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
                 'columns' => [
-                    'id',
+                    'external_id',
                     [
                         'attribute' => 'created_at',
                         'filter' => DatePicker::widget([
@@ -63,6 +64,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => function (User $model) {
                             return UserHelper::statusLabel($model->status);
                         },
+                        'format' => 'raw',
+                    ],
+                    [
+                        'attribute' => 'updated_at',
+                        'value'=> function($model){
+                            $value = ($model->myrent_update)? date("Y-m-d H:i:s",$model->myrent_update):'';
+                            return UserHelper::getSynchroTime($model);
+                        },
+                        'label'=>"Update",
                         'format' => 'raw',
                     ],
                     ['class' => ActionColumn::class],

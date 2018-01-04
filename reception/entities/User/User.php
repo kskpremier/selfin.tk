@@ -1,23 +1,18 @@
 <?php
 namespace reception\entities\User;
 
+use reception\entities\AggregateRoot;
+use reception\entities\Apartment\Apartment;
 use reception\entities\Apartment\Receptionist;
 use reception\entities\Booking\Guest;
 use reception\entities\EventTrait;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Owner;
-use reception\forms\MyRent\MyRentUserForm;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-//
-//use filsh\yii2\oauth2server\Module;
-//use OAuth2\Storage\UserCredentialsInterface;
-////use reception\entities\User\User;
-//use reception\readModels\UserReadRepository;
-//
-//use yii\web\IdentityInterface;
+
 
 
 /**
@@ -42,9 +37,13 @@ use yii\db\ActiveRecord;
  * @property string $contact_tel
  *
  * @property Network[] $networks
- * @property WishlistItem[] $wishlistItems
+ * @property Owners[] $owners
+ * @property Apartments[] $apartments
+ * @property Workers[] $workers
+ * @property Guest $guest
+ *
  */
-class User extends ActiveRecord //implements IdentityInterface, UserCredentialsInterface
+class User extends ActiveRecord implements AggregateRoot//implements IdentityInterface, UserCredentialsInterface
 {
     use EventTrait;
 
@@ -73,7 +72,7 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
             $user->contact_name = $contact_name;
             $user->contact_tel = $contact_tel;
             $user->external_id = $user_id;
-            $user->myrent_update = ($updated)?$updated:time();
+//            $user->myrent_update = ($updated)?$updated:time();
             $user->guid = $guid;
             //толи хак, толи так надо я пока не понимаю
             $user->save();
@@ -89,7 +88,7 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
     {
         $this->username = $username;
         $this->email = $email;
-        $this->updated_at = time();
+
     }
 
     public static function requestSignup(string $username, string $email, string $password): self
@@ -164,7 +163,11 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
     {
         return $this->status === self::STATUS_ACTIVE;
     }
-    public function saveUpdate ($time)
+    public function setUpdateTime ($time)
+    {
+        $this->updated_at = $time;
+    }
+    public function setMyRentUpdateTime ($time)
     {
         $this->myrent_update = $time;
     }
@@ -174,19 +177,22 @@ class User extends ActiveRecord //implements IdentityInterface, UserCredentialsI
         return $this->hasMany(Network::className(), ['user_id' => 'id']);
     }
 
-    public function getOwner(): ActiveQuery
+    public function getOwners(): ActiveQuery
     {
-        return $this->hasOne(Owner::className(), ['user_id' => 'id']);
+        return $this->hasMany(Owner::className(), ['user_id' => 'id']);
     }
-    public function getReceptionist(): ActiveQuery
+    public function getWokers(): ActiveQuery
     {
-        return $this->hasOne(Receptionist::className(), ['user_id' => 'id']);
+        return $this->hasOne(Worker::className(), ['user_id' => 'id']);
     }
     public function getGuest(): ActiveQuery
     {
         return $this->hasOne(Guest::className(), ['user_id' => 'id']);
     }
-
+    public function getApartments()
+    {
+        return $this->hasMany(Apartment::className(), ['user_id' => 'id']);
+    }
 
     /**
      * @inheritdoc

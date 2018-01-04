@@ -35,12 +35,7 @@ class FaceManageService
     public function create(FaceForm $form): FaceInterface
     {
             $face = FaceInterface::create(
-                $form->face_id,
-                $form->x,
-                $form->y,
-                $form->width,
-                $form->angle,
-                $form->image->id);
+                $form->face_id, $form->x, $form->y, $form->width, $form->angle, $form->image->id);
             $this->faceRepository->save($face);
 
         return $face;

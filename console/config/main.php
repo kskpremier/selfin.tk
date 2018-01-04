@@ -12,6 +12,12 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'console\controllers',
     'controllerMap' => [
+        'migrate' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            'migrationNamespaces' => [
+                'zhuravljov\yii\queue\monitor\migrations',
+            ],
+        ],
         'fixture' => [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
@@ -22,6 +28,7 @@ return [
         ],
 
     ],
+
     'components' => [
         'log' => [
             'targets' => [
