@@ -42,7 +42,7 @@ class UserController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin'],
+                    'roles' => ['receptionist','admin', 'mobile'],
                 ],
             ],
         ];
@@ -66,9 +66,15 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        if (Yii::$app->user->can("admin")) {
+            $searchModel = new UserSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }
+        else {
+            $searchModel = new UserSearch(['user'=>Yii::$app->user->id]);
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -125,6 +131,9 @@ class UserController extends Controller
                 Yii::$app->errorHandler->logException($e);
                 Yii::$app->session->setFlash('error', $e->getMessage());
             }
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Something went wrong -> '. json_encode ($form->getErrors() ));
         }
         return $this->render('create_my_rent_user', [
             'model' => $form,

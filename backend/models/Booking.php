@@ -326,6 +326,24 @@ class Booking extends \yii\db\ActiveRecord
             ->send();
     }
 
+    /**
+     * Sends an email to the specified email address using the information collected by this model.
+     *
+     * @param string $email the target email address
+     * @return bool whether the email was sent
+     */
+    public function sendTestMarcoPoloEmail($email)
+    {
+
+        return Yii::$app->mailer->compose()
+            ->setTo($email)
+            ->setFrom(["test_myrent@marcopolotours.hr"=>'Test Send'])
+            ->setSubject('Booking informantion')
+            ->setTextBody('Test')
+            ->send();
+    }
+
+
     public static function isUnique($booking){
         if (!$booking->apartment_id && $booking->external_apartment_id) {
             $apartment = Apartment::find()->andWhere(['external_id' => $booking->external_apartment_id])->one();

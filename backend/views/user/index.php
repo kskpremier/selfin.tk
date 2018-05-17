@@ -27,8 +27,16 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
-                'columns' => [
-                    'external_id',
+                'columns' => [ [
+                    'attribute' => 'username',
+                    'value' => function (User $model) {
+                        return Html::a(Html::encode($model->username), ['view', 'id' => $model->id]);
+                    },
+                    'format' => 'raw',
+                ],
+                    'email:email',
+                    ['attribute' =>'external_id',
+                        'label'=>'MyRent ID' ],
                     [
                         'attribute' => 'created_at',
                         'filter' => DatePicker::widget([
@@ -45,18 +53,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]),
                         'format' => 'datetime',
                     ],
-                    [
-                        'attribute' => 'username',
-                        'value' => function (User $model) {
-                            return Html::a(Html::encode($model->username), ['view', 'id' => $model->id]);
-                        },
-                        'format' => 'raw',
-                    ],
-                    'email:email',
+
                     [
                         'attribute' => 'role',
                         'class' => RoleColumn::class,
                         'filter' => $searchModel->rolesList(),
+                        'label' => 'Roles and permissions'
                     ],
                     [
                         'attribute' => 'status',
@@ -74,6 +76,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'label'=>"Update",
                         'format' => 'raw',
+                    ],
+                    [
+                            'attribute'=>'dependedUsers',
+                            'format'=>'raw',
+                        'value'=> function($model){
+                            $result='';
+                            foreach ($model->dependedUsers as $user)
+                            {
+                                $result .= '<div class="row">'. Html::a(Html::encode($user->username), ['view', 'id' => $model->id]) .'</div>';
+                            }
+                            return  $result;
+                        },
+                        'label'=>"Users",
+
                     ],
                     ['class' => ActionColumn::class],
                 ],

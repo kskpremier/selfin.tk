@@ -9,6 +9,11 @@
 namespace api\controllers;
 
 use api\models\GetKeyboardKey;
+use function json_encode;
+use reception\entities\User\User;
+use reception\forms\DoorLockInstallForm;
+use reception\forms\DoorLockNameForm;
+use reception\repositories\Apartment\ApartmentRepository;
 use reception\repositories\DoorLock\DoorLockRepository;
 use Yii;
 use reception\entities\DoorLock\DoorLock;
@@ -24,6 +29,7 @@ use yii\helpers\Url;
 
 use reception\useCases\manage\DoorLock\DoorLockManageService;
 use yii\filters\VerbFilter;
+use yii\web\ServerErrorHttpException;
 
 /**
  * DoorLockController implements the CRUD actions for DoorLock model.
@@ -33,13 +39,14 @@ class DoorLockController extends Controller
 
     private $doorLock;
     private $service;
+    private $apartmentRepository;
 
-
-    public function __construct($id, $module, DoorLockManageService $service, DoorLockRepository $doorLock, $config = [])
+    public function __construct($id, $module, DoorLockManageService $service, DoorLockRepository $doorLock, ApartmentRepository $apartmentRepository, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->doorLock = $doorLock;
         $this->service = $service;
+        $this->apartmentRepository = $apartmentRepository;
 
     }
 
@@ -48,20 +55,31 @@ class DoorLockController extends Controller
      */
     public function behaviors()
     {
-
             $behaviors = parent::behaviors();
-            $behaviors['authenticator']['only'] = ['create', 'update', 'delete'];
+            $behaviors['authenticator']['only'] = ['create', 'update', 'delete','index','install','view', 'uninstall'];
             $behaviors['authenticator']['authMethods'] = [
                 HttpBasicAuth::className(),
                 HttpBearerAuth::className(),
             ];
             $behaviors['access'] = [
                 'class' => AccessControl::className(),
-                'only' => ['create', 'update', 'delete'],
+                'only' => ['create', 'update', 'delete','index','install','view'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'actions'=>['index','view'],
+                        'roles' => ['admin', 'mobile','tourist','owner','worker'],
+                    ],
+                        [
+                            'allow' => true,
+                            'actions'=>['update','create','view'],
+                            'roles' => ['mobile','owner','worker'],
+//                            'rules' => ['forUserId']
+                        ],
+                    [
+                        'allow' => true,
+                        'actions'=>['install','uninstall','delete','name'],
+                        'roles' => ['lockAdmin'],
                     ],
                 ],
             ];
@@ -75,30 +93,29 @@ class DoorLockController extends Controller
             'index' => ['get'],
             'update' => ['put', 'patch'],
             'create' => ['post'],
-            'delete' => ['delete']
+            'install' =>['post'],
+            'delete' => ['delete'],
         ];
     }
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['create']);
-        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
-        return $actions;
-    }
 
-//    public function checkAccess($action, $model = null, $params = [])
-//    {
-//        if (in_array($action, ['update', 'delete','view','create'])) {
-//            if (!Yii::$app->user->can('manageDoorLock', ['doorlock' => $model])) {
-//                throw  new ForbiddenHttpException('Forbidden.');
-//            }
-//        }
-//    }
 
     public function prepareDataProvider()
     {
-        $searchModel = new DoorLockSearch();
+       if (Yii::$app->getUser()->can('admin')) {
+           $searchModel = new DoorLockSearch();
+       }
+        else $searchModel = new DoorLockSearch(['user'=>Yii::$app->getUser()->getid()]);
+
         return $searchModel->search(Yii::$app->request->queryParams);
+    }
+
+    public function actionIndex() {
+        $dataProvider = $this->prepareDataProvider();
+        $result =[];
+        foreach ($dataProvider->getModels() as $doorlock) {
+            $result[] = $this->serializeDoorLockShort($doorlock);
+        }
+        return $result;
     }
     /**
      * @SWG\Post(
@@ -238,7 +255,8 @@ class DoorLockController extends Controller
                     $response = Yii::$app->getResponse();
                     $response->setStatusCode(201);
                     $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $doorLock->id], true));
-                } elseif (!$doorLock->hasErrors()) {
+                } else {
+                    Yii::error("Something wrong");
                     throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
                 }
                 return $this->serializeDoorLock($doorLock);
@@ -246,6 +264,54 @@ class DoorLockController extends Controller
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
         }
+    }
+
+    public function actionInstall (){
+
+        $model = new DoorLockInstallForm();
+
+        $model->load(Yii::$app->request->getBodyParams(), '');
+        if (! $model->validate()) {
+            throw new ServerErrorHttpException('Failed to update the object for unknown reason.'. json_encode($model->getErrors()));
+        }
+        if (!$apartment = $this->apartmentRepository->get($model->apartmentId)) {
+            throw new NotFoundHttpException('The requested apartment does not exist.');
+        }
+
+        $result = $this->service->addApartment($model->id,  $apartment, $model->lockAlias, Yii::$app->getUser()->getId());
+
+        return json_encode(["result"=>($result)?'success': "errors"]);
+    }
+
+    public function actionName (){
+
+        $model = new DoorLockNameForm();
+
+        $model->load(Yii::$app->request->getBodyParams(), '');
+        if (! $model->validate()) {
+            throw new ServerErrorHttpException('Failed to update the object for unknown reason.'. json_encode($model->getErrors()));
+        }
+
+        $result = $this->service->setName($model->id, $model->lockAlias);
+
+        return ["result"=>($result)?'success': "errors"];
+    }
+
+
+    public function actionUninstall (){
+
+        $model = new DoorLockInstallForm();
+
+        $model->load(Yii::$app->request->getBodyParams(), '');
+        if (! $model->validate()) {
+            throw new ServerErrorHttpException('Failed to update the object for unknown reason.');
+        }
+        if (!$apartment = $this->apartmentRepository->get($model->apartmentId)) {
+            throw new NotFoundHttpException('The requested apartment does not exist.');
+        }
+        $result = $this->service->removeApartment($model->id,  $apartment->id, $model->lockAlias, $apartment->user_id);
+
+        return json_encode(["result"=>($result)?'success': "errors"]);
     }
 
 
@@ -271,10 +337,10 @@ class DoorLockController extends Controller
      */
     public function actionView($id)
     {
-        if (!$doorLock = $this->doorLock->get($id)) {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-        return $this->serializeDoorLock($doorLock);
+         if (!$doorlock = $this->doorLock->get($id)) {
+                throw new NotFoundHttpException('The requested doorlock does not exist.');
+            }
+        return $this->serializeDoorLock($doorlock);
     }
 
     /**
@@ -314,13 +380,19 @@ class DoorLockController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->doorLock->findModel($id);
+        if (!$doorlock = $this->doorLock->get($id)) {
+            throw new NotFoundHttpException('The requested doorlock does not exist.');
+        }
+
+        $model = new DoorLockForm (['id'=>$id]);
 
         $model->load(Yii::$app->request->getBodyParams(), '');
-        if ($model->save() === false && !$model->hasErrors()) {
+        if (! $model->validate()) {
             throw new ServerErrorHttpException('Failed to update the object for unknown reason.');
         }
-        return $this->serializeDoorLock($model);
+        $result = $this->service->edit($doorlock, $model, Yii::$app->getUser()->getId());
+
+        return ($result)? 'success': "errors";
     }
 
     /**
@@ -370,6 +442,21 @@ class DoorLockController extends Controller
 
     public function serializeDoorLock(DoorLock $doorLock): array
     {
+        $apartments =[];
+        foreach ($doorLock->apartments as $apartment)
+        {
+            $apartments[]=[
+                'id' => $apartment->id,
+                'name' => $apartment->name,
+                'external_apartment_id' => $apartment->external_id,
+                'city_name'=>$apartment->city_name,
+                'address'=>$apartment->adress,
+                'latitude'=>$apartment->latitude,
+                'longitude'=>$apartment->longitude,
+                 'user_id'=>$apartment->user_id
+            ];
+        }
+
         return [
             'lockId'=>$doorLock->lock_id,
             'keyId'=>$doorLock->key_id,
@@ -397,9 +484,35 @@ class DoorLockController extends Controller
                 'orgId'=>$doorLock->lockVersion->org_id,
                 'scene'=>$doorLock->lockVersion->scene
             ],
-            'apartment'=>[
-                'name'=>($doorLock->apartment)?$doorLock->apartment->name:'not yet installed',
-            ]
+            'apartments'=>$apartments
+
+        ];
+    }
+    public function serializeDoorLockShort(DoorLock $doorLock): array
+    {
+        $apartments =[];
+        foreach ($doorLock->apartments as $apartment)
+        {
+            $apartments[]=[
+                'id' => $apartment->id,
+                'name' => $apartment->name,
+//                'external_apartment_id' => $apartment->external_id,
+                'city_name'=>$apartment->city_name,
+                'address'=>$apartment->adress,
+                'latitude'=>$apartment->latitude,
+                'longitude'=>$apartment->longitude,
+                'user_id'=>$apartment->user_id
+            ];
+        }
+
+        return [
+            'id'=>$doorLock->id,
+            'lockName'=>$doorLock->lock_name,
+            'lockAlias'=>$doorLock->lock_alias,
+            'lockMac'=>$doorLock->lock_mac,
+
+            'apartments'=>$apartments
+
         ];
     }
 }

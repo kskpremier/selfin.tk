@@ -6,6 +6,8 @@
  * Time: 11:06
  */
 
+
+
 /**
  * @property string $firstName
  * @property string $secondName
@@ -20,7 +22,9 @@
  * @property string citizenshipOfBirth
  * @property string $address
 
+
  * @property string bookingId
+ * @property Booking $booking
  *
  */
 namespace reception\forms;
@@ -30,11 +34,7 @@ use backend\models\DocumentType;
 use reception\entities\Booking\Booking;
 use function strtotime;
 use yii\base\Model;
-//use yii\web\UploadedFile;
-//
-/**
- * @property LockVersionForm $lockVersion
- */
+
 class eVisitorForm extends Model
 {
     public $firstName;
@@ -51,9 +51,20 @@ class eVisitorForm extends Model
     public $validBefore;
     public $address;
 
+
+    public $from;
+    public $to;
+    public $time_from;
+    public $time_to;
+
+    public $dateFrom;
+    public $dateTo;
+
+    public $id;
     public $eVisitor;
 
     public $bookingId;
+    public $booking_external_id;
     public $booking;
 
     public function __construct(array $config = [])
@@ -67,9 +78,11 @@ class eVisitorForm extends Model
     {
         $rules = array_merge(
             parent::rules(),[
-                [['firstName', 'secondName','country','city','address', "eVisitor",
+                [['firstName', 'secondName','country','city','address', 'from', 'to', 'time_from', 'time_to',
                     'identityData','numberOfDocument','gender','countryOfBirth','cityOfBirth','dateOfBirth','citizenshipOfBirth'], 'string'],
                 [['validBefore'],'validateExpireDate'],
+                [['id','dateFrom','dateTo','booking_external_id'],'integer'],
+                [[ "eVisitor"],'boolean'],
                 [['firstName', 'secondName'], 'validateNames'],
                 [['identityData'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['identityData'=>'code'],'message'=>'Type of  Document ID should exist'],
                 [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
@@ -118,11 +131,21 @@ class eVisitorForm extends Model
         if (!isset($this->bookingId)){
             $this->addError('Booking ID should be set');
         }
-        $booking = Booking::find()->where(['external_id'=>$this->bookingId])->orWhere(['id'=>$this->bookingId])->one();
+        $booking = Booking::find()->where(['id'=>$this->bookingId])->one();
         if (!isset($booking)){
             $this->addError('Wrong ID of Booking');
         }
-        $this->booking= $booking;
+        else {
+            $this->booking = $booking;
+            $this->booking_external_id = $booking->external_id;
+//по умолчанию даты регистрации совпадают с датами букинга
+            $this->from = ($this->from) ? $this->from : $this->booking->start_date;
+            $this->to = ($this->to) ? $this->to : $this->booking->end_date;
+            $this->time_from = ($this->time_from) ? $this->time_from : $this->booking->from_time;
+            $this->time_to = ($this->time_to) ? $this->time_to : $this->booking->until_time;
+            $this->dateFrom = strTotime(date("Y-m-d", strTotime($this->from)) . " " . $this->time_from);
+            $this->dateTo = strTotime(date("Y-m-d", strTotime($this->to)) . " " . $this->time_to);
+        }
     }
 
     public function getCountry(){

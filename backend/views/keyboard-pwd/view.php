@@ -23,13 +23,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?= Html::a(Yii::t('app', 'SendByEmail'), ['send-email'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
+            'value',
             //'id',
-            'keyboard_pwd_id',
+//            ['attribute'=>'keyboard_pwd_id',
+//              'label'=> 'Id'],
             ['attribute'=>'start_date',
                 'value'=>function($model){
                     return ($model->start_date)?date('Y-m-d H:i',$model->start_date):'-';
@@ -38,13 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($model) {
                     return ($model->end_date) ? date('Y-m-d H:i', $model->end_date) : '-';
                 }],
-            'value',
+
             [
                 'attribute'=>'doorLockName',
                 'label'=>'Door lock',
                 'format'=>'raw',
                 'value'=> function($model) {
-                    return HTML::a($model->doorLock->lock_name, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+                    return HTML::a($model->doorLock->lock_alias, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
                 } ,
             ],
             [
@@ -61,8 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ['attribute'=>'keyboard_pwd_type',
                 'value'=>function($model){
                     return ($model->keyboard_pwd_type == 2)? 'Permanent': 'Period';
-                }],
-            'keyboard_pwd_version',
+                },
+                'label'=> 'Type'],
+
+//            'keyboard_pwd_version',
         ],
     ]) ?>
 

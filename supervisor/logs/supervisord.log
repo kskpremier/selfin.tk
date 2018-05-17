@@ -1,0 +1,71 @@
+2018-03-05 17:56:20,415 WARN No file matches via include "/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 17:56:20,445 INFO RPC interface 'supervisor' initialized
+2018-03-05 17:56:20,445 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2018-03-05 17:56:20,447 INFO daemonizing the supervisord process
+2018-03-05 17:56:20,448 INFO set current directory: '/tmp'
+2018-03-05 17:56:20,450 INFO supervisord started with pid 14230
+2018-03-05 18:14:51,682 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:14:51,682 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:01,917 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:01,918 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:12,168 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:12,168 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:22,397 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:22,397 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:32,640 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:32,640 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:42,866 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:42,867 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:15:53,098 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:15:53,098 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:03,353 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:03,353 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:13,597 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:13,597 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:23,824 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:23,824 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:34,164 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:34,164 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:44,486 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:44,486 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:16:54,746 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:16:54,746 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:05,114 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:05,114 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:15,342 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:15,342 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:25,657 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:25,657 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:35,904 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:35,904 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:46,213 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:46,214 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:17:56,473 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:17:56,473 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:06,724 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:06,724 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:16,960 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:16,960 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:27,201 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:27,201 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:37,440 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:37,440 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:47,690 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:47,690 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:18:57,953 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:18:57,953 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:08,198 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:19:08,198 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:18,481 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:19:18,481 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:28,748 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:19:28,748 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:39,005 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:19:39,006 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:41,697 WARN received SIGTERM indicating exit request
+2018-03-05 18:19:49,281 WARN No file matches via include "/private/etc/supervisor/~/Sites/reception/supervisor/conf.d/*.conf"
+2018-03-05 18:19:49,281 INFO Increased RLIMIT_NOFILE limit to 1024
+2018-03-05 18:19:49,312 INFO RPC interface 'supervisor' initialized
+2018-03-05 18:19:49,312 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2018-03-05 18:19:49,312 INFO supervisord started with pid 15203
+2018-03-05 18:22:40,114 WARN received SIGTERM indicating exit request

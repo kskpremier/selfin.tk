@@ -8,9 +8,11 @@
 
 namespace reception\entities\Apartment;
 
+use backend\models\query\ApartmentQuery;
 use reception\entities\Booking\Booking;
 use reception\entities\DoorLock\DoorLock;
 use reception\entities\Apartment\Owner;
+use reception\entities\User\User;
 use reception\forms\MyRent\ApartmentForm;
 use reception\services\MyRent\MyRent;
 use yii\db\ActiveRecord;
@@ -32,6 +34,8 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property string $guid
  * @property String $object_color
  * @property integer $myrent_update
+ *
+ *  * @property DoorLock [] $doorlocks
  * 
  */
 class Apartment extends ActiveRecord
@@ -52,7 +56,7 @@ class Apartment extends ActiveRecord
 
         $apartment->object_color = $object_color;
         $apartment->guid = $guid;
-        
+
         $apartment->external_id = $externalId;
         $apartment->owner_id = ($owner)? $owner->id : null;
         $apartment->user_id = ($user_id)? $user_id : null;
@@ -75,7 +79,7 @@ class Apartment extends ActiveRecord
         $apartment->country = $form->country;
         $apartment->object_color = $form->object_color;
         $apartment->guid = $form->guid;
-        $apartment->external_id = $form->object_id;
+        $apartment->external_id = $form->id;
         $apartment->user_id = $user_id;
         $apartment->owner_id = $owner_id;
         $apartment->myrent_update = ($updateTime)? $updateTime : time();
@@ -101,7 +105,7 @@ class Apartment extends ActiveRecord
             $this->country = $form->country;
             $this->object_color = $form->object_color;
             $this->guid = $form->guid;
-            $this->external_id = $form->object_id;
+            $this->external_id = $form->id;
             $this->user_id = $user_id;
             $this->owner_id = $owner_id;
             $this->myrent_update = ($updateTime)? $updateTime : time();
@@ -176,6 +180,22 @@ class Apartment extends ActiveRecord
      */
     public function getDoorLocks()
     {
-        return $this->hasMany(DoorLock ::className(), ['apartment_id' => 'id']);
+        return $this->hasMany(DoorLock ::className(), ['id' =>'doorlock_id'])->viaTable('{{%apartment_doorlock}}', ['apartment_id'=>'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @inheritdoc
+     * @return ApartmentQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new ApartmentQuery(get_called_class());
     }
 }

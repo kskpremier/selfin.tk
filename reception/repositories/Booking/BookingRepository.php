@@ -49,6 +49,21 @@ class BookingRepository
         return ($bookings)? $bookings: [];
     }
 
+    public function getBookingsForApartmentsSet($apartments) {
+        $bookings = Booking::find()
+                    ->andWhere(['in','apartment_id',$apartments])
+                    ->all();
+        return ($bookings)? $bookings: [];
+    }
+
+    public function getBookingsForApartmentsSetAndFromTime($apartments, $lastUpdateTime) {
+        $bookings = Booking::find()
+            ->andFilterWhere(['>=','from_date', date('Y-m-d',$lastUpdateTime)])
+            ->andWhere(['in','apartment_id',$apartments])
+            ->all();
+        return ($bookings)? $bookings: [];
+    }
+
     public function isBookingExist($externalId, $startDate,$endDate,$status,$apartmentId)
     {
         if ($booking = Booking::find()->where([
@@ -96,8 +111,9 @@ class BookingRepository
         if ($from===$to) {
             $bookings = Booking::find()
                 ->andWhere(['status' => Booking::STATUS_ACTIVE])
-                ->andwhere(['like', 'start_date',  $from])
-                //->andWhere(['<=', 'end_date', $to])
+                ->where(['or',['like','start_date', '%'.$from.'%'],['<=', 'start_date', $from],['>=', 'end_date', $to]])
+//                ->andWhere(['like', 'start_date',  $from])
+//                ->orWhere(['<=', 'end_date', $to])
                 ->joinWith('guests')
                 ->andWhere(['or', ['guest.id' => $guest->id], ['booking.guest_id' => $guest->id]])
                 ->all();
@@ -117,12 +133,13 @@ class BookingRepository
         //найти ве букинги, где гость является мобильным пользователем $user
        if ($from===$to) {
            $bookings = Booking::find()
-               ->andWhere(['status' => Booking::STATUS_ACTIVE])
-               ->andwhere( ['like', 'start_date', $from])
-               //->andwhere(['<=', 'start_date', $to])
-               //->andWhere(['or',['like','end_date', $to],['<=', 'end_date', $to]])
+               ->andFilterwhere(['status' => Booking::STATUS_ACTIVE])
+               ->andFilterwhere( ['like', 'start_date', $from])
+//               ->orFilterWhere(['<=', 'start_date', $to])
+//               ->andFilterwhere(['or',['like','end_date', $to],['<=', 'end_date', $to]])
                ->joinWith('apartment')
-               ->andWhere(['apartment.user_id' => $user_id])
+               ->andFilterwhere(['apartment.user_id' => $user_id])
+               ->orderBy(['apartment.name'=>SORT_ASC])
                ->all();
        }
         else $bookings = Booking::find()
@@ -171,6 +188,15 @@ class BookingRepository
     {
         if (!$booking->delete()) {
             throw new \RuntimeException('Removing error.');
+        }
+    }
+
+    public function removeById (int $id) {
+        $booking = $this->get ($id);
+        if ($booking) {
+            if (!$booking->delete()) {
+                throw new \RuntimeException('Removing error.');
+            }
         }
     }
 }

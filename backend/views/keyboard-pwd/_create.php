@@ -7,6 +7,7 @@
  */
 
 use yii\helpers\Html;
+use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
@@ -17,70 +18,111 @@ use kartik\select2\Select2;
 /* @var $model reception\forms\KeyboardPwdForm */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = Yii::t('app', 'Create Keyboard Password');
+$this->title = 'Creating digital pass code for '. $model->getDoorLockName();//Yii::t('app', 'Create Keyboard Password');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Keyboard Password'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerJsFile('/js/keyboardPwd.js');
+
 ?>
 
 <div class="keyboard-pwd-form">
 
-    <?php $form = ActiveForm::begin([]);; ?>
+    <h1><?= Html::encode ($this->title);?></h1>
+    <?php $form = ActiveForm::begin([
+        'id' => 'keyboardPwd-form',
+    ]); ?>
 
     <?= $form->field($model, 'type')->widget(Select2::className(), [
         'data'=>$model->getKeyboardTypeList(),
-        //'value'=>($model->keyboardPwdType == 0) ? 'Permanent':'Period',
-        'options' => ['placeholder' => 'Select a type ...'],
-        'pluginOptions' => [],
-    ])->label('Keyboard Password Type');?>
+        'options' => ['placeholder' => 'Select a type ...', 'id'=>'type'],
+        'pluginEvents' => [
+            "change" => new JsExpression("function (params) {
+                             var value = params.target.value;
+                         
+                            if (value != '99') {
+                                 $('#password-value').addClass('hidden');
+                            }
+                            if (value != '2') {
+                                 $('#endDate').removeClass('hidden');
+                            }
+                            if (value != '1') {
+                                 $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                            }
+                             
+             }"),
 
+            "select2:select" => new JsExpression("function(params) {
+                           
+                            var value = params.target.value;
+                         
+                            if (value == '99') {
+                                 $('#password-value').removeClass('hidden');
+                            }
+                             if (value == '2') {
+                                 $('#endDate').addClass('hidden');
+                            }
+                            if (value == '1') {
+                                 $('#endDate').addClass('hidden');
+                                  $('#startDate').addClass('hidden');
+                            }
+                        }"
+            ),
+        ],
+    ])->label('Keyboard Password Type');?>
+<div id="password-value" class="hidden">
+    <?= $form->field($model, 'value')->textInput(['value'=>$model->value])->label('Value of Pin code'); ?>
+</div>
+    <div id="startDate" class="">
     <?= $form->field($model, 'startDate')->widget(DateTimePicker::className(), [
         //'model' => $model,
         'value' => $model->startDate ,//date('M-d-Y, h:i'),
 
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
+            'format' => 'D, dd-M-yyyy, HH P',
             'autoclose' => true,
+//            "minuteStep" => 10,
+            'minView'=> 1
         ]
     ]);
     ?>
-
-
+    </div>
+    </div>
+    <div id="endDate" class="">
     <?=
     $form->field($model, 'endDate')->widget(DateTimePicker::className(), [
         'value' => $model->endDate ,//date('M-d-Y, h:i'),
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
+            'format' => 'D, dd-M-yyyy, HH P',
             'autoclose' => true,
+//            "minuteStep" => 10,
+            'minView'=> 1
         ]
     ]);?>
-
+    </div>
 
     <?php
-//    if ($model->bookingId)
-//        echo  $form->field($model, 'bookingId')->textInput(['disabled'=>true])->label('for Booking #');
-//    else
-//        echo $form->field($model, 'bookingId')->widget(Select2::className(), [
-//        'data'=> $model->getAllBookings(),
-//        'options' => ['placeholder' => 'Select a booking ...'],
-//        'pluginOptions' => [],
-//    ])->label('for Booking #');
-    ?>
-    <?php
-//    if ($model->doorLockId)
-       // echo  $form->field($model, 'doorLockId')->textInput(['disabled'=>true])->label('for Door lock #');
-    echo $form->field($model, 'doorLockId')//->textInput(['disabled'=>true, 'value'=>$model->doorLock->lock_alias])->label('for Door lock #');
-
-    ->widget(Select2::className(), [
-    'data'=>ArrayHelper::map(\reception\entities\DoorLock\DoorLock::find()->all(),'id','lock_alias'),
-    //'value'=>($model->type == '0')? 'Permanent':'Period',
-    'options' => ['placeholder' => 'Select a type ...'],
+    if ($model->doorLockId)
+        echo  $form->field($model, 'doorLockId')->hiddenInput(['disabled'=>true])->label(false);
+    else echo $form->field($model, 'door_lock_id')->widget(Select2::className(), [
+    'data'=> ArrayHelper::map(DoorLockHelper::getDoorlocks($user) ,'id','lock_alias'),
+    'options' => ['placeholder' => 'Select a booking ...'],
     'pluginOptions' => [],
-    ])->label('Door Lock');?>
-    <?php  //по умолчанию , пока непонятно что в документации у китайцев
+    ])->label('for DoorLock #'); ?>
 
-//    echo $form->field($model, 'keyboardPwdVersion')->hiddenInput()->label(false); ?>
+    <?php
+    if ($model->bookingId)
+        echo  $form->field($model, 'bookingId')->textInput(['disabled'=>true])->label('for Booking #');
+    else
+        echo $form->field($model, 'bookingId')->widget(Select2::className(), [
+            'data'=> $model->getAllBookings(),
+            'options' => ['placeholder' => 'Select a booking ...'],
+            'pluginOptions' => [],
+        ])->label('for Booking #');
+    ?>
+
 
 
     <div class="form-group">

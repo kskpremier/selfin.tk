@@ -16,11 +16,12 @@ class UserSearch extends Model
     public $email;
     public $status;
     public $role;
+    public $user;
 
     public function rules()
     {
         return [
-            [['id', 'status'], 'integer'],
+            [['id', 'status','user'], 'integer'],
             [['username', 'email', 'role'], 'safe'],
             [['date_from', 'date_to'], 'date', 'format' => 'php:Y-m-d'],
         ];
@@ -54,9 +55,13 @@ class UserSearch extends Model
             $query->innerJoin('{{%auth_assignments}} a', 'a.user_id = u.id');
             $query->andWhere(['a.item_name' => $this->role]);
         }
+//        $query->leftJoin( 'superuser as dep', ['dep.slave_user_id'=>'u.id'])->andFilterWhere(['=','dep.master_user_id', $this->user]);
+        $query->joinWith( 'dependedUsers');
+
 
         $query
             ->andFilterWhere(['like', 'u.username', $this->username])
+            ->andFilterWhere(['like', 'u.id', $this->user])
             ->andFilterWhere(['like', 'u.email', $this->email])
             ->andFilterWhere(['>=', 'u.created_at', $this->date_from ? strtotime($this->date_from . ' 00:00:00') : null])
             ->andFilterWhere(['<=', 'u.created_at', $this->date_to ? strtotime($this->date_to . ' 23:59:59') : null]);

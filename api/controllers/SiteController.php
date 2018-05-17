@@ -134,7 +134,7 @@ class SiteController extends Controller
  *     @SWG\Property(property="username", type="string", description = "Login username for DoorLock management system",example="myRent"),
  *     @SWG\Property(property="password", type="string", description = "Password for DoorLock management system",example="myRentmyRent"),
  *     @SWG\Property(property="client_id", type="string", description = "right now could be equal default value",example="myRent"),
- *     @SWG\Property(property="client_secret", type="string", description = "External booking identity",example="testpass"),
+ *     @SWG\Property(property="client_secret", type="string", description = "Some secret_key, given by provider",example="testpass"),
  * )
  */
 

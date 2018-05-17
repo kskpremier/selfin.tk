@@ -22,7 +22,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 
 /**
-    Abstract class for operating with Images (selfy, images from cameras, images of documets  etc...)
+    Abstract class for operating with images (selfy, images from cameras, images of documets  etc...)
 
  * @property integer  $id
  * @property string   $date

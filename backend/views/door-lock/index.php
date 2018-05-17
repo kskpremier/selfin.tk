@@ -24,32 +24,49 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
+            ['attribute' => 'lock_alias',
+                'label'=> 'Door lock',
+                 'format'=>'raw',
+                'value'=> function($model) {
+                        return HTML::a($model->lock_alias, Url::to(['door-lock/view', 'id' => $model->id]));
+                } ,
+            ],
+            ['attribute' => 'lock_name',
+                'label'=> 'Model',],
 
-            'id',
-           'lock_name',
            'lock_mac',
-           'lock_alias',
 
-           // 'type',
+            [
+                'attribute'=>'owner',
+                'label'=>'Owner',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->user_id) {
+                        return HTML::a($model->user->username, Url::to(['user/view', 'id' => $model->user_id]));
+                    }
+                    else return HTML::tag('span','unset',['class'=>'danger']);
+                } ,
+            ],
             ['attribute'=>'apartmentName',
                 'label'=>'Apartment',
 
                 'format'=>'raw',
                 'value'=> function($model) {
-                    if ($model->apartment_id) {
-                        return HTML::a($model->apartment->name, Url::to(['apartment/view', 'id' => $model->apartment_id]));
+                    $names ='';
+                    foreach ($model->apartments as $apartment)
+                    {
+                        $names.= HTML::a($apartment->name. ' ', Url::to(['apartment/view', 'id' => $apartment->id]));
                     }
-                    else return HTML::tag('span','-',['class'=>'danger']);
+
+                    return ($names=='')?HTML::tag('span','-',['class'=>'danger']): $names;
                 } ,
                 ],
 
-
-            [   //'label'=>'Actions',
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {delete} {key} {pin} {install}',
+            [   'class' => 'yii\grid\ActionColumn',
+                'template' => '{key} {pin} {install} {delete}',
                 'buttons' => [
                     'key' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-phone"></span>',
+                        return Html::a('<span class="glyphicon glyphicon-user"></span>',
                             ['key/create-for-door-lock', 'doorLockId' => $model->id ],
                             ['class' => '',
                                 'title'=>'Send E-key for guest']
@@ -64,7 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'install' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-home"></span>',
-                            ['door-lock/install', 'id' => $model->id ],
+                            ['door-lock/install', 'lock' => $model->id ],
                             ['class' => '',
                                 'title'=>'Install into Apartment']
                         );

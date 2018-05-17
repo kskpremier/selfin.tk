@@ -26,28 +26,33 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'contact_email')->textInput(['maxLength' => true]) ?>
 
     <?= $form->field($model, 'guid')->textInput(['maxLength' => true]) ?>
-    <?= $form->field($model, 'created')->widget(DateTimePicker::className(), [
-        'name' => 'changed',
-//        'attribute' => 'created',
-        // 'options' => ['placeholder' => 'Created'],
-        'type' => DateTimePicker::TYPE_COMPONENT_APPEND ,
-        'pluginOptions' => [
-            'format' => 'dd-M-yyyy hh:ii:ss',
-            'autoclose' => true,]
-    ]);
+    <?php
+//    echo $form->field($model, 'created')->widget(DateTimePicker::className(), [
+//        'name' => 'changed',
+////        'attribute' => 'created',
+//        // 'options' => ['placeholder' => 'Created'],
+//        'type' => DateTimePicker::TYPE_COMPONENT_APPEND ,
+//        'pluginOptions' => [
+//            'format' => 'dd-M-yyyy hh:ii:ss',
+//            'autoclose' => true,]
+//    ]);
     ?>
-    <?= $form->field($model, 'changed')->widget(DateTimePicker::className(), [
-        'name' => 'changed',
-//        'attribute' => 'changed',
-        //  'options' => ['placeholder' => 'Changed'],
-        'type' => DateTimePicker::TYPE_COMPONENT_APPEND ,
-        'pluginOptions' => [
-            'format' => 'dd-M-yyyy hh:ii:ss',
-            'autoclose' => true,]
-    ]);
+    <?php
+//    echo
+//    $form->field($model, 'changed')->widget(DateTimePicker::className(), [
+//        'name' => 'changed',
+////        'attribute' => 'changed',
+//        //  'options' => ['placeholder' => 'Changed'],
+//        'type' => DateTimePicker::TYPE_COMPONENT_APPEND ,
+//        'pluginOptions' => [
+//            'format' => 'dd-M-yyyy hh:ii:ss',
+//            'autoclose' => true,]
+//    ]);
     ?>
 
-    <?= $form->field($model, 'role')->widget(Select2::className(),[
+    <?php
+    echo
+    $form->field($model, 'roles')->widget(Select2::className(),[
             'data'=> $model->rolesList(),
             'options' => ['placeholder' => 'Select roles for user ...','multiple' => true],
             'pluginOptions' => [

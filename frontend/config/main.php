@@ -11,6 +11,8 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'language'   => 'en',
+    'sourceLanguage' => 'en_GB',
     'components' => [
         'formatter' => [
             // 'dateFormat' => 'dd.MM.yyyy',
@@ -53,20 +55,31 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
+            'class' => 'codemix\localeurls\UrlManager',
+            'languages' => ['en','hr'],
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
-
-
-//                'users/<user_id:\d+>/posts' => 'user-posts/index',
-//                'users/<user_id:\d+>/posts/<id:\d+>' => 'user-posts/view',
-//                'users/<user_id:\d+>/posts/<id:\d+>/<_a:[\w-]+>' => 'user-posts/<_a>',
-//                'users/<user_id:\d+>/posts/<_a:[\w-]+>' => 'user-posts/<_a>',
-
                 '<_c:[\w-]+>' => '<_c>/index',
                 '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
                 '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
+            ],
+        ],
+        'i18n' => [
+            'translations' => [
+                'mReception' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@frontend/messages',
+                ],
+                'internal' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@frontend/messages',
+                ],
+                'cookies' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@frontend/messages',
+                ],
             ],
         ],
     ],

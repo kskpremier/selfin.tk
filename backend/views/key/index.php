@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use reception\helpers\TTLHelper;
 use kartik\select2\Select2;
@@ -20,15 +21,28 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?php //echo  Html::a(Yii::t('app', 'Create Key'), ['create'], ['class' => 'btn btn-success']); ?>
+     <?php   echo Html::a(Yii::t('app', 'Send E-Key to new user'), ['key/create-key-for-new-user'], ['class' => 'btn btn-success']); ?>
+
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+//            ['class' => 'yii\grid\SerialColumn'],
+//
+//            'id',
+            [
+                'attribute'=>'username',
+                'label'=>'Guest/Username',
+                'format'=>'raw',
+                'value'=> function($model) {
+                    if ($model->user_id) {
+                        return HTML::a($model->user->username, Url::to(['key/index', 'userId' => $model->user_id]));
+                    }
+                    else return HTML::tag('span','not set',['class'=>'danger']);
+                } ,
+            ],
 
-            'id',
             ['attribute'=>'start_date',
                 'label'=>'From',
                 'filter' => DatePicker::widget([
@@ -78,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => Select2::widget([
                     'model' => $searchModel,
                     'attribute' => 'type',
-                    'data'=>TTLHelper::getKeyTypeList(),
+                    'data'=>ArrayHelper::merge([''=>'All'],TTLHelper::getKeyTypeList()),
                     'value'=> function($model){
                         return TTLHelper::getKeyTypeName($model->type);
                     },
@@ -98,33 +112,36 @@ $this->params['breadcrumbs'][] = $this->title;
                                 else return HTML::tag('span','-',['class'=>'danger']);
                     } ,
             ],
-            [
-                'attribute'=>'doorLockName',
-                'label'=>'Door lock',
-                'format'=>'raw',
-                'value'=> function($model) {
-                    return HTML::a($model->doorLock->lock_alias, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
-                } ,
-            ],
-            [
-                'attribute'=>'username',
-                'label'=>'Guest/Username',
-                'format'=>'raw',
-                'value'=> function($model) {
-                    if ($model->user_id) {
-                        return HTML::a($model->user->username, Url::to(['key/index', 'userId' => $model->user_id]));
-                    }
-                    else return HTML::tag('span','not set',['class'=>'danger']);
-                } ,
-            ],
+//            [   'attribute'=>'doorLockName',
+//                'filter' => Select2::widget([
+//                    'model' => $searchModel,
+//                    'attribute' => 'type',
+//                    'data'=>function($model) { returnArrayHelper::merge([''=>'All'],ArrayHelper::map($model->apartments,''), }
+//                    'value'=> function($model){
+//                        return TTLHelper::getKeyTypeName($model->type);
+//                    },
+//                ]),
+//                'label'=>'Door lock',
+//                'format'=>'raw',
+//                'value'=> function($model) {
+//                    return HTML::a($model->doorLock->lock_alias, Url::to(['door-lock/view', 'id'=>$model->door_lock_id]) );
+//                } ,
+//            ],
+
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view}{delete}',
+                'template' => '{view}{update}{delete}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                             ['key/view', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'update' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>',
+                            ['key/update', 'id' => $model->id ],
                             ['class' => '']
                         );
                     },

@@ -7,6 +7,11 @@
  */
 namespace reception\entities\DoorLock;
 
+
+use function in_array;
+use function isInstanceOf;
+use reception\entities\Apartment\Apartment;
+use reception\entities\User\User;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
@@ -39,7 +44,9 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
  * @property int $myrent_update
  *
  * @property LockVersion $lockVersion
- * @property Apartment $apartment
+ * @property Apartment [] $apartments
+ * @property  Key[] $keys
+ * @property  KeyboardPwd[] $keyboardPwds
 
  */
 class DoorLock extends ActiveRecord
@@ -48,8 +55,7 @@ class DoorLock extends ActiveRecord
     public static function create( $lockName, $lockAlias, $lockMac, $lockKey,
                                   $lockFlagPos, $aesKeyStr, $adminPwd, $noKeyPwd,
                                   $deletePwd, $pwdInfo, $timestamp, $specialValue,
-                                  $timezoneRawOffset,
-                                   $lockVersion, $modelNumber,
+                                  $timezoneRawOffset,$lockVersion, $modelNumber,
                                    $hardwareRevision, $firmwareRevision, $electricQuantity, $date, $user_id=null) :self
     {
         $doorLock = new static();
@@ -81,7 +87,8 @@ class DoorLock extends ActiveRecord
     public function edit( $lockName, $lockAlias, $lockMac, $lockKey,
                          $lockFlagPos, $aesKeyStr, $adminPwd, $noKeyPwd,
                          $deletePwd, $pwdInfo, $timestamp, $specialValue,
-                         $timezoneRawOffset, $modelNumber, $hardwareRevision, $firmwareRevision, $electricQuantity,$user_id=null)
+                         $timezoneRawOffset, $modelNumber, $hardwareRevision,
+                          $firmwareRevision, $electricQuantity, $date, $user_id=null, $lockVersion = null)
     {
         $this->lock_name = $lockName;
         $this->lock_alias = $lockAlias;
@@ -101,7 +108,9 @@ class DoorLock extends ActiveRecord
         $this->hardware_revision = $hardwareRevision;
         $this->firmware_revision = $firmwareRevision;
         $this->electric_quantity = $electricQuantity;
-        $this->user_id = $user_id;
+        $this->date = $date;
+        $this->user_id = ($user_id)? $user_id : $this->user_id;
+//        $this->lockVersion = ($lockVersion)? $lockVersion : $this->lockVersion;
 
     }
 
@@ -112,20 +121,37 @@ class DoorLock extends ActiveRecord
     public function setElectricQuantity($electricQuantity){
         $this->electric_quantity = $electricQuantity;
     }
-    public function setApartment(Apartment $apartment, $user_id){
-        $this->apartment = $apartment;
-        $this->user_id = $user_id;
+    public function setApartment($apartments){
+        $array=[];
+        if (is_array($apartments)){
+            foreach ($apartments as $apartment) {
+                if ( $apartment instanceof Apartment ){
+                    if (!in_array($apartment->id, $array))
+                        $array[]=$apartment->id;
+                }
+                else {
+                    if (!in_array($apartment, $array))
+                        $array[] = $apartment;
+                }
+            }
+            $this->apartments = $apartments;
+        }
+        else {$this->apartments = $apartments; }
     }
+
+    //Используется при обновлении апартаментов из под MyRent
     public function installInApartment($apartmentId,  $user_id, $updateTime){
         $this->apartment_id = $apartmentId;
-        $this->user_id = $user_id;
+//        $this->user_id = $user_id;
         $this->myrent_update = $updateTime;
     }
     public function uninstallDoorLock($user_id,$updateTime){
-        $this->apartment_id = null;
-        $this->user_id = $user_id;
+        $this->apartments = [];
+//        $this->user_id = $user_id;
         $this->myrent_update = $updateTime;
     }
+
+
 
     public static function tableName(): string
     {
@@ -139,7 +165,7 @@ class DoorLock extends ActiveRecord
         return [
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['lockVersion','apartment'],
+                'relations' => ['lockVersion','apartments','user'],
             ],
         ];
     }
@@ -152,8 +178,68 @@ class DoorLock extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getApartment()
+    public function getUser()
     {
-        return $this->hasOne(\backend\models\Apartment::className(), ['id' => 'apartment_id']);
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApartments()
+    {
+        return $this->hasMany(Apartment::className(), ['id' => 'apartment_id'])->viaTable('{{%apartment_doorlock}}', ['doorlock_id'=>'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeyboardPwds()
+    {
+        return $this->hasMany(KeyboardPwd::className(), [ 'door_lock_id'=>'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKeys()
+    {
+        return $this->hasMany(Key::className(), ['door_lock_id'=>'id']);
+    }
+
+    /**
+     * @inheritdoc
+     * @return ApartmentDoorlockQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new \backend\models\query\DoorLockQuery(get_called_class());
+    }
+
+    public function serializeDoorLockShort(): array
+    {
+        $apartments =[];
+        foreach ($this->apartments as $apartment)
+        {
+            $apartments[]=[
+                'id' => $apartment->id,
+                'name' => $apartment->name,
+//                'external_apartment_id' => $apartment->external_id,
+                'city_name'=>$apartment->city_name,
+                'address'=>$apartment->adress,
+                'latitude'=>$apartment->latitude,
+                'longitude'=>$apartment->longitude,
+                'user_id'=>$apartment->user_id
+            ];
+        }
+
+        return [
+            'id'=>$this->id,
+            'lockName'=>$this->lock_name,
+            'lockAlias'=>$this->lock_alias,
+            'lockMac'=>$this->lock_mac,
+            'apartments'=>$apartments
+
+        ];
+    }
+
 }

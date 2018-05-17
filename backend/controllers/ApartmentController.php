@@ -35,8 +35,17 @@ class ApartmentController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ApartmentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (Yii::$app->user->can("admin")) {
+            $searchModel = new ApartmentSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }
+        else {
+            $searchModel = new ApartmentSearch(['user'=>Yii::$app->getUser()->getId()]);
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }
+
+//        $searchModel = new ApartmentSearch();
+//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

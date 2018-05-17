@@ -20,11 +20,12 @@ class LockVersionRepository
         return $lockVersion;
     }
 
-    public function save(LockVersion $lockVersion): void
+    public function save(LockVersion $lockVersion)
     {
         if (!$lockVersion->save()) {
             throw new \RuntimeException('Saving error.');
         }
+        return true;
     }
 
     public function remove(LockVersion $lockVersion): void

@@ -20,26 +20,25 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?php // echo Html::a(Yii::t('app', 'Create Keyboard Pwd'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?php  echo Html::a(Yii::t('app', 'Create Keyboard Pwd'), ['keyboard-pwd/create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+//            ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+//            'id',
+            'value',
             ['attribute'=>'start_date',
                 'label'=>'From',
                 'filter' => DatePicker::widget([
                     'model' => $searchModel,
                     'attribute' => 'start_date',
-                    'value'=> function($model){
-                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                    'value'=> function($model) {
+                        return ($model->start_date == 0)? '': date('yyyy-M-dd', $model->start_date);
                     },
-                    // 'attribute2' => 'date_to',
                     'type' => DatePicker::TYPE_INPUT,
-                    //'separator' => '-',
                     'pluginOptions' => [
                         'todayHighlight' => true,
                         'autoclose'=>true,
@@ -48,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 //'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->start_date == 0)? '': date('d-m-Y h:i', $model->start_date);
+                    return ($model->start_date == 0)? '': date('Y-m-d h:i', $model->start_date);
                 }
             ],
             ['attribute'=>'end_date',
@@ -57,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'model' => $searchModel,
                     'attribute' => 'end_date',
                     'value'=> function($model){
-                        return ($model->start_date == 0)? '': date('dd-M-yyyy', $model->start_date);
+                        return ($model->start_date == 0)? '': date('yyyy-M-dd', $model->start_date);
                     },
                     // 'attribute2' => 'date_to',
                     'type' => DatePicker::TYPE_INPUT,
@@ -70,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                // 'format' => 'datetime',
                 'value'=> function($model){
-                    return ($model->end_date == 0)? '': date('d-m-Y h:i', $model->end_date);
+                    return ($model->end_date == 0)? '': date('Y-m-d h:i', $model->end_date);
                 },
 
             ],
@@ -88,20 +87,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return TTLHelper::getKeyboardPwdTypeName($model->keyboard_pwd_type);
                 }
             ],
-            'value',
 
-            // 'keyboard_pwd_version',
-            [
-                'attribute'=>'booking_id',
-                'label'=>'Booking',
-                'format'=>'raw',
-                'value'=> function($model) {
-                    if ($model->booking_id) {
-                        return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
-                    }
-                    else return HTML::tag('span','-',['class'=>'danger']);
-                } ,
-            ],
+//            [
+//                'attribute'=>'booking_id',
+//                'label'=>'Booking',
+//                'format'=>'raw',
+//                'value'=> function($model) {
+//                    if ($model->booking_id) {
+//                        return HTML::a($model->booking_id, Url::to(['booking/view', 'id' => $model->booking_id]));
+//                    }
+//                    else return HTML::tag('span','-',['class'=>'danger']);
+//                } ,
+//            ],
             [
                 'attribute'=>'doorLockName',
                 'label'=>'Door lock',
@@ -113,11 +110,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view}{delete}',
+                'template' => '{view}{update}{delete}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                             ['keyboard-pwd/view', 'id' => $model->id ],
+                            ['class' => '']
+                        );
+                    },
+                    'update' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>',
+                            ['keyboard-pwd/update', 'id' => $model->id ],
                             ['class' => '']
                         );
                     },

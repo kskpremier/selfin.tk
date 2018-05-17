@@ -1,6 +1,11 @@
 <?php
 
+use backend\helpers\DoorLockHelper;
+use reception\forms\KeyboardPasswordForm;
+use reception\forms\KeyboardPwdForm;
+use reception\helpers\BookingHelper;
 use yii\helpers\Html;
+use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
@@ -8,7 +13,7 @@ use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\KeyboardPwd */
+/* @var $model KeyboardPasswordForm */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
@@ -16,63 +21,213 @@ use kartik\select2\Select2;
 
 <div class="keyboard-pwd-form">
 
-    <?php $form = ActiveForm::begin([
-//        'action' => ['index'],
-//        'method' => 'get',
-    ]);; ?>
+    <div class="keyboard-pwd-form">
+
+        <h1><?= Html::encode ($this->title);?></h1>
+        <?php $form = ActiveForm::begin([
+            'id' => 'keyboardPwd-form',
+        ]); ?>
 
 
-    <?= $form->field($model, 'keyboard_pwd_type')->widget(Select2::className(), [
-        'data'=>['2'=>'Permanent','3'=>'Period','5'=>'Cycle','1'=>'One-time'],
-        'value'=>($model->keyboard_pwd_type == 0)? 'Permanent':'Period',
-        'options' => ['placeholder' => 'Select a type ...'],
-        'pluginOptions' => [],
-    ])->label('Keyboard Password Type');?>
+        <div>
+            <?php  if ($model->bookingId) {?>
+                <?php echo  $form->field($model, 'bookingId')->hiddenInput(['disabled'=>true])->label(false);
+            }
 
-    <?= $form->field($model, 'start_date')->widget(DateTimePicker::className(), [
-        //'model' => $model,
-        'value' => $model->start_date ,//date('M-d-Y, h:i'),
+            ?>
+        </div>
+        <div><label class="cbx-label" for="check-box-my" id="for-bookinkg-label">Create for </label></div>
 
-        'type' => DateTimePicker::TYPE_INPUT,
-        'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
-            'autoclose' => true,
-        ]
-    ]);
-    ?>
+        <div id="checkbox-for-booking">
+            <?php if (!$model->bookingId) echo kartik\checkbox\CheckboxX::widget([
+                'name'=>'forBooking?',
+                'options'=>['id'=>'booking'],
+                'value'=>0,
+                'pluginOptions'=>['threeState'=>false,
+                    'size'=>'xl',
+                    'iconUnchecked'=>'<i class="glyphicon glyphicon-calendar"></i>',
+                    'iconChecked'=>'<i class="glyphicon glyphicon-globe"></i>',
+                ],
+                'pluginEvents' => [
+                    "change" => new JsExpression("function (params) {
+                             var value = params.target.value;
+                            if (value == '1') {
+                                 $('#booking-input').removeClass('hidden');
+                                   $('#endDate').addClass('hidden');
+                                  $('#startDate').addClass('hidden');
+                                 $('#door_lock-input').addClass('hidden');
+                                 $('#type-input').addClass('hidden');
+                                 $('#for-bookinkg-label').text('Create for booking');
+                               
+                            }
+                            if (value == '0') {
+                                 $('#booking-input').addClass('hidden');
+                                   $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                                 $('#door_lock-input').removeClass('hidden');
+                                  $('#type-input').removeClass('hidden');
+                                  
+                                   $('#for-bookinkg-label').text('Create for');
+                            }
+             }"),
+                    "select2:select" => new JsExpression("function(params) {                         
+                            var value = params.target.value;                       
+                            if (value == '1') {
+                                 $('#booking-input').removeClass('hidden');
+                                   $('#endDate').addClass('hidden');
+                                  $('#startDate').addClass('hidden');
+                                 $('#door_lock-input').addClass('hidden');
+                                 $('#type-input').addClass('hidden');
+                            }
+                            if (value == '0') {
+                                 $('#booking-input').addClass('hidden');
+                                   $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                                 $('#door_lock-input').removeClass('hidden');
+                                 $('#type-input').removeClass('hidden');
+                            }
+                        }"
+                    ),
+                ],
+            ]);
+            ?>
+        </div>
+        <div class="" id="booking-input">
+
+            <?php
+            echo $form->field($model, 'booking_internal_id')->widget(Select2::className(), [
+                    'id'=>'check-box-my',
+                'data'=> ArrayHelper::map(BookingHelper::getBookingsForUser($user),'id',function ($model){
+                    return $model->external_id.'/ '.$model->apartment->name.'/ '.$model->start_date.'/ '.$model->end_date.'/ '.$model->author->contact_name
+                        ;}),
+                'options' => ['placeholder' => 'Select a booking ...'],
+                'pluginOptions' => [
+
+                ],
+//                'pluginEvents' => [
+//                    "change" => new JsExpression("function (params) {
+//                            var value = params.target.value;
+//
+//                            if (value != '99') {
+//                                 $('#password-value').addClass('hidden');
+//                            }
+//                            if (value != '2') {
+//                                 $('#endDate').removeClass('hidden');
+//                            }
+//                            if (value != '1') {
+//                                 $('#endDate').removeClass('hidden');
+//                                  $('#startDate').removeClass('hidden');
+//                            }
+//
+//             }"),
+//                    "select2:select" => new JsExpression("function(params) {
+//                            var value = params.target.value;
+//                            if (value == '99') {
+//                                 $('#password-value').removeClass('hidden');
+//                            }
+//                             if (value == '2') {
+//                                 $('#endDate').addClass('hidden');
+//                            }
+//                            if (value == '1') {
+//                                 $('#endDate').addClass('hidden');
+//                                  $('#startDate').addClass('hidden');
+//                            }
+//                        }"
+//                    ),
+//                ],
 
 
-    <?=
-    $form->field($model, 'end_date')->widget(DateTimePicker::className(), [
-        'value' => $model->end_date ,//date('M-d-Y, h:i'),
-        'type' => DateTimePicker::TYPE_INPUT,
-        'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
-            'autoclose' => true,
-        ]
-    ]);?>
 
+            ]);
+            ?>
+        </div>
+        <div id="door_lock-input">
+            <?php
+            if ($model->doorLockId)
+                echo  $form->field($model, 'doorLockId')->hiddenInput(['disabled'=>true])->label(false);
+            else echo $form->field($model, 'doorLockId')->widget(Select2::className(), [
+                'data'=> ArrayHelper::map(DoorLockHelper::getDoorlocks($user) ,'id','lock_alias'),
+                'options' => ['placeholder' => 'Select a door lock ...'],
+                'pluginOptions' => [],
+            ])->label('for DoorLock #');
+            ?>
+        </div>
 
-    <?php
-    if ($model->booking_id)
-       echo  $form->field($model, 'booking_id')->textInput(['disabled'=>true])->label('for Booking #');
-    else echo $form->field($model, 'booking_id')->widget(Select2::className(), [
-        'data'=> ArrayHelper::map(\backend\models\Booking::find()->all() ,'id','id'),
-        'options' => ['placeholder' => 'Select a booking ...'],
-        'pluginOptions' => [],
-    ])->label('for Booking #');
-    ?>
-    <?php
-    if ($model->door_lock_id)
-        echo  $form->field($model, 'door_lock_id')->textInput(['disabled'=>true])->label('for Door lock #'); ?>
+        <div id="type-input">
 
-    <?php $model->keyboard_pwd_version = 4; //по умолчанию , пока непонятно что в документации у китайцев
+        <?= $form->field($model, 'type')->widget(Select2::className(), [
+            'data'=>$model->getKeyboardTypeList(),
+            'options' => ['placeholder' => 'Select a type ...', 'id'=>'type'],
+            'pluginEvents' => [
+                "change" => new JsExpression("function (params) {
+                             var value = params.target.value;
+                         
+                            if (value != '99') {
+                                 $('#password-value').addClass('hidden');
+                            }
+                            if (value != '2') {
+                                 $('#endDate').removeClass('hidden');
+                            }
+                            if (value != '1') {
+                                 $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                            }
+//                             if (value != '13') {
+//                                 $('#endDate').removeClass('hidden');
+//                            }
+                             
+             }"),
+                "select2:select" => new JsExpression("function(params) {                         
+                            var value = params.target.value;                       
+                            if (value == '99') {
+                                 $('#password-value').removeClass('hidden');
+                            }
+                             if (value == '2') {
+                                 $('#endDate').addClass('hidden');
+                            }
+                            if (value == '1') {
+                                 $('#endDate').addClass('hidden');
+                                  $('#startDate').addClass('hidden');
+                            }
+                        }"
+                ),
+            ],
+        ])->label('Keyboard Password Type');?>
+        </div>
 
-    echo $form->field($model, 'keyboard_pwd_version')->hiddenInput(); ?>
+        <div id="password-value" class="hidden">
+            <?= $form->field($model, 'value')->textInput(['value'=>$model->value])->label('Value of Pin code'); ?>
+        </div>
+        <div id="startDate" class="">
+            <?= $form->field($model, 'startDate')->widget(DateTimePicker::className(), [
+                'value' => $model->startDate ,
+                'type' => DateTimePicker::TYPE_INPUT,
+                'pluginOptions' => [
+                    'format' => 'D, dd-M-yyyy, HH P',
+                    'autoclose' => true,
+                    'minView'=> 1
+                ]
+            ]);
+            ?>
+        </div>
+    </div>
+    <div id="endDate" class="">
+        <?=
+        $form->field($model, 'endDate')->widget(DateTimePicker::className(), [
+            'value' => $model->endDate ,
+            'type' => DateTimePicker::TYPE_INPUT,
+            'pluginOptions' => [
+                'format' => 'D, dd-M-yyyy, HH P',
+                'autoclose' => true,
+                'minView'=> 1
+            ]
+        ]);?>
+    </div>
+
 
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton( 'Create' , ['btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

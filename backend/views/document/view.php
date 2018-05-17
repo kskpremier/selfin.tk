@@ -10,7 +10,12 @@ use yii\widgets\DetailView;
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Documents'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+//$this->registerCssFile('/assets/makephoto.js');
 ?>
+
+
+
 <div class="document-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -27,7 +32,20 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo  Html::a('Send image for faces recognition',
             ['document/process', 'id' => $model->id],
             ['class' => 'btn btn-primary']); ?>
+        <?php echo  Html::a('Send to eVisitor',
+            ['document/checkin', 'id' => $model->id],
+            ['class' => 'btn btn-primary']); ?>
+
     </p>
+
+    <div class="booth">
+        <img src="http://192.168.1.4:29219/videostream.cgi?user=admin&pwd=12345678" id="photo" alt="Ваша фотография">
+        <?php echo  Html::a('Make photo',
+            ['document/snapshot', 'id' => $model->id],
+            ['class' => 'btn btn-primary']); ?>
+    </div>
+
+
 
     <?= DetailView::widget([
         'model' => $model,

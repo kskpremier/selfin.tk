@@ -68,7 +68,9 @@ class RentForm extends CompositeForm
     public $note;
     public $in_advance;
     public $local_price;
-   //public $user_id;
+    public $guests_count;
+    public $user_id;
+    public $object_id;
 
     
     /**
@@ -96,7 +98,7 @@ class RentForm extends CompositeForm
         $rules = [
                 [["guid","created","changed", "paid","from_date", "from_time", "until_date", "until_time",
                     "rent_status",  "label", "active", "note"  ],'string'],
-                [[ "rent_adults", "rent_children","total_guests","id","currency_id", ], 'integer'],
+                [[ "rent_adults", "rent_children","total_guests","id","currency_id","user_id","object_id" ], 'integer'],
                 [[ "in_advance", "local_price","price_local","price","exchange" ], 'double'],
                 ];
         return $rules;

@@ -31,14 +31,14 @@ class DocumentAddListener
     //обработка и добавление фотографий
     if (isset($event->PhotosForm)) {
         foreach ($event->PhotosForm->files as $photoDoc) {
-            $image = AbstractImage::create($photoDoc, AbstractImage::ALBUM_DOCUMENT, $event->document, $event->document->booking_id);
+            $image = AbstractImage::create($photoDoc, AbstractImage::ALBUM_DOCUMENT, $event->document);
             $this->imageRepository->save($image);
             $facesFromDoc = $this->service->getDetectedFaces($image);
         }
     }
     if (isset($event->SelfyForm)) {
         foreach ($event->SelfyForm->files as $image) {
-            $image = AbstractImage::create($photoDoc, AbstractImage::ALBUM_IMAGES, $event->document, $event->document->booking_id);
+            $image = AbstractImage::create($photoDoc, AbstractImage::ALBUM_IMAGES, $event->document);
             $this->imageRepository->save($image);
             $facesFromSelfy = $this->service->getDetectedFaces($image);
 

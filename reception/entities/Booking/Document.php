@@ -28,6 +28,7 @@ use yii\db\BaseActiveRecord;
  * @property string $number
  * @property integer $country_id
  * @property string $valid_before
+ * @property integer $updatedTime
  * @property string $type
  * @property string $gender
  * @property string $city
@@ -61,7 +62,7 @@ class Document extends \yii\db\ActiveRecord
                                     $numberOfDocument, $gender,
                                     $country,  $city,
                                     $countryOfBirth,$citizenshipOfBirth,
-                                    $cityOfBirth, $dateOfBirth, $validBefore, $address) :self
+                                    $cityOfBirth, $dateOfBirth,  $address, $validBefore=null, $updatedTime=null) :self
     {
 
             $document = new static();
@@ -79,22 +80,26 @@ class Document extends \yii\db\ActiveRecord
             $document->country_id = $country;
             $document->address = $address;
             $document->valid_before = date("Y-m-d",$validBefore/1000);
+            $document->updated_at = ($updatedTime)?$updatedTime:time();
 
         return $document;
     }
-    public function edit(    $identityData, $gender, $country,  $city,
-                                    $countryOfBirth,$citizenshipOfBirth,
-                                    $cityOfBirth, $validBefore, $address) :self
+    public function edit($identityData, $gender, $country, $city, $countryOfBirth, $citizenshipOfBirth,   $dateOfBirth, $documentNumber, $address, $firstName, $secondName, $validBefore = null,$updatedTime=null) :self
+
     {
         $this->document_type_id = $identityData;
         $this->gender = $gender;
         $this->city = $city;
+        $this->first_name = $firstName;
+        $this->second_name = $secondName;
         $this->country_of_birth_id = $countryOfBirth;
         $this->citizenship_of_birth_id = $citizenshipOfBirth;
-        $this->city_of_birth = $cityOfBirth;
         $this->country_id = $country;
+        $this->number = $documentNumber;
         $this->address = $address;
-        $this->valid_before = date("Y-m-d",$validBefore/1000);
+        $this->date_of_birth = $dateOfBirth;
+        $this->valid_before = ($validBefore)?$this->valid_before : $validBefore;
+        $this->updated_at = ($updatedTime)?$updatedTime:time();
 
         return $this;
     }
@@ -126,6 +131,38 @@ class Document extends \yii\db\ActiveRecord
             "arrival_organisation" => "I",
             "offered_service_type" => "noćenje",
             "tt_payment_category"  => "14"
+        ];
+    }
+    public function fieldsForMyRent(){
+        $urls=[];
+        foreach($this->documentImages as $image){
+            $urls[]=$image->getUploadedFileUrl('file_name');
+        }
+        $face_url=[];
+        foreach($this->faceImages as $face){
+            $face_url[]=$face->getFaceFileUrl();
+        }
+
+        return [
+            "name_first"=>$this->first_name,
+            "name_last"=> $this->second_name,
+            "citizenship"=> $this->citizenship->code,
+            "birth_country"=>$this->birthCountry->code,
+            "gender"=>(($this->gender=="male")||($this->gender=="M"))?  "M":"F",
+            "birth_city"=>$this->city_of_birth,
+            "residence_city"=>$this->city_of_birth,
+            "birth_date"=> $this->date_of_birth,
+            "document_number"=>$this->number,
+            "document_type"=>$this->documentType->code,
+            "residence_country" => $this->citizenship->code,
+            "residence_adress"  =>$this->address,
+            "residence_city"=> $this->city,
+            "arrival_organisation" => "I",
+            "offered_service_type" => "noćenje",
+            "tt_payment_category"  => "14",
+            "url_face"=> $face_url,
+            "url_document"=> $urls
+
         ];
     }
 
@@ -167,7 +204,7 @@ class Document extends \yii\db\ActiveRecord
         return $this->hasOne(DocumentType::className(), ['id' => 'document_type_id']);
     }
     /**
-     * Return all Images, connected with this Document
+     * Return all images, connected with this Document
      * @return \yii\db\ActiveQuery
      */
     public function getImages()
@@ -175,7 +212,7 @@ class Document extends \yii\db\ActiveRecord
         return $this->hasMany(AbstractImage::className(), ['document_id' => 'id']);
     }
     /**
-     * * Return all face selfy or camera Images, connected with this Document
+     * * Return all face selfy or camera images, connected with this Document
      * @return \yii\db\ActiveQuery
      */
     public function getSelfys()
@@ -183,7 +220,7 @@ class Document extends \yii\db\ActiveRecord
         return $this->hasMany(AbstractImage::className(), ['document_id' => 'id'])->andWhere(["album_id"=>AbstractImage::ALBUM_IMAGES]);
     }
     /**
-     * * Return all document Images, connected with this Document
+     * * Return all document images, connected with this Document
      * @return \yii\db\ActiveQuery
      */
     public function getDocumentImages()
@@ -191,7 +228,7 @@ class Document extends \yii\db\ActiveRecord
         return $this->hasMany(AbstractImage::className(), ['document_id' => 'id'])->andWhere(["album_id"=>AbstractImage::ALBUM_DOCUMENT]);
     }
     /**
-     * * Return all document Images, connected with this Document
+     * * Return all document images, connected with this Document
      * @return \yii\db\ActiveQuery
      */
     public function getFaceImages()

@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /* @var $searchModel backend\models\PhotoImageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Photo Images';
+$this->title = 'Photo images';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="photo-image-index">

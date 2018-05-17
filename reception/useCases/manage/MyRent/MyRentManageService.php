@@ -7,6 +7,7 @@ use reception\entities\Booking\Guest;
 use reception\entities\DoorLock\DoorLock;
 use reception\entities\EventTrait;
 use reception\entities\MyRent\Owner;
+use reception\entities\MyRent\Worker;
 use reception\entities\User\events\UserMobileCreated;
 use reception\entities\User\User;
 use reception\forms\MyRent\MyRentUserForm;
@@ -81,7 +82,7 @@ class MyRentManageService
         $this->transaction->wrap(function() use ($form, $user) {
             $owner=null; $guest=null;
         $this->repository->save($user);
-        if ($form->role === "owner") {
+        if (in_array("owner", $form->roles)) {
             $owner = Owner::create($form->id, $form->guid, $form->username, $form->country_id, $form->contact_tel, $form->contact_email,
                 $form->contact_name, strtotime($form->created), strtotime($form->changed), null, $form->country_id,
                 null, null, $user->id, $apartments = null);
@@ -89,18 +90,26 @@ class MyRentManageService
             $this->repository->save($masterUser);
             $this->ownerRepository->saveMyRentOwner($owner);
         }
-        if ($form->role === "tourist") {
+        if (in_array("worker", $form->roles)) {
+            $owner = Worker::create($form->id, $form->guid, $form->username, $form->country_id, $form->contact_tel, $form->contact_email,
+                $form->contact_name, strtotime($form->created), strtotime($form->changed), null, $form->country_id,
+                null, null, $user->id, $apartments = null);
+            $masterUser = $this->repository->getByExternalId($form->user_id);
+            $this->repository->save($masterUser);
+            $this->ownerRepository->saveMyRentOwner($owner);
+        }
+        if (in_array("tourist", $form->roles)) {
             $booking = $this->bookingService->updateBookings($form->rent, $user->id, time());
-            $guest = Guest::create('', $form->contact_name, $form->contact_email, $user, $booking, $form->contact_tel, time(), $form->guid);
+            $guest = Guest::createContact($form->rent->contact, time());
+            $guest->user_id=$user->id;//'', $form->contact_name, $form->contact_email, $user, $booking, $form->contact_tel, time(), $form->guid);
             $this->guestRepository->save($guest);
         }
-        if ($form->role === "checkin") {
+        if (in_array("checkin", $form->roles)) {
         }
 
-        $this->roles->assignRoles($user->id, [$form->role]);
+        $this->roles->assignRoles($user->id, $form->roles);
         $user->recordEvent(new UserMobileCreated($user, $owner, $guest));
         $this->repository->save($user);
-
     });
         return $user;
     }
@@ -129,8 +138,8 @@ class MyRentManageService
                         $form->load($apartmentData, '');
                         if ($form->validate()) {
                             //ищем уже существующие апартаменты
-                            $apartment = $this->apartmentRepository->findByMyRentId($form->object_id);
-                            $doorLocks = [];
+                            $apartment = $this->apartmentRepository->findByMyRentId($form->id);
+                 //           $doorLocks = [];
                             if (!isset($apartment)) {
                                 //если не найдены - создаем
                                 $apartment = Apartment::addProperty($form, $user->id, $updateTime);
@@ -139,22 +148,24 @@ class MyRentManageService
                             {
                                 $apartment = $apartment->edit($form, $user->id, $updateTime);
                                 //сохраняем замки, которые уже присоеденины к апартаменту
-                                $doorLocks=$apartment->doorLocks;
+
+                                /** изъял все, что касается обновления замков до определения новой стратегии взаимодействия */
+//                                $doorLocks=$apartment->doorLocks;
                             }
-                            //обновляем замки в апартаменте
-                            if ($apartmentData["door_id"]) {
-                                $doorlock = $this->doorlockRepository->findByMyrRentId($apartmentData["door_id"]);
-                                if ($doorlock) {
-                                    $doorlock->installInApartment($apartment->id, $user->id, $updateTime);
-                                    $this->doorlockRepository->save($doorlock);
-                                } else throw new \DomainException ('Failed to find door lock with id => ' . $apartmentData["door_id"]);
-                            }
-                            else {
-                                foreach ($doorLocks as $lock){
-                                    $lock->uninstallDoorLock($user->id, $updateTime);
-                                    $this->doorlockRepository->save($lock);
-                                }
-                            }
+//                            //обновляем замки в апартаменте
+//                            if ($apartmentData["door_id"]) {
+//                                $doorlock = $this->doorlockRepository->get($apartmentData["door_id"]);
+//                                if ($doorlock && $dorlock->apartments) {
+//                                    $doorlock->installInApartment($apartment->id, $user->id, $updateTime);
+//                                    $this->doorlockRepository->save($doorlock);
+//                                } else throw new \DomainException ('Failed to find door lock with id => ' . $apartmentData["door_id"]);
+//                            }
+//                            else {
+//                                foreach ($doorLocks as $lock){
+//                                    $lock->uninstallDoorLock($user->id, $updateTime);
+//                                    $this->doorlockRepository->save($lock);
+//                                }
+//                            }
                             $this->apartmentRepository->save($apartment);
                         }
                         else throw new \DomainException ('Failed to create the object => ' . \GuzzleHttp\json_encode($form->getFirstErrors()));

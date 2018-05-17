@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model backend\models\PhotoImage */
 
 $this->title = 'Update Photo Image: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Photo Images', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Photo images', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>

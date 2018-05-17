@@ -7,10 +7,12 @@ namespace api\controllers;
 use backend\models\DocumentSearch;
 use Book;
 use reception\entities\Booking\Booking;
+use reception\entities\User\User;
 use reception\forms\eVisitorForm;
 use reception\forms\GuestDocumentAddForm;
 use reception\repositories\Booking\DocumentRepository;
 use reception\useCases\manage\Booking\DocumentManageService;
+use function strtotime;
 use Yii;
 use reception\entities\Booking\Document;
 use yii\filters\auth\HttpBasicAuth;
@@ -51,19 +53,20 @@ class DocumentController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete', 'view','index','get-booking-documents'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete', 'view'],
+            'only' => ['create', 'update', 'delete', 'view','index','get-booking-documents'],
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin','tourist','mrz','owner','mobile'],
+                    'roles' => ['receptionist','admin','mrz','owner','mobile','tourist'],
                 ],
+
             ],
         ];
 
@@ -121,29 +124,6 @@ class DocumentController extends Controller
      * @return mixed
      */
 
-    public function actionCreate()
-    {
-        $form = new eVisitorForm();
-
-        if ($form->load(Yii::$app->getRequest()->getBodyParams(), '') && $form->validate()) {
-            try {
-                $booking = Booking::findByBookingIdentity($form->bookingId);
-                $document = $this->service->addDocument($form);
-                if ($document) {
-                    $result = MyRent::addGuest($document,$booking);
-
-                    $response = Yii::$app->getResponse();
-                    $response->setStatusCode(201);
-                    $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $document->id], true));
-                } elseif (!$document->hasErrors()) {
-                    throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
-                }
-                return $this->serializeDocument($document,$result);
-            } catch (\DomainException $e) {
-                throw new BadRequestHttpException($e->getMessage(), null, $e);
-            }
-        }
-    }
     /**
      * Creates a new Document model. without any photos
      * If creation is successful, return Response as Json string
@@ -155,14 +135,26 @@ class DocumentController extends Controller
         $form->load(Yii::$app->request->post(), '');
         if ($form->validate()) {
             try {
-                $document = $this->service->addDocumentDataWithPhoto($form);
+                $user = User::findOne (Yii::$app->user->id);
+                $document = $this->service->addDocumentDataWithPhoto($form, $user);
                 Yii::$app->getResponse()->setStatusCode(201);
                 if ($document) {
-                    $booking = Booking::findByBookingIdentity($form->eVisitorForm->bookingId);
-
-                    $result = MyRent::addGuest($document, $booking, $form->eVisitorForm->eVisitor);
+                    $booking = $form->eVisitorForm->booking;//Booking::findByBookingIdentity($form->eVisitorForm->bookingId);
+                    $registrations = $booking->registrations;
+                    $result=[];
+                    foreach ($registrations as $model){
+                        $result[]= $this->serializeDocument($model->document, null,$booking);
+                    }
+                    return $result;
+//                    $result = MyRent::addGuest($document, $form->eVisitorForm->bookingId, $form->eVisitorForm->eVisitor, Yii::$app->user->id);
+//                    if ($result) {
+//                        $this->service->updateRegistration($result);
+//                        $this->service->checkin( $document, $booking );
+//                    }
+//                    return $this->serializeDocument($document, null ,$form->eVisitorForm->booking);
                 }
-                return $this->serializeDocument($document);
+                else throw new \DomainException("Can not build new document registration");
+//                return $this->serializeDocument($document);
             } catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
@@ -219,19 +211,23 @@ class DocumentController extends Controller
         $booking_id = (isset($id))?$id: Yii::$app->request->get()['id'];
         $booking = Booking::findOne($booking_id);
 
-        if (isset($booking) && ( $booking->apartment->user_id==Yii::$app->user->id ) || ($booking->apartment->owner_id==Yii::$app->user->id )) {
+        if (isset($booking) && ( ($booking->apartment->user_id == Yii::$app->user->id) || ($booking->apartment->owner_id == Yii::$app->user->id ) || ($booking->author->user_id ==  Yii::$app->user->id))) {
             foreach ($booking->guests as $guest ) {
                 $iDs[]=$guest->id;
             }
-            $documents = $this->documentRepository->getForGuests($iDs);
-            foreach ($documents as $model){
-                $result[]= $this->serializeDocument($model);
+            $registrations = $booking->registrations;
+            foreach ($registrations as $model){
+                $result[]= $this->serializeDocument($model->document, null,$booking);
             }
+//            $documents = $this->documentRepository->getForGuests($iDs);
+//            foreach ($documents as $model){
+//                $result[]= $this->serializeDocument($model);
+//            }
         }
+
         return $result;
 
     }
-
 
     /**
      * Displays a single Document model.
@@ -304,33 +300,35 @@ class DocumentController extends Controller
         }
     }
 
-    public function serializeDocument($document,$result=null): array
+    public function serializeDocument($document,$result=null, $booking=null): array
     {
         $images=[];$urls=[];
             foreach($document->images as $image){
-                //$images[]=$image->getThumbFileUrl('file_name', 'thumb');
                 $urls[]=$image->getUploadedFileUrl('file_name');
             }
         return [
             'firstName' => $document->first_name,
             'secondName' => $document->second_name,
             'id' => $document->id,
+            'bookingId' => 844,
             'numberOfDocument'=>$document->number,
             'city' =>$document->city,
             'gender' =>$document->gender,
             'date_of_issue' =>$document->date_of_issue,
-            'validBefore' =>$document->valid_before,
+            'validBefore' =>strtotime($document->valid_before)*1000,
             'country' =>$document->citizenship->name,
-            'identityData' =>$document->document_type_id,
+            'identityData' =>$document->documentType->code,
             'citizenshipOfBirth'=>$document->birthCitizenship->name,
             'address' =>$document->address,
             'dateOfBirth' => $document->date_of_birth,
             //'image_files'=>$images,
             'image_urls'=>$urls,
-            'eVisitorID'=>$result
+            'eVisitorID'=>"",
+            "eVisitor"=>true,//$result
+            'dateFrom'=>strTotime(date ("Y-m-d", strTotime($booking->start_date))." ".$booking->from_time)*1000,
+            'dateTo'=>strTotime(date ("Y-m-d", strTotime($booking->end_date))." ".$booking->until_time)*1000
         ];
     }
-
 }
 
 

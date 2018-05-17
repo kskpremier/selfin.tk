@@ -8,13 +8,16 @@
 
 namespace reception\entities\Booking;
 
+use backend\models\query\BookingQuery;
+use function key_exists;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Apartment;
 use reception\entities\DoorLock\Key;
 use reception\entities\DoorLock\KeyboardPwd;
-use backend\models\BookingGuest;
+use reception\entities\Booking\BookingGuest;
 use reception\entities\User\User;
 use reception\forms\MyRent\RentForm;
+use yii\db\ActiveQuery;
 use yii\httpclient\Client;
 
 /**
@@ -45,10 +48,12 @@ use yii\httpclient\Client;
  * @property string $myrent_update
  * @property integer $apartment_id
  * @property integer $guest_id
- *
+ * @property string $active
  * @property Apartment $apartment
  * @property Guest $author
  * @property Guest [] $guests
+ * @property ActiveQuery $registrations
+ * @property ActiveQuery $guestAssignments
  * @property KeyboardPwd [] $keyboardPwds
  */
 class Booking extends \yii\db\ActiveRecord
@@ -127,6 +132,7 @@ class Booking extends \yii\db\ActiveRecord
             $booking->myrent_update = $updateTime;
             $booking->apartment_id  = $apartment_id;
             $booking->guest_id      = $author_id;
+            $booking->active = $form->active;
         
         return $booking;
     }
@@ -159,8 +165,45 @@ class Booking extends \yii\db\ActiveRecord
        // $this->user_id       = $user_id;
         $this->apartment_id  = $apartment_id;
         $this->guest_id      = $author_id;
+        $this->active = $form->active;
 
         return $this;
+    }
+    
+    public function updateEdit($startDate,$endDate,$numberOfTourist) {
+        $this->start_date = $startDate;
+        $this->end_date = $endDate;
+        $this->number_of_tourist = $numberOfTourist;
+    }
+
+    public function assignGuest($id): void
+    {
+        $assignments = $this->guestAssignments;
+        foreach ($assignments as $assignment) {
+            if ($assignment->isForGuest($id)) {
+                return;
+            }
+        }
+        $assignments[] = BookingGuest::create($id);
+        $this->guestAssignments = $assignments;
+    }
+
+    public function revokeGuest($id): void
+    {
+        $assignments = $this->guestAssignments;
+        foreach ($assignments as $i => $assignment) {
+            if ($assignment->isForGuest($id)) {
+                unset($assignments[$i]);
+                $this->guestAssignments = $assignments;
+                return;
+            }
+        }
+        throw new \DomainException('Guest is not found.');
+    }
+
+    public function revokeAllGuests(): void
+    {
+        $this->guestAssignments = [];
     }
 
     public function deleteBooking(Booking $booking) {
@@ -176,6 +219,32 @@ class Booking extends \yii\db\ActiveRecord
         return $this->status;
 
     }
+
+
+    public function getStartDateTimeString () {
+        $date = strtotime ($this->start_date);
+        $time = date_parse($this->from_time);
+        $time =  key_exists('hour',$time)? $time['hour']*60*60 : 0;
+
+        return date ("Y-m-d H:i:s", $date + $time );
+    }
+
+    public function getEndDateTimeString () {
+        $date = strtotime ($this->end_date);
+        $time = date_parse($this->until_time);
+        $time =  key_exists('hour',$time)? $time['hour']*60*60 : 0;
+
+        return date ("Y-m-d H:i:s", $date+$time );
+    }
+
+    public function getAllExistingDocuments():array {
+        $documentList = [];
+        foreach ($this->guests as $guest){
+            array_merge($documentList,$guest->documents);
+        }
+        return $documentList;
+    }
+
 
     /**
      * @inheritdoc
@@ -197,11 +266,26 @@ class Booking extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getGuestAssignments()
+    {
+        return $this->hasMany(BookingGuest::className(), ['booking_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getGuests()
     {
         return $this->hasMany(Guest::className(), ['id' => 'guest_id'])->viaTable('{{%booking_guest}}', ['booking_id'=>'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRegistrations()
+    {
+        return $this->hasMany(Registration::className(), ['booking_id' => 'id']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -283,7 +367,7 @@ class Booking extends \yii\db\ActiveRecord
             //   MetaBehavior::className(),
             [
                 'class' => SaveRelationsBehavior::className(),
-                'relations' => ['author','guests','apartment'],
+                'relations' => ['author','guests','apartment','guestAssignments'],
             ],
         ];
     }
@@ -332,5 +416,14 @@ class Booking extends \yii\db\ActiveRecord
         return Booking::find()->where(['external_id'=>$identity])->orWhere(['id'=>$identity])->one();
     }
 
+
+    /**
+     * @inheritdoc
+     * @return BookingQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new BookingQuery(get_called_class());
+    }
 
 }

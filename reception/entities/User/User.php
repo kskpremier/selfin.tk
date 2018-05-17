@@ -1,13 +1,17 @@
 <?php
 namespace reception\entities\User;
 
+use backend\models\Superuser;
 use reception\entities\AggregateRoot;
 use reception\entities\Apartment\Apartment;
 use reception\entities\Apartment\Receptionist;
 use reception\entities\Booking\Guest;
+use reception\entities\DoorLock\Key;
+use reception\entities\DoorLock\KeyboardPwd;
 use reception\entities\EventTrait;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Owner;
+use reception\entities\User\events\UserSignUpRequested;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -39,6 +43,9 @@ use yii\db\ActiveRecord;
  * @property Network[] $networks
  * @property Owners[] $owners
  * @property Apartments[] $apartments
+ * @property User[] parentUsers
+ * @property User[] dependedUsers
+ * @property  Key[] $keys
  * @property Workers[] $workers
  * @property Guest $guest
  *
@@ -49,11 +56,29 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
 
 //    private $user;
 
+    /**
+     *
+     */
     const STATUS_WAIT = 0;
+    /**
+     *
+     */
     const STATUS_ACTIVE = 10;
 
     private $temporaryPassword = null;
 
+    /**
+     * @param string $username
+     * @param string $email
+     * @param string $password
+     * @param null $contact_name
+     * @param null $contact_tel
+     * @param null $user_id
+     * @param null $guid
+     * @param null $updated
+     * @return User
+     * @throws \yii\base\Exception
+     */
     public static function create(string $username, string $email, string $password, $contact_name=null, $contact_tel=null, $user_id=null, $guid=null, $updated=null): self
     {
         $user = User::find()->where(['username'=>$username,'email'=>$email])->one();
@@ -72,18 +97,23 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
             $user->contact_name = $contact_name;
             $user->contact_tel = $contact_tel;
             $user->external_id = $user_id;
+            $user->generateAuthKey();
+            $user->created_at = time();
+            $user->email_confirm_token = Yii::$app->security->generateRandomString();
 //            $user->myrent_update = ($updated)?$updated:time();
             $user->guid = $guid;
             //толи хак, толи так надо я пока не понимаю
-            $user->save();
+//            $user->save();
 
             // TODO - change user->save() in USER
             return $user;
         }
     }
 
-
-
+    /**
+     * @param string $username
+     * @param string $email
+     */
     public function edit(string $username, string $email): void
     {
         $this->username = $username;
@@ -91,6 +121,28 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
 
     }
 
+    public function setParent($parent) {
+        if ($parent->id != $this->id)
+        {$this->parentUsers = $parent;
+        return true;}
+        else return false;
+    }
+
+    public function setChild($child) {
+        if ($child->id != $this->id) {
+            $this->dependedUsers = $child;
+            return true;}
+        else return false;
+
+    }
+
+    /**
+     * @param string $username
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws \yii\base\Exception
+     */
     public static function requestSignup(string $username, string $email, string $password): self
     {
         $user = new User();
@@ -105,6 +157,9 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         return $user;
     }
 
+    /**
+     *
+     */
     public function confirmSignup(): void
     {
         if (!$this->isWait()) {
@@ -115,6 +170,11 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         $this->recordEvent(new UserSignUpRequested($this));
     }
 
+    /**
+     * @param $network
+     * @param $identity
+     * @return User
+     */
     public static function signupByNetwork($network, $identity): self
     {
         $user = new User();
@@ -125,6 +185,10 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         return $user;
     }
 
+    /**
+     * @param $network
+     * @param $identity
+     */
     public function attachNetwork($network, $identity): void
     {
         $networks = $this->networks;
@@ -137,6 +201,9 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         $this->networks = $networks;
     }
 
+    /**
+     * @throws \yii\base\Exception
+     */
     public function requestPasswordReset(): void
     {
         if (!empty($this->password_reset_token) && self::isPasswordResetTokenValid($this->password_reset_token)) {
@@ -145,6 +212,9 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
+    /**
+     * @param $password
+     */
     public function resetPassword($password): void
     {
         if (empty($this->password_reset_token)) {
@@ -154,44 +224,95 @@ class User extends ActiveRecord implements AggregateRoot//implements IdentityInt
         $this->password_reset_token = null;
     }
 
+    /**
+     * @return bool
+     */
     public function isWait(): bool
     {
         return $this->status === self::STATUS_WAIT;
     }
 
+    /**
+     * @return bool
+     */
     public function isActive(): bool
     {
         return $this->status === self::STATUS_ACTIVE;
     }
+
     public function setUpdateTime ($time)
     {
         $this->updated_at = $time;
     }
+
     public function setMyRentUpdateTime ($time)
     {
         $this->myrent_update = $time;
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getNetworks(): ActiveQuery
     {
         return $this->hasMany(Network::className(), ['user_id' => 'id']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getOwners(): ActiveQuery
     {
         return $this->hasMany(Owner::className(), ['user_id' => 'id']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
     public function getWokers(): ActiveQuery
     {
         return $this->hasOne(Worker::className(), ['user_id' => 'id']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
     public function getGuest(): ActiveQuery
     {
         return $this->hasOne(Guest::className(), ['user_id' => 'id']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
     public function getApartments()
     {
         return $this->hasMany(Apartment::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getKeys()
+    {
+        return $this->hasMany(Key::className(), ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getParentUsers(): ActiveQuery
+    {
+        return $this->hasMany(User::className(), ['id' =>'master_user_id'])->viaTable('{{%superuser}}', ['slave_user_id'=>'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDependedUsers(): ActiveQuery
+    {
+        return $this->hasMany(User::className(), ['id' =>'slave_user_id'])->viaTable('{{%superuser}}', ['master_user_id'=>'id']);
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace backend\models;
 
+use backend\models\query\AparmentDoorlockQuery;
 use GuzzleHttp\Exception\ServerException;
+use reception\entities\User\User;
 use Yii;
 
 /**
@@ -54,8 +56,6 @@ class DoorLock extends \yii\db\ActiveRecord
       public $aesKeyStr;
       public $lockVersionString;
         //for keyboard password parameters
-
-
 
 
     /**
@@ -122,6 +122,15 @@ class DoorLock extends \yii\db\ActiveRecord
     public function getApartment()
     {
         return $this->hasOne(Apartment::className(), ['id' => 'apartment_id']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApartments()
+    {
+        return $this->hasMany(Apartment::className(), ['id' => 'apartment_id'])->viaTable('{{%apartment_doorlock}}', ['doorlock_id'=>'id']);
     }
 
     /**
@@ -255,5 +264,11 @@ class DoorLock extends \yii\db\ActiveRecord
             return ($flag)? $this : null;
         }
         else throw new ServerException('Can not create an admin Key for Door lock with this parameters');
+    }
+
+
+    public static function find()
+    {
+        return new \backend\models\query\DoorLockQuery(get_called_class());
     }
 }

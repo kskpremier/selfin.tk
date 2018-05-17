@@ -9,6 +9,7 @@ namespace api\controllers;
 
 use reception\forms\KeyboardPasswordForm;
 use reception\forms\KeyboardPwdForm;
+use reception\helpers\TTLHelper;
 use Yii;
 use reception\repositories\DoorLock\KeyboardPwdRepository;
 use reception\useCases\manage\DoorLock\KeyboardPwdManageService;
@@ -17,6 +18,7 @@ use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\KeyboardPwdSearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
@@ -51,19 +53,24 @@ class KeyboardPwdController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','index'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete','create-for-booking'],
+            'only' => ['create', 'update', 'delete','create-for-booking','index'],
             'rules' => [
                 [
                     'allow' => true,
                     // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['admin','receptionist','owner','mrz'],
+                    'roles' => ['admin','receptionist','owner','mrz','mobile'],
+                ],
+                [
+                    'allow' => true,
+                    'actions'=>['index'],
+                    'roles' => ['lock','tourist'],
                 ],
             ],
         ];
@@ -77,45 +84,76 @@ class KeyboardPwdController extends Controller
             'index' => ['get'],
             'update' => ['put', 'patch'],
             'create' => ['post'],
-            'delete' => ['delete']
+            'delete' => ['delete','put']
         ];
     }
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['create']);
-        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
-        return $actions;
-    }
+//    public function actions()
+//    {
+//        $actions = parent::actions();
+//        unset($actions['create']);
+//        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+//        return $actions;
+//    }
 
-    public function checkAccess($action, $model = null, $params = [])
-    {
-        if (in_array($action, ['create'])) {
-            if (!Yii::$app->user->can('createKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['delete'])) {
-            if (!Yii::$app->user->can('deleteKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['view'])) {
-            if (!Yii::$app->user->can('viewKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['update'])) {
-            if (!Yii::$app->user->can('updateKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-    }
+//    public function checkAccess($action, $model = null, $params = [])
+//    {
+//        if (in_array($action, ['create'])) {
+//            if (!Yii::$app->user->can('createKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['delete'])) {
+//            if (!Yii::$app->user->can('deleteKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['view'])) {
+//            if (!Yii::$app->user->can('viewKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['update'])) {
+//            if (!Yii::$app->user->can('updateKeyboardPwd',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//    }
 
     public function prepareDataProvider()
     {
         $searchModel = new KeyboardPwdSearch();
         return $searchModel->search(Yii::$app->request->queryParams);
+    }
+
+    public function actionIndex(){
+        $result=[];
+        $user = Yii::$app->user->identity->getUserModel();
+        if (Yii::$app->user->can("admin")) {
+            $searchModel = new KeyboardPwdSearch();
+        }
+        elseif  (Yii::$app->user->can("receptionist")) {
+            $parents = $user->parentUsers;
+            $ids = ArrayHelper::getColumn($parents, 'id');
+            $ids[]=$user->id;
+            $searchModel = new KeyboardPwdSearch(['user'=>$ids]);
+        }
+        elseif (Yii::$app->user->can("owner")){
+            $searchModel = new KeyboardPwdSearch(['owner'=>$user]);
+        }
+        elseif (Yii::$app->user->can('lock')  ){
+            $searchModel = new KeyboardPwdSearch(['lockUser'=>$user]);
+        }
+        elseif(Yii::$app->user->can('tourist')){
+            $searchModel = new KeyboardPwdSearch(['tourist'=>$user]);
+        }
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $models = $dataProvider->getModels();
+        foreach ($models as $model){
+            $result[]= $this->serializeKeyboardPwd($model);
+        }
+        return $result;
     }
 
     /**
@@ -137,12 +175,12 @@ class KeyboardPwdController extends Controller
                     $response->setStatusCode(201);
                     return $this->serialize($resultOfGenerating);
                 }
-                throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+                throw new ServerErrorHttpException('Failed to get information from China API for some reason -');
             }  catch (\DomainException $e) {
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
         }
-        else throw new ServerErrorHttpException($form->getErrors());
+        throw new ServerErrorHttpException(json_encode($form->getErrors()));
     }
 
     public function serialize($resultOfGenerating)
@@ -150,7 +188,7 @@ class KeyboardPwdController extends Controller
         $result =[];
         if ( !($resultOfGenerating instanceof KeyboardPwd) ) {
             foreach ($resultOfGenerating as $keyboardPwd) {
-                $result[] = $keyboardPwd->serializeKeyboardPwd();
+                $result[] = $this->serializeKeyboardPwd($keyboardPwd);
             }
             return $result;
         }
@@ -262,9 +300,17 @@ class KeyboardPwdController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete($id,$deleteType)
     {
-        return  $this->findModel($id)->delete();
+        $keyboardPwd = $this->findModel($id);
+            if ($keyboardPwd) {
+                $respond = $this->service->remove($keyboardPwd,$deleteType);
+                if ($respond) {
+                    $keyboardPwd->delete();
+                    return ['success' => true];
+                }
+            }
+        return  ['success'=>false];
     }
 
     /**
@@ -281,6 +327,47 @@ class KeyboardPwdController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function serializeKeyboardPwd($key): array
+    {
+
+
+        return [
+            'value'=>$key->value,
+            'type'=>$key->keyboard_pwd_type,
+            'version'=>$key->keyboard_pwd_version,
+            'id'=>$key->id,
+            'sciener_id'=> $key->keyboard_pwd_id,
+            'startDate'=>$key->start_date*1000,//-7200000,
+            'endDate'=>$key->end_date*1000,//-7200000,
+            'lock' => $key->doorLock->serializeDoorLockShort(),
+////            'lockName'=>$key->doorLock->lock_name,
+//            'lockAlias'=>$key->doorLock->lock_alias,
+////            'lockMac'=>$key->doorLock->lock_mac,
+////            'unlockKey'=>$key->doorLock->lock_key,
+////            'lockFlagPos'=>$key->doorLock->flag_pos,
+////            'aesKeyStr'=>$key->doorLock->aes_key_str,
+//
+//            'timezoneOffset'=>$key->doorLock->timezone_raw_offset,
+
+//            'lockVersion'=>[
+//                'groupId'=>$key->doorLock->getLockVersion()->one()->group_id,
+//                'protocolVersion'=>$key->doorLock->getLockVersion()->one()->protocol_version,
+//                'protocolType'=>$key->doorLock->getLockVersion()->one()->protocol_type,
+//                'orgId'=>$key->doorLock->getLockVersion()->one()->org_id,
+//                'scene'=>$key->doorLock->getLockVersion()->one()->scene
+//            ],
+//            'apartment'=>[
+//                'name'=>(count($apartments)>=1)?$apartments[0]['name']:'not yet installed',
+//            ],
+            'booking_id'=>$key->booking_id
+        ];
+    }
+
+    public function actionGetType()
+    {
+        return TTLHelper::getKeyboardPwdTypeNameList();
     }
 }
 
@@ -306,3 +393,6 @@ class KeyboardPwdController extends Controller
  *     @SWG\Property(property="accessToken", type="string")
  * )
  */
+
+
+

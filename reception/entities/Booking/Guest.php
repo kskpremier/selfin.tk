@@ -31,12 +31,13 @@ use Yii;
  *
  *
  * @property Booking[] $bookings
+ * @property Dooking $authorBookings
  * @property Application $application
  * @property Document[] $documents
  */
 class Guest extends \yii\db\ActiveRecord
 {
-    public static function create( $first_name, $second_name, $contact_email, $user=null, $booking=null,$contact_tel=null, $updatetime=null, $guid=null) :self
+    public static function create( $first_name, $second_name, $contact_email=null, $user=null, $booking=null,$contact_tel=null, $updatetime=null, $guid=null) :self
     {
         $guest = Guest::find()->where(['first_name'=>$first_name,'second_name'=>$second_name,'contact_email'=>$contact_email])->one();
         if (!isset($guest)) {
@@ -49,21 +50,22 @@ class Guest extends \yii\db\ActiveRecord
             $guest->myrent_update = ($updatetime) ? $updatetime : time();
             $guest->user = $user;
         }
-        else $guest->editGuest($first_name, $second_name, $contact_email, $user, $booking,$contact_tel, $updatetime, $guid);
+        else $guest->editGuest($first_name, $second_name, $contact_email, $booking, $contact_tel, $updatetime, $guid);
         $guest->bookings = $booking;
         return $guest;
     }
-    public function editGuest(  $first_name, $second_name, $contact_email, $user=null, $booking=null,$contact_tel=null, $updatetime=null, $guid=null) :self
+    public function editGuest($first_name, $second_name, $contact_email=null, $booking = null, $contact_tel = null, $updatetime = null, $guid = null) :self
     {
-        $names = explode(' ', $second_name);
-        $this->first_name = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
-        $this->second_name = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+        //$names = explode(' ', $second_name);
+        $this->first_name = $first_name;//(is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+        $this->second_name = $second_name;//(is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
         $this->contact_email = $contact_email;
         $this->contact_tel = $contact_tel;
-        $this->contact_name = $second_name;
+        $this->contact_name = $first_name." ".$second_name;
         $this->myrent_update = $updatetime;
+//        $this->bookings = $booking;
         $this->guid = $guid;
-//        return $this;
+        return $this;
     }
 
     public static function createContact( ContactForm $form, $updatetime) :self
@@ -91,8 +93,8 @@ class Guest extends \yii\db\ActiveRecord
     public function updateContact( ContactForm $form, $updatetime) :self
     {
         $names = explode(' ', $form->contact_name);
-        $this->first_name = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
-        $this->second_name = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+        $this->first_name = (is_array($names) && array_key_exists(0, $names)) ? $names[0] : '';
+        $this->second_name = (is_array($names) && array_key_exists(1, $names)) ? $names[1] : '';
         $this->contact_email = $form->contact_email;
         $this->contact_tel = $form->contact_tel;
         $this->contact_name = $form->contact_name;
@@ -111,8 +113,7 @@ class Guest extends \yii\db\ActiveRecord
             $guest->first_name = $first_name;
             $guest->second_name = $second_name;
         }
-        $guest->bookings = $booking;
-        $booking->guests = $guest;
+        $booking->assignGuest($guest->id);
         return $guest;
     }
 //формирует массив гостей в для букинга и возвращает его
@@ -161,6 +162,7 @@ class Guest extends \yii\db\ActiveRecord
 
 
     /**
+     * Connect guest and booking as group of tourists
      * @return \yii\db\ActiveQuery
      */
     public function getBookings()
@@ -168,6 +170,14 @@ class Guest extends \yii\db\ActiveRecord
         return $this->hasMany(Booking::className(), ['id' => 'booking_id'])->viaTable('{{%booking_guest}}', ['guest_id'=>'id']);
     }
 
+    /**
+     * Connect guest and booking as author
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthorBookings()
+    {
+        return $this->hasMany(Booking::className(), ['guest_id' => 'id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */

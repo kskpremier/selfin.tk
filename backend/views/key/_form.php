@@ -1,6 +1,9 @@
 <?php
 
+use backend\helpers\DoorLockHelper;
+use reception\helpers\UserHelper;
 use yii\helpers\Html;
+use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
@@ -10,7 +13,7 @@ use kartik\checkbox\CheckboxX;
 use backend\models\Guest;
 
 /* @var $this yii\web\View */
-/* @var $model reception\forms\KeeForm */
+/* @var $model reception\forms\KeyForm*/
 /* @var $form yii\widgets\ActiveForm */
 //$model->pin = 123456;
 //$model->e_key = md5(uniqid(rand(), true));
@@ -24,90 +27,86 @@ use backend\models\Guest;
 
 
     <?= $form->field($model, 'type')->widget(Select2::className(), [
-        'data'=>['0'=>'Period','2'=>'Permanent'],
-        'value'=>($model->type == '0')? 'Permanent':'Period',
-        'options' => ['placeholder' => 'Select a type ...'],
-        'pluginOptions' => [],
-    ])->label('E-Key type');?>
+        'data'=>[0=>'Period',2=>'Permanent',99=>'Admin'],
+        'value'=>($model->type == 0)? 'Permanent':'Period',
+        'options' => ['placeholder' => 'Select a type ...','id'=>'type'],
+        'pluginEvents' => [
+            "change" => new JsExpression("function (params) {
+                             var value = params.target.value;
+                         
+                            if (value != 99) {
+                                 $('#startDate').removeClass('hidden');
+                            }
+                            if (value != 2) {
+                                 $('#endDate').removeClass('hidden');
+                            }
+                            if (value == 0) {
+                                  $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                            }
+                             
+             }"),
 
+            "select2:select" => new JsExpression("function(params) {
+                           
+                            var value = params.target.value;
+                         
+                            if (value == 99) {
+                                   $('#endDate').addClass('hidden');
+                                   $('#startDate').addClass('hidden');
+                            }
+                             if (value == 2) {
+                                 $('#endDate').addClass('hidden');
+                            }
+                            if (value == 0) {
+                                  $('#endDate').removeClass('hidden');
+                                  $('#startDate').removeClass('hidden');
+                            }
+                        }"
+            ),
+        ],
+
+    ])->label('E-Key type');?>
+    <div id="startDate" class="">
     <?= $form->field($model, 'startDate')->widget(DateTimePicker::className(), [
-        //'model' => $model,
-        'value' => $model->startDate ,//date('M-d-Y, h:i'),
-        //'attribute' => 'from',
-        //'options' => ['placeholder' => 'from what moment'],
+        'value' => $model->startDate ,
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
+            'format' => 'D, dd-M-yyyy, HH P',
             'autoclose' => true,
+            'minView'=> 1
         ]
     ]);
     ?>
-    <?=// $form->field($model, 'till')->textInput()
+    </div>
+    <div id="endDate" class="">
+    <?=
     $form->field($model, 'endDate')->widget(DateTimePicker::className(), [
-        //'model' => $model,
-        'value' => $model->endDate ,//date('M-d-Y, h:i'),
-        //'attribute' => 'from',
-        //'options' => ['placeholder' => 'from what moment'],
+        'value' => $model->endDate ,
         'type' => DateTimePicker::TYPE_INPUT,
         'pluginOptions' => [
-            'format' => 'D, dd-M-yyyy, hh:ii',
+            'format' => 'D, dd-M-yyyy, HH P',
             'autoclose' => true,
+            'minView'=> 1
         ]
-    ]);?>
-<!--    --><?//= $form->field($model, 'guest_id')->widget(Select2::className(), [
-//        'data'=>($model->booking)?ArrayHelper::map($model->booking->guests,'id','contact_email'): ArrayHelper::map(Guest::find()->all(),'id','contact_email'),//['1'=>'svrybin','4'=>'domouprav'],
-//        'value'=>0,
-//        'options' => ['placeholder' => 'Select a guest ...'],
-//        'pluginOptions' => [],
-//    ])->label('for Guest');?>
-<!--    --><?//= CheckboxX::widget([
-//        'name'=>'booking_connection',
-//        'options'=>['id'=>'booking_connection'],
-//        'pluginOptions'=>['threeState'=>false],
-//        'pluginEvents' =>[
-//            "change"=>'function() { var checked;
-//            if (!checked)
-//                { $("select#key-booking_id").prop( "disabled", false );
-//                    checked = true;}
-//            else
-//                { $("select#key-booking_id").prop( "disabled", true );
-//                  checked = false;
-//                 }
-//            }'
-//
-//            // "reset"=>'function() { log("reset"); }',
-//        ]
-//    ]);
-    ?>
-
-    <?php
-
-//    if ($model->bookingId)
-//        echo  $form->field($model, 'bookingId')->textInput(['disabled'=>true])->label('for Booking #');
-//    else echo $form->field($model, 'bookingId')->widget(Select2::className(), [
-//        'data'=> ArrayHelper::map(\backend\models\Booking::find()->all() ,'id','id'),
-//        'options' => ['placeholder' => 'Select a booking ...',
-//            'disabled'=>true ],
-//        'pluginOptions' => [],
-//    ])->label('for Booking #');
-    ?>
+    ]);
+?>
+    </div>
     <?php
 //    if ($model->doorLockId)
-        echo  $form->field($model, 'doorLockId')//->textInput(['disabled'=>true, 'value'=>$model->doorLock->lock_alias])->label('for Door lock #');
-
-    ->widget(Select2::className(), [
-            'data'=>ArrayHelper::map(\reception\entities\DoorLock\DoorLock::find()->all(),'id','lock_alias'),
+        echo  $form->field($model, 'doorLockId')->widget(Select2::className(), [
+            'data'=>ArrayHelper::map(DoorLockHelper::getDoorlocks(Yii::$app->getUser()->getId()),'id','lock_alias'),
             //'value'=>($model->type == '0')? 'Permanent':'Period',
-            'options' => ['placeholder' => 'Select a type ...'],
+            'options' => ['placeholder' => 'Select a door lock ...'],
             'pluginOptions' => [],
         ])->label('Door Lock');
 ?>
     <?php echo  $form->field($model, 'userId')//->textInput(['disabled'=>true, 'value'=>$model->doorLock->lock_alias])->label('for Door lock #');
 
     ->widget(Select2::className(), [
-    'data'=>ArrayHelper::map(\reception\entities\User\User::find()->all(),'id','username'),
+    'data'=>ArrayHelper::map(UserHelper::getConnectedUsers(Yii::$app->user->identity->getUserModel()),'id','username'),
     //'value'=>($model->type == '0')? 'Permanent':'Period',
-    'options' => ['placeholder' => 'Select a type ...'],
+    'options' => ['placeholder' => 'Select a user ...'],
     'pluginOptions' => [],
     ])->label('For user');
     ?>

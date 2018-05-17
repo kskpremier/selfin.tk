@@ -31,6 +31,7 @@ return [
         'monitor' => [
             'class' => \zhuravljov\yii\queue\monitor\Module::class,
         ],
+        'gridview' => ['class' => 'kartik\grid\Module']
     ],
     'components' => [
         'queue' => [
@@ -109,11 +110,21 @@ return [
     ],
     'as access' => [
         'class' => 'yii\filters\AccessControl',
-        'except' => ['auth/login', 'site/error','site/index'],
+        'except' => ['auth/login', 'site/error','site/index','auth/logout', 'auth/confirm'],
         'rules' => [
             [
                 'allow' => true,
-                'roles' => ['admin','receptionist'],
+                'roles' => ['admin','receptionist','mobile','owner','worker','vacation','superuser','tourist'],
+            ],
+            [
+                'allow' => true,
+                'actions' =>['logout',],
+                'roles' => ['@'],
+            ],
+            [
+                'allow' => true,
+                'actions' =>['gii/default/view',],
+                'roles' => ['admin'],
             ],
         ],
     ],

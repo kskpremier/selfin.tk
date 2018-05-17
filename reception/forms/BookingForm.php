@@ -50,6 +50,7 @@ class BookingForm extends FormWithDates
     public $eKey;
 
     public $apartment;
+    public $booking;
 
 
     /**

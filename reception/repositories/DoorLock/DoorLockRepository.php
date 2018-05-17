@@ -19,11 +19,11 @@ class DoorLockRepository
         }
         return $doorLock;
     }
-    public function findByMac($lockMac): DoorLock
+    public function findByMac($lockMac)
     {
         //return DoorLock::findOne(['lock_mac' => $lockMac]);
         if (!$doorLock = DoorLock::find()->where(['lock_mac' => $lockMac])->one()) {
-            throw new NotFoundException('DoorLock is not found.');
+           return null;
         }
         return $doorLock;
     }
@@ -44,11 +44,12 @@ class DoorLockRepository
         return $doorLock;
     }
 
-    public function save(DoorLock $doorLock): void
+    public function save(DoorLock $doorLock)
     {
         if (!$doorLock->save()) {
             throw new \RuntimeException('Saving error.');
         }
+        return true;
     }
 
     public function remove(DoorLock $doorLock): void

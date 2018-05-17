@@ -65,7 +65,7 @@ return [
                     [
                     'class'=>'yii\web\MultipartFormDataParser',
                     'uploadFileMaxCount' => 10,
-                    'uploadFileMaxSize' => 20000000
+                    'uploadFileMaxSize' => 80000000
                     ],
                 'application/xml' => 'yii\web\XmlParser',
             ],
@@ -110,6 +110,7 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
+//                'GET atraveo'=>'atraveo/index',
                 'POST auth'=>'oauth2/rest/token',
                 'POST oauth2/<action:\w+>' => 'oauth2/rest/<action>',
                 'GET profile' => 'profile/index',
@@ -124,27 +125,39 @@ return [
                 'POST booking-old' => 'booking/create-old',
                 'POST booking' => 'booking/create-for-owner',
                 'GET bookings' => 'booking/bookings',
+                'GET rents' => 'booking/rents',
                 'GET booking/view' => 'booking/view',
                 'GET booking/documents' =>'document/get-booking-documents',
                 'GET booking/view-external' => 'booking/view-external',
                 'DELETE booking/delete' => 'booking/delete',
                 'POST myrent'=>'booking/my-rent',
+                //crud для  Apartments
+                'GET apartments'=> 'booking/apartments',
 //               //crud  для замков
+                'GET locks' => 'door-lock/index',
                 'POST lock/add' => 'door-lock/create',
-//                'PUT,PATCH door_lock' => 'door-lock/update',
+                'POST lock/name' => 'door-lock/name',
+                'PUT,PATCH lock/update' => 'door-lock/update',
+                'POST lock/install'=>'door-lock/install',
+                'POST lock/uninstall'=>'door-lock/uninstall',
                 'GET lock/view' => 'door-lock/view',
                 'GET lock/viewByMac' => 'door-lock/mac',
-//                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
+                'PUT,PATCH door_lock/delete' => 'door-lock/delete',
 //                //crud для электронных ключей
                 'POST e-key' => 'key/create',
-                'GET keys' => 'key/index',
+                'GET keys' => 'key/keys-list-for-opening',
+                'GET key/index' => 'key/list',
+                'GET passcodes'=>'keyboard-pwd/index',
 //                'PUT,PATCH e-key' => 'key/update',
                 'GET e-key' => 'key/view',
 //                'PUT,PATCH e-key/delete' => 'key/delete',
 //                //curd для буквенно-цифрового ключа (pin)
-                'POST password' => 'keyboard-pwd/create',
+                'POST passcodes' => 'keyboard-pwd/create',
+                'DELETE passcode/delete' => 'keyboard-pwd/delete',
+                'PUT passcode/delete' => 'keyboard-pwd/delete',
                 'POST key/generate' => 'key/create-for-booking',
-                'POST password/create' => 'keyboard-pwd/create',
+                'POST passcodes/create' => 'keyboard-pwd/create',
+                'GET passcodes/type'=> 'keyboard-pwd/get-type',
                 'request-password' => 'site/request-password',
                 'POST add-mobile-user' => 'mobile/create',
                 'GET portal-link' => 'booking/get-link',
@@ -158,7 +171,7 @@ return [
     ],
     'as authenticator' => [
         'class' => 'filsh\yii2\oauth2server\filters\auth\CompositeAuth',
-        'except' => ['site/index', 'oauth2/rest/token','site/login'],
+        'except' => ['site/index', 'oauth2/rest/token','site/login','atraveo/index'],
         'authMethods' => [
             ['class' => 'yii\filters\auth\HttpBearerAuth'],
             ['class' => 'yii\filters\auth\QueryParamAuth', 'tokenParam' => 'accessToken'],
@@ -166,7 +179,7 @@ return [
     ],
     'as access' => [
         'class' => 'yii\filters\AccessControl',
-        'except' => ['site/index', 'oauth2/rest/token','site/login'],
+        'except' => ['site/index', 'oauth2/rest/token','site/login','atraveo/index'],
         'rules' => [
             [
                 'allow' => true,

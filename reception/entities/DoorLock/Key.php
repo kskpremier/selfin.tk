@@ -10,6 +10,7 @@ namespace reception\entities\DoorLock;
 
 use backend\models\DOMOUPRAV;
 use reception\entities\Booking\Booking;
+use reception\entities\EventTrait;
 use reception\entities\User\User;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
@@ -35,18 +36,21 @@ use yii\httpclient\Client;
  */
 class Key extends ActiveRecord
 {
+    use EventTrait;
     public $guest_id;
 
     public static function create( $start_date, $end_date, $type, $booking_id,
                                    $door_lock_id, $user_id, $remarks) :self
     {
+
+
         $key = new static();
-        $key->start_date = ($start_date > time()+60*60) ? $start_date: time()+60*60; // понять формат в котором с формы приходит дата
-        $key->end_date = $end_date;
+        $key->start_date = ($type==99)?0 :$start_date; // понять формат в котором с формы приходит дата
+        $key->end_date =($type==2 || $type==99)?0 : $end_date;
         $key->type = $type;
         $key->booking_id = $booking_id;
         $key->door_lock_id = $door_lock_id;
-        $key->user_id = $user_id;
+        $key->user = $user_id;
         $key->remarks = $remarks;
 
         return $key;
@@ -56,12 +60,12 @@ class Key extends ActiveRecord
                           $door_lock_id, $user_id,$remarks, $last_update_date,$key_status,$key_id
                             )
     {
-        $this->start_date = $start_date;
-        $this->end_date = $end_date;
+        $this->start_date = ($type==99)?0 :$start_date;
+        $this->end_date = ($type==2 || $type==99)?0 : $end_date;
         $this->type = $type;
         $this->booking_id = $booking_id;
         $this->door_lock_id = $door_lock_id;
-        $this->user_id = $user_id;
+        $this->user = $user_id;
         $this->last_update_date = $last_update_date;
         $this->remarks = $remarks;
         $this->key_status = $key_status;
@@ -72,6 +76,16 @@ class Key extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%key}}';
+    }
+    public function behaviors(): array
+    {
+        return [
+            //   MetaBehavior::className(),
+            [
+                'class' => SaveRelationsBehavior::className(),
+                'relations' => ['user'],
+            ],
+        ];
     }
 
     /**
@@ -102,7 +116,7 @@ class Key extends ActiveRecord
         $client = $client = new Client(['baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,]);
         $response = $client->createRequest()
             ->setMethod('post')
-            ->setHeaders(['content-type' => 'application/json'])
+            ->setHeaders(['Content-Type' => 'application/json'])
             ->addHeaders(['Accept' => 'application/json'])
             ->addHeaders(['Authorization' => 'Bearer '.DOMOUPRAV::DOMOUPRAV_ADMIN_TOKEN])
             ->setData([
@@ -121,11 +135,36 @@ class Key extends ActiveRecord
         }
         else return false;
     }
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getUser()
-//    {
-//        return $this->hasOne(User::className(), ['id' => 'user_id']);
-//    }
+    public function serializeKey(): array
+    {
+        $apartments=[];
+        foreach ($this->doorLock->apartments as $apartment)
+        {
+            $apartments[]=[
+                'id' => $apartment->id,
+                'name' => $apartment->name,
+                'external_apartment_id' => $apartment->external_id,
+                'city_name'=>$apartment->city_name,
+                'address'=>$apartment->adress,
+                'latitude'=>$apartment->latitude,
+                'longitude'=>$apartment->longitude
+            ];
+        }
+
+        return [
+
+            'id'=>$this->id,
+            'startDate'=>$this->start_date*1000,//-7200000,
+            'endDate'=>$this->end_date*1000,//-7200000,
+            'type'=>$this->type,
+            'lock'=>$this->doorLock->serializeDoorLockShort(),
+            'booking_id'=>$this->booking_id,
+            'user_id'=>$this->user_id
+        ];
+    }
+
+    public static function find()
+    {
+        return new \backend\models\query\KeyQuery(get_called_class());
+    }
 }

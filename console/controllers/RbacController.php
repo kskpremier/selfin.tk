@@ -134,4 +134,18 @@ class RbacController extends Controller
         $auth->addChild($tourist, $createKeyboardPwdByTourist);
 
     }
+
+    public function actionLock()
+    {
+        $auth = Yii::$app->authManager;
+        $rule = new \console\rbac\isUsingBy();
+        $auth->add($rule);
+
+        // добавляем разрешение "createDoorLock"
+        $doorLockManagement = $auth->createPermission('DoorLockManagement');
+        $doorLockManagement->description = 'Create/Install/Unistall/View a DoorLock';
+        $doorLockManagement->ruleName = $rule->name;
+        $auth->add($doorLockManagement);
+
+    }
 }

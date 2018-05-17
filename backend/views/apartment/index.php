@@ -24,8 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'location',
+//            'id',
+           ['attribute'=>'location',
+               'value'=>function ($model) { return $model->city_name.' '.$model->adress; },
+               ],
             'name',
             ['attribute'=>'doorLocks',
                 'label'=>'Door Lock on object',
@@ -33,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=> function ($model) {
                     $doorLockList='';
                     foreach ($model->doorLocks as $doorLock){
-                        $doorLockList .= '<p>'.Html::a($doorLock->lock_id,
+                        $doorLockList .= '<p>'.Html::a($doorLock->lock_alias,
                                 ['door-lock/view', 'id' => $doorLock->id],
                                 ['class' => '']). PHP_EOL.'</p>';
                     }
@@ -42,12 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {delete} {lock}',
+                'template' => '{view} {update}  {lock}',
                 'buttons' => [
 
                     'lock' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-lock"></span>',
-                            ['door-lock/install', 'apartmentId' => $model->id ],
+                            ['door-lock/install', 'lock' => $model->id ],
                             ['class' => '',
                                 'title'=>'Install door lock']
                         );

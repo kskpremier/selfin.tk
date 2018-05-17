@@ -2,14 +2,18 @@
 
 namespace backend\controllers;
 
+use backend\models\KeyAdminSearch;
 use reception\forms\KeyForm;
 use reception\forms\KeyEditForm;
+use reception\forms\KeyFormForNewUser;
 use reception\repositories\DoorLock\KeyRepository;
 use reception\useCases\manage\DoorLock\KeyManageService;
 use Yii;
 use reception\entities\DoorLock\Key;
 use backend\models\KeySearch;
 use reception\entities\Booking\Booking;
+use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use reception\entities\DoorLock\DoorLock;
@@ -37,14 +41,40 @@ class KeyController extends Controller
      */
     public function behaviors()
     {
-        return [
-//            'verbs' => [
-//                'class' => VerbFilter::className(),
-//                'actions' => [
-//                    'delete' => ['POST'],
-//                ],
-//            ],
+
+        $behaviors = parent::behaviors();
+
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'only' => ['create', 'update', 'delete','create-for-booking','index'],
+            'except' => ['keys-list-for-opening'],
+            'rules' => [
+                [
+                    'allow' => true,
+                    'actions'=>['create', 'update', 'delete','create-for-booking','index'],
+                    'roles' => ['admin','receptionist','mobile'],
+                ],
+
+                [
+                    'allow' => true,
+                    'actions'=>['create-for-booking','index'],
+                    'roles' => ['tourist'],
+                ],
+                [
+                    'allow' => true,
+                    'actions'=>['keys-list-for-opening'],
+                    'roles' => ['@'],
+                ],
+            ],
         ];
+        $behaviors ['verbs'] = [
+            'class' => VerbFilter::className(),
+            'actions' => [
+                'delete' => ['POST'],
+            ]
+        ];
+
+        return $behaviors;
     }
 
     /**
@@ -52,6 +82,36 @@ class KeyController extends Controller
      * @return mixed
      */
     public function actionIndex($userId=null,$bookingId=null)
+    {
+        $user = Yii::$app->user->identity->getUserModel();
+        $parentsIDs = (isset($user->parentUsers))?ArrayHelper::getColumn ($user->parentUsers, 'id'):[];
+
+        if (Yii::$app->user->can("admin")) {
+            $searchModel = new KeySearch();
+        }
+        elseif  (Yii::$app->user->can('mobile')) {
+                $searchModel = new KeyAdminSearch(['userId'=>$user->id, "parents"=>$parentsIDs]);
+            }
+        elseif  (Yii::$app->user->can('owner')) {
+            $searchModel = new KeyAdminSearch(['userId'=>$user->id, "owner"=>$parentsIDs]);
+        }
+        elseIf (Yii::$app->user->can('tourist')) {
+             $searchModel = new KeySearch(['tourist_user_id' => Yii::$app->user->id] );
+        }
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('list', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Key models.
+     * @return mixed
+     */
+    public function actionIndexForBooking($userId=null,$bookingId=null)
     {
         $searchModel = new KeySearch(['userId'=>$userId, 'bookingId'=>$bookingId]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -186,6 +246,29 @@ class KeyController extends Controller
         else {
             return $this->render('_create', [
                 'model' => $form,
+            ]);
+        }
+    }
+
+    /**
+     * Creates a new Key model for appointed booking
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateKeyForNewUser($id=null)
+    {
+        $user = Yii::$app->user->identity->getUserModel();
+        $form = new KeyFormForNewUser(['doorLockId'=>$id]);
+        if ($form->load(Yii::$app->request->post()) && $form->validate() ) {
+            $key = $this->service->sendForNewUser ($form, Yii::$app->user->identity->getUserModel());
+            Yii::$app->session->setFlash('success', 'E-Key was successfully generated');
+            return $this->redirect(['view', 'id' => $key->id]);
+        }
+        else {
+            return $this->render('_sendkey', [
+                'model' => $form,
+                'user'=> $user
+
             ]);
         }
     }

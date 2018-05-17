@@ -2,7 +2,9 @@
 
 namespace backend\controllers;
 
+use reception\entities\Booking\Booking;
 use reception\forms\GuestDocumentAddForm;
+use reception\services\eVisitor\eVisitor;
 use reception\useCases\manage\Booking\DocumentManageService;
 use reception\useCases\manage\Image\ImageProcessManagement;
 use reception\useCases\manage\Booking\PhotoManageService;
@@ -12,6 +14,8 @@ use backend\models\DocumentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use yii\httpclient\Client;
 
 /**
  * DocumentController implements the CRUD actions for Document model.
@@ -91,6 +95,30 @@ class DocumentController extends Controller
             ]);
         }
     }
+    /**
+     * Making shapshot from camera
+     * @return array
+     */
+    public function actionSnapshot()
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('get')
+            ->setUrl('http://192.168.1.4:29219/snapshot.cgi?user=admin&pwd=12345678')
+            ->send();
+
+        define('UPLOAD_DIR', Yii::getAlias('@facePath')."/real_photos/");
+//        foreach ($_REQUEST['image'] as $value) {
+           $img = $response->getContent();
+//            $img = str_replace('data:image/jpeg;base64,', '', $img);
+//            $data = base64_decode($img);
+            $file = UPLOAD_DIR . uniqid() . '.jpeg';
+//            $file1 = UPLOAD_DIR . uniqid() . '.jpeg';
+//            $success = file_put_contents($file, $data);
+        $success = file_put_contents($file, $img);
+//        $this->ser
+
+    }
 
     /**
      * Making recognition of existing document .
@@ -145,6 +173,28 @@ class DocumentController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    /**
+     * Make checkin in test eVisitor dB
+     * @param integer $id
+     * @param Booking $booking
+     * @return mixed
+     */
+    public function actionCheckin($id)
+    {
+        $booking = Booking::findOne(844);
+        $document=$this->findModel($id);
+        if ($document) {
+            $eVisitor = new eVisitor();
+            $response = $eVisitor->checkin($booking, $document);
+                echo $response;
+            $response = $eVisitor->checkout($response, "2018-01-12","10-00-00");
+        }
+        return $this->redirect(['index']);
+    }
+
+
+    
 
     /**
      * Finds the Document model based on its primary key value.

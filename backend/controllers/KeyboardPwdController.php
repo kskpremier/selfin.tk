@@ -9,6 +9,7 @@
 namespace backend\controllers;
 
 use reception\forms\KeyboardPasswordForm;
+use reception\helpers\BookingHelper;
 use Yii;
 use reception\entities\DoorLock\KeyboardPwd;
 use reception\forms\KeyboardPwdForm;
@@ -17,6 +18,8 @@ use reception\repositories\DoorLock\KeyboardPwdRepository;
 use reception\useCases\manage\DoorLock\KeyboardPwdManageService;
 use backend\models\KeyboardPwdSearch;
 use backend\models\Booking;
+use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -38,19 +41,40 @@ class KeyboardPwdController extends Controller
         $this->service = $service;
     }
 
+
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                   // 'delete' => ['POST'],
+
+        $behaviors = parent::behaviors();
+
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'only' => ['create', 'update', 'delete','create-for-booking','index'],
+            'except' => ['keys-list-for-opening'],
+            'rules' => [
+                [
+                    'allow' => true,
+                    'actions'=>['create', 'update', 'delete','create-for-booking','index'],
+                    'roles' => ['admin','receptionist','mobile'],
+                ],
+                [
+                    'allow' => true,
+                    'actions'=>['index'],
+                    'roles' => ['tourist'],
                 ],
             ],
         ];
+       $behaviors ['verbs'] = [
+        'class' => VerbFilter::className(),
+            'actions' => [
+                 'delete' => ['DELETE','POST'],
+            ]
+        ];
+
+        return $behaviors;
     }
 
     /**
@@ -59,9 +83,32 @@ class KeyboardPwdController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new KeyboardPwdSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $user = Yii::$app->user->identity->getUserModel();
+        if (Yii::$app->user->can("admin")) {
+            $searchModel = new KeyboardPwdSearch();
+        }
+        elseif  (Yii::$app->user->can("receptionist")) {
+            $parents = $user->parentUsers;
+            $ids = ArrayHelper::getColumn($parents, 'id');
+            $ids[]=$user->id;
+            $searchModel = new KeyboardPwdSearch(['user'=>$ids]);
+        }
+        elseif (Yii::$app->user->can("mobile")){
+            $searchModel = new KeyboardPwdSearch(['user'=>$user->id]);
+        }
+        elseif (Yii::$app->user->can("owner")){
+            $searchModel = new KeyboardPwdSearch(['owner'=>$user]);
+        }
+        elseif (Yii::$app->user->can('lock') ){
+            $searchModel = new KeyboardPwdSearch(['lockUser'=>$user]);
+        }
+        elseif(Yii::$app->user->can('tourist')){
+            $searchModel = new KeyboardPwdSearch(['tourist'=>$user]);
+        }
 
+        else $searchModel = new KeyboardPwdSearch(['user'=>$user->id]);
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -81,72 +128,83 @@ class KeyboardPwdController extends Controller
     }
 
     /**
-     * Creates a new Key model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * Displays a single Key model.
+     * @param integer $id
      * @return mixed
      */
-    public function actionCreateOld($booking_id  = null)
+    public function actionSendEmail()
     {
-        $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
-
-        if (isset($booking)) {
-            $model = new KeyboardPwd(['start_date' => Yii::$app->formatter->asDateTime($booking->start_date, "php:D, d-M-Y H:i"),
-                'end_date' => Yii::$app->formatter->asDateTime($booking->end_date, "php:D, d-M-Y H:i"),
-                'booking_id' => $booking_id,
-                'door_lock_id'=> $booking->apartment->doorLock->id]);
-        } else {
-            $model = new KeyboardPwd();
-            $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?
-                                    Yii::$app->request->queryParams['door_lock_id']:
-                                    $model->door_lock_id;
-        }
-
-        if ($model->load(Yii::$app->request->post()) ) {
-            $model->start_date = Yii::$app->formatter->asDateTime($model->start_date,'php:d-m-Y H:i');
-            $model->end_date = Yii::$app->formatter->asDateTime($model->end_date,'php:d-m-Y H:i');
-            if ($response = $model->getKeyboardPwdLocal()) {
-
-                Yii::$app->session->setFlash('success', 'Keyboard password is successfully generated  ' );
-                return $this->redirect(['view', 'id' => $response]);
-            }
-            else {
-                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
-                return $this->render('create', [
-                    'model' => $model,
-                ]);
-            }
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
+        $booking = new Booking();
+        $booking->sendTestMarcoPoloEmail("sergey.sap@my-rent.net");
     }
 
-    public function actionCreate($booking_id  = null, $doorLockId = null)
+
+//    /**
+//     * Creates a new Key model.
+//     * If creation is successful, the browser will be redirected to the 'view' page.
+//     * @return mixed
+//     */
+//    public function actionCreateOld($booking_id  = null)
+//    {
+//        $booking = ($booking_id) ? Booking::findOne($booking_id) : null;
+//
+//        if (isset($booking)) {
+//            $model = new KeyboardPwd(['start_date' => Yii::$app->formatter->asDateTime($booking->start_date, "php:D, d-M-Y H:i"),
+//                'end_date' => Yii::$app->formatter->asDateTime($booking->end_date, "php:D, d-M-Y H:i"),
+//                'booking_id' => $booking_id,
+//                'door_lock_id'=> $booking->apartment->doorLock->id]);
+//        } else {
+//            $model = new KeyboardPwd();
+//            $model->door_lock_id = (array_key_exists('door_lock_id',Yii::$app->request->queryParams))?
+//                                    Yii::$app->request->queryParams['door_lock_id']:
+//                                    $model->door_lock_id;
+//        }
+//
+//        if ($model->load(Yii::$app->request->post()) ) {
+//            $model->start_date = Yii::$app->formatter->asDateTime($model->start_date,'php:d-m-Y H:i');
+//            $model->end_date = Yii::$app->formatter->asDateTime($model->end_date,'php:d-m-Y H:i');
+//            if ($response = $model->getKeyboardPwdLocal()) {
+//
+//                Yii::$app->session->setFlash('success', 'Keyboard password is successfully generated  ' );
+//                return $this->redirect(['view', 'id' => $response]);
+//            }
+//            else {
+//                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+//                return $this->render('create', [
+//                    'model' => $model,
+//                ]);
+//            }
+//        } else {
+//            return $this->render('create', [
+//                'model' => $model,
+//            ]);
+//        }
+//    }
+
+    public function actionCreate($doorLockId=null,$booking_id=null)
     {
-//        $booking = \reception\entities\Booking\Booking::findOne($booking_id);
-//        $doorLocks = $booking->apartment->getDoorLocks()->one();
-        $model = new KeyboardPasswordForm(['bookingId'=>$booking_id,'doorLockId'=>$doorLockId]);//($doorLockId)?$doorLockId:$doorLocks->id]);
+        $user = Yii::$app->user->identity->getUserModel();
+        $model = new KeyboardPasswordForm(['bookingId'=>$booking_id,'doorLockId'=>$doorLockId]);
 
         if ($model->load(Yii::$app->request->post() ) && $model->validate() ) {
-            $keyboardPwd =  $this->service->generate($model);
-            if ($response = $this->service->getKeyboardPwdValueFromChina($keyboardPwd)) {
-                $keyboardPwd->value = $response['keyboardPwd'];
-                $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
-                $this->keyboardPwdRepository->save($keyboardPwd);
-                Yii::$app->session->setFlash('success', 'Password was successfully generated');
-                return $this->redirect(['view', 'id' => $keyboardPwd->id]);
+            $keyboardPwds =  $this->service->generate($model); //в общем случае это может быть массив ключей
+            if (count($keyboardPwds)>=1) {
+                $value = ArrayHelper::getColumn($keyboardPwds,'value');
+                Yii::$app->session->setFlash('success', 'Password(s) was successfully generated',implode ( ',' , $value));
+                return $this->redirect(['index']);
             }
             else {
                 Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
                 return $this->render('create', [
                     'model' => $model,
+                    'user'=>$user,
                 ]);
             }
         }
         else {
-            return $this->render('_create', [
+            return $this->render('_form', [
                 'model' => $model,
+                'user'=>$user,
             ]);
         }
     }

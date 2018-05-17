@@ -29,6 +29,13 @@ class DocumentRepository
         }
         return $document;
     }
+    public function getByDocumentNumber($documentNumber): Document
+    {
+        if (!$document = Document::find()->where(["number"=>$documentNumber])->one()) {
+            return false;//throw new NotFoundException('Document is not found.');
+        }
+        return $document;
+    }
 
     public function getForGuests($iDs): array
     {
@@ -36,9 +43,9 @@ class DocumentRepository
         $documents = Document::find()->where(["guest_id"=>$iDs])->all();
         return $documents;
     }
-    public function isDocumentExist($firstName, $secondName,$numberOfDocument, $country, $dateOfBirth)
+    public function isDocumentExist($firstName, $secondName, $numberOfDocument, $country, $dateOfBirth, $city)
     {
-        if ($document = Document::findOne(['first_name' => $firstName,'second_name'=>$secondName,'number'=>$numberOfDocument,'date_of_birth'=>$dateOfBirth])) {
+        if ($document = Document::findOne(['first_name' => $firstName,'second_name'=>$secondName,'number'=>$numberOfDocument,'date_of_birth'=>$dateOfBirth, 'city'=>$city])) {
             return $document;
         }
         return false;
@@ -58,6 +65,16 @@ class DocumentRepository
             throw new \RuntimeException('Removing error.');
         }
         $this->dispatcher->dispatchAll($document->releaseEvents());
+    }
+
+    public function removeById(int $id): void
+    {
+        $document = $this->get ($id);
+        if ($document) {
+            if (!$document->delete()) {
+                throw new \RuntimeException('Removing error.');
+            }
+        }
     }
 
     public function isDocumentReadyForMatching(Document $document):array

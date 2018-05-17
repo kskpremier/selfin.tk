@@ -35,8 +35,8 @@ class KeyForm extends Model
     public function rules(): array
     {
         return [
-            [['type','startDate', 'endDate'],'string', 'max' => 255],
-            [['remarks'],'safe'],
+            [['startDate', 'endDate'],'string', 'max' => 255],
+            [['remarks','type'],'safe'],
             [['startDate'],'validateDates','message'=>'Start Date must be bigger then current time'],
             [['endDate'],'validateDates','message'=>'End Date must be bigger then Start Date'],
             [['doorLockId','type'],'required'],
@@ -64,7 +64,12 @@ class KeyForm extends Model
     }
 
     public function validateDates(){
-        if ($this->type != "2"){
+        if ($this->type == 2){
+            if (strtotime($this->startDate) < (time()-60) ){
+                $this->addError('Start Date must be bigger then current time');
+            }
+        }
+        if ($this->type == 0){
             if (strtotime($this->startDate) < (time()-60) ){
                 $this->addError('Start Date must be bigger then current time');
             }
@@ -73,5 +78,7 @@ class KeyForm extends Model
             }
         }
     }
+
+
 
 }

@@ -8,6 +8,7 @@
 
 namespace reception\forms\MyRent;
 
+use reception\entities\DoorLock\DoorLock;
 use yii\base\Model;
 
 /**
@@ -20,11 +21,15 @@ class DoorLockInstallForm extends Model
     public $name;	//String	Y	Lockname
     public $id;	//external_id
 
+    public $doorLock;
     //for keyboard password parameters
 
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], $id=null)
     {
         parent::__construct($config);
+        if ($id) {
+            $this->doorLock = DoorLock::find()->where(['id'=>$id])->one();
+        }
     }
 
     public function rules(): array

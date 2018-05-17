@@ -55,7 +55,7 @@ class MobileController extends Controller
                 [
                     'allow' => true,
                     // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['admin'],
+                    'roles' => ['admin','mobile'],
                 ],
             ],
         ];

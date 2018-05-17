@@ -34,6 +34,16 @@ class LockVersion extends ActiveRecord
 
         return $lockVersion;
     }
+    public function edit($protocolType,$protocolVersion,$scene,$groupId,$orgId)
+    {
+       $this->group_id = $groupId;
+       $this->protocol_version = $protocolVersion;
+       $this->protocol_type = $protocolType;
+       $this->scene = $scene;
+       $this->org_id = $orgId;
+
+        return $this;
+    }
 
     public static function tableName(): string
     {

@@ -53,6 +53,16 @@ class UserHelper
             'class' => $class,
         ]);
     }
+    public static function getConnectedUsers($user):array
+    {
+    $parents = $user->parentUsers;
+    $child = $user->dependedUsers;
+
+    return  array_merge($parents,$child);
+    }
+
+
+
     public static function getUserRoles($user): array
     {
         $rolesArray = [];

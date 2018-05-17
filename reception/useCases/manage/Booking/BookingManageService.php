@@ -11,29 +11,41 @@
 namespace reception\useCases\manage\Booking;
 
 
+use backend\models\Country;
+use DomainException;
+use function is_array;
 use reception\entities\Apartment\Apartment;
 use reception\entities\Booking\Booking;
+use reception\entities\Booking\Document;
 use reception\entities\Booking\FaceComparation;
 use reception\entities\Booking\DocumentPhoto;
 use reception\entities\Booking\Guest;
+use reception\entities\Booking\Registration;
 use reception\forms\BookingForm;
+use reception\forms\eVisitorForm;
+use reception\forms\MyRent\ApartmentForm;
+use reception\forms\MyRent\GuestForm;
 use reception\forms\MyRent\RentForm;
 use reception\helpers\TTLHelper;
 use reception\repositories\Apartment\ApartmentRepository;
 use reception\repositories\Booking\AbstractImageRepository;
 use reception\repositories\Booking\BookingRepository;
 use reception\entities\DoorLock\KeyboardPwd;
+use reception\repositories\Booking\DocumentRepository;
 use reception\repositories\Booking\FaceComparationRepository;
 use reception\repositories\Booking\FaceRepository;
 use reception\repositories\Booking\GuestRepository;
+use reception\repositories\Booking\RegistrationRepository;
+use reception\repositories\DoorLock\DoorLockRepository;
 use reception\repositories\UserRepository;
+use reception\services\MyRent\MyRent;
 use reception\services\TransactionManager;
+use reception\services\TTL\DoorLockChinaService;
 use reception\useCases\BusinessException;
 
 use reception\entities\User\User;
 use reception\useCases\manage\TTL\TTL;
-use yii\web\ServerErrorHttpException;
-
+use yii\base\ErrorHandler;
 
 class BookingManageService
 {
@@ -45,15 +57,28 @@ class BookingManageService
     private $apartmentRepository;
     private $transaction;
     private $userRepository;
+    private $registrationRepository;
+    private $documentRepository;
+    private $errorHandler;
+    private $doorLockRepository;
+    private $doorLockChinaService;
+
 
     public function __construct(BookingRepository $bookingRepository,
                                 AbstractImageRepository $imageRepository,
                                 FaceRepository $faceRepository,
                                 FaceComparationRepository $faceCompareRepository,
+                                DocumentRepository $documentRepository,
                                 GuestRepository $guestRepository,
                                 ApartmentRepository $apartmentRepository,
+                                RegistrationRepository $registrationRepository,
                                 UserRepository $userRepository,
-                                TransactionManager $transaction)
+                                TransactionManager $transaction,
+                                ErrorHandler $errorHandler,
+                                DoorLockRepository $doorLockRepository,
+                                DoorLockChinaService $doorLockChinaService
+
+    )
     {
         $this->bookingRepository = $bookingRepository;
         $this->imageRepository = $imageRepository;
@@ -63,12 +88,17 @@ class BookingManageService
         $this->apartmentRepository = $apartmentRepository;
         $this->transaction = $transaction;
         $this->userRepository = $userRepository;
+        $this->registrationRepository = $registrationRepository;
+        $this->documentRepository = $documentRepository;
+        $this->errorHandler = $errorHandler;
+        $this->doorLockRepository = $doorLockRepository;
+        $this->doorLockChinaService = $doorLockChinaService;
     }
 
-    public function create($form,$needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
+
+    public function create($form, $needToSendConfirmationLetter=null, $needToMakeUser=null, $needToMakeKeyboardPassword=null): Booking
     {
         $needToSendConfirmationLetter = ($needToSendConfirmationLetter==null)?false:$needToSendConfirmationLetter;
-
         $needToMakeUser = ($needToMakeUser==null)?false:$needToMakeUser;
         $user = null;
         if ($needToMakeUser) {
@@ -102,29 +132,36 @@ class BookingManageService
         }
             //если в заявке есть список гостей - их надо добавить в список гостей букинга
         $guestList = ($form->guests->isEmpty())?  $author : Guest::createGuestList($form->guests);
-        //ищем, есть ли такие апартаменты
-        $apartment = Apartment::find()->where(['external_id'=>$form->externalApartmentId])->one();
-        if (!isset($apartment)) {
-            $apartment = Apartment::create('',$form->name,$form->externalId,$form->owner,$form->latitude,$form->longitude, $form->city_name, $form->adress, $form->object_color,$form->guid,
-                $form->user->user_id, '', $form->country, $form->doorlocks);
-        }
         //ищем , есть ли уже такой букинг
-
         $booking = $this->bookingRepository->findByMyRentId($form->externalId);
-        if (!$booking) {
+        if (!$booking && $form->externalId) {
+           
+            $rentInfo = MyRent::getRent($form->externalId);
+            $formBooking = new RentForm($rentInfo);
+            //ищем, есть ли такие апартаменты
+            $apartment = (isset($form->aparmnent)) ? $form->apartment : $this->apartmentRepository->findByMyRentId($form->externalApartmentId);
+            if (!isset($apartment)) {
+                $myRentResponse = MyRent::getApartmentsById($form->externalApartmentId);
+                if (count($myRentResponse)==1) {
+                    $apartmentForm = new ApartmentForm();
+                    $apartmentForm->load($myRentResponse[0], '');
+                    if ($apartmentForm->validate()) {
+                        $apartment = Apartment::create('', $formBooking->name, $form->externalId, $form->owner, $form->latitude,
+                            $form->longitude, $form->city_name, $form->adress, $form->object_color, $form->guid,
+                            $form->user->user_id, '', $form->country, $form->doorlocks);
+                    }
+                }
+                else throw new DomainException("wrong answer from Myrent");
+            }
             $booking = Booking::create(
-               $form->startDate,$form->endDate,
-               $apartment,
-               $author,
-               $form->numberOfGuest,$form->externalId,Booking::STATUS_ACTIVE,
+               $formBooking->from_date, $formBooking->until_date, $apartment, $author,
+               $formBooking->total_guests,$formBooking->id,Booking::STATUS_ACTIVE,
                $guestList,
-               $form->guid,$form->rent_status,$form->from_time,$form->until_time,$form->price,$form->exchange,
-               $form->label,$form->price_local,$form->paid,$form->created,$form->changed);
+               $formBooking->guid,$formBooking->rent_status,$formBooking->from_time,$formBooking->until_time,$formBooking->price,$formBooking->exchange,
+               $formBooking->label,$formBooking->price_local,$formBooking->paid,$formBooking->created,$formBooking->changed);
         }
         else {
-            $booking->edit($form->startDate,$form->endDate,$form->numberOfGuest,$form->status,
-                $form->rent_status,$form->from_time,$form->until_time,$form->price,$form->exchange,
-                $form->label,$form->price_local,$form->paid,$form->created,$form->changed=null);
+            $booking->updateEdit($form->startDate, $form->endDate, $form->numberOfTourist);
             $booking->guests = $guestList;
         }
         $this->bookingRepository->save($booking);
@@ -137,18 +174,45 @@ class BookingManageService
         return $booking;
     }
 
+
+    public function getKeys(BookingForm $form){
+
+            $rentInfo = MyRent::getRent($form->externalId);
+            if (count($rentInfo)==1) {
+                $formBooking = new RentForm($rentInfo);
+                $formBooking->load($rentInfo[0],'');
+                if ($formBooking->validate()) {
+                    $user = $this->userRepository->getByExternalId($formBooking->user_id);
+                    $this->updateBookings($formBooking, $user->id, time());
+                }
+                else { throw new \DomainException(" No correct validation ".json_encode ($formBooking->getErrors()) ) ;}
+            }
+            else {throw new \DomainException("wrong answer from Myrent");}
+
+        $booking = $this->bookingRepository->findByMyRentId($form->externalId);
+        if ($booking) {
+             $this->generateKeyboardPwdForBooking($booking);
+             return $booking;
+        }
+    }
+
     public function updateBookings(RentForm $form, $user_id, $updateTime, $owner_id=null)
     {
-
         //здесь по хорошему надо бы делать транзакцию
         $this->transaction->wrap(function () use ($form, $user_id, $updateTime, $owner_id){
-            $user = $this->userRepository->get($user_id);
-            $user->setUpdateTime($updateTime);
+            try {
+                $user = $this->userRepository->get($user_id);
+            } catch (\NotFoundException $e) {
+                $this->errorHandler->logException($e);
+            }
         if ($form->active === "Y") {
             //ищем апартамент
-            $apartment = $this->apartmentRepository->findByMyRentId($form->property->object_id);
-            if (!$apartment)
+            $apartment = $this->apartmentRepository->findByMyRentId($form->object_id);
+            $apartmentInfo = MyRent::getApartmentsById($form->object_id);
+            $form->property->load($apartmentInfo[0],'');
+            if (!$apartment) {
                 $apartment = Apartment::createProperty($form->property, $user_id, $updateTime, $owner_id);
+            }
             else $apartment->edit($form->property, $user_id, $updateTime, $owner_id);
             $this->apartmentRepository->save($apartment);
             //ищем автора
@@ -161,9 +225,72 @@ class BookingManageService
             $booking = $this->bookingRepository->findByMyRentId($form->id);
             if (!$booking)
                 $booking = Booking::createBooking($form, $updateTime, $apartment->id, $author->id);
-            else $booking->edit($form, $updateTime, $apartment->id, $author->id);
+            else {
+                $booking->edit($form, $updateTime, $apartment->id, $author->id);
+                //список гостей
+                $guestList= MyRent::getGuestsForBooking($booking);
+                $existingGuests = $booking->getGuests()->all();
+                $existingDocuments = $booking->getAllExistingDocuments();
+                $existingRegistrations = $booking->getRegistrations()->all();
+                $currentGuests=[];
+                $currentDocuments=[];
+                $currentRegistrations=[];
+                if ($guestList!="NoContent") {
+                    foreach (\GuzzleHttp\json_decode($guestList, true) as $element) {
+                        $form = new GuestForm();
+                        $form->load($element, '');
+                        if ($form->validate()) {
+                            $guest = $this->guestRepository->isGuestExist($form->name_first, $form->name_last, $form->email);
+                            if ($guest==false) $guest = Guest::create($form->name_first, $form->name_last, $form->email);
+                            else $guest->editGuest($form->name_first, $form->name_last, $form->email, $booking, $form->telephone, time(), $form->guid);
+                            $this->guestRepository->save($guest);
+                            $document = $this->documentRepository->isDocumentExist($form->name_first, $form->name_last, $form->document_number, $form->citizenship, $form->birth_date, $form->residence_city);
+                            //для документа
+                            $country = Country::find()->where(['code' => $form->citizenship])->one();
+                            $citizen = ($country != null) ? $country->id : 237; ///по умолчанию Зимбабве
+                            $countryOfBirth = (Country::find()->where(['code' => $form->birth_country])->one());
+                            $birthCountry = ($countryOfBirth != null) ? $countryOfBirth->id : $citizen;
+                            $citizenshipOfBirth = (Country::find()->where(['code' => $form->birth_country])->one());
+                            $birthCitizenship = ($citizenshipOfBirth != null) ? $citizenshipOfBirth->id : $citizen;
+                            if ($document==false) $document = Document::create($form->name_first, $form->name_last, ($form->document_type==null)?3:$form->document_type, $form->document_number,
+                                ($form->gender == "muški") ? "M" : "F", $citizen, $form->residence_city,
+                                $birthCountry, $birthCitizenship, $birthCountry, $form->birth_date, $form->residence_adress);
+                            else $document->edit(($form->document_type==null)?3:$form->document_type, ($form->gender == "muški") ? "M" : "F", $citizen, $form->residence_city, $birthCountry, $birthCitizenship,
+                                $form->birth_date, $form->document_number, $form->residence_adress, $form->name_first, $form->name_last);
+                            $document->guest = $guest;
+                            $booking->guests = $guest;
+                            $this->documentRepository->save($document);
+                            //ищем уже существующую регистрацию
+                            $registration = $this->registrationRepository->findByMyRentId($form->id);
+                            if ($registration==false) {
+                                //если не найдена - создаем новую
+                                $registration = Registration::create($form->id, $form->date_from, $form->date_until, $booking->from_time, $booking->until_time, $document, $booking, $guest, $form->guid, $form->checkin, $form->checkout);
+                            } else $registration->edit($form->id, $form->date_from, $form->date_until, $booking->from_time, $booking->until_time, $document, $booking, $guest, $form->guid, $form->checkin, $form->checkout);
+                            $this->registrationRepository->save($registration);
+                            $currentGuests[] = $guest;
+                            $currentDocuments[] = $document;
+                            $currentRegistrations[] = $registration;
+                        }
+                    }
+                }
+                foreach ($existingRegistrations as $registration) {
+                    if (!array_search($registration, $currentRegistrations)) {
+                        $registration->delete();
+                    }
+                }
+                foreach ($existingDocuments as $document) {
+                    if (!array_search($document, $currentDocuments)) {
+                        $document->delete();
+                    }
+                }
+                foreach ($existingGuests as $guest) {
+                    if (!array_search($guest, $currentGuests)) {
+                        $guest->delete();
+                    }
+                }
+
+            }
             $this->bookingRepository->save($booking);
-//            throw new \DomainException ('Failed to save booking object => ' . ($booking->external_id));
             return $booking;
         } elseif ($form->active === "N") {
             //букинг ищем
@@ -174,7 +301,10 @@ class BookingManageService
                 return $booking;
             }
         }
-            $this->userRepository->save($user);
+//        if ($user) {
+//            $user->setUpdateTime($updateTime);
+//            $this->userRepository->save($user);
+//        }
         });
     }
 
@@ -186,20 +316,25 @@ class BookingManageService
     public function generateKeyboardPwdForBooking($booking) {
         foreach ($booking->apartment->doorLocks as $doorLock) {
             $keyboardPwd = KeyboardPwd::create(
-                strtotime($booking->start_date),
-                strtotime($booking->end_date), //ключ на весь период действия букинга
+                strTotime(date ("Y-m-d", strTotime($booking->start_date))." ".$booking->from_time),
+                strTotime(date ("Y-m-d", strTotime($booking->end_date))." ".$booking->until_time), //ключ на весь период действия букинга
                 TTLHelper::TTL_KEYBOARD_PERIOD_TYPE,
                 4,//пока так, потом из модели $doorLock->keyboard_pwd_version,
                 $doorLock->id,
                 $booking->id
             );
-            //получаем значение с китайского сервера для этого замка
-            $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
-            //проверяем, что ответ корректен
-            if (!is_array($data) || !$data['success']) {
-                throw new BusinessException('Can not get keyboard password for this door lock identity: ' . $doorLock->id);
+            if (!$keyboardPwd->value) {
+//
+                //получаем значение с китайского сервера для этого замка
+                $data = json_decode($this->doorLockChinaService->getKeyboardPwdFromChina($doorLock, $keyboardPwd), true);
+                //проверяем, что ответ корректен
+                if (!is_array($data) || !$data['success']) {
+                    throw new BusinessException('Can not get keyboard password for this door lock identity: ' . $doorLock->id);
+                }
+                $keyboardPwd->save();
             }
         }
+        return $booking->keyboardPwds;
     }
 
     /**
@@ -254,5 +389,7 @@ class BookingManageService
                 }
         return $finalProbability;
     }
+
+
 
 }

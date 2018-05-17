@@ -29,14 +29,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'location',
+//            'location',
             'name',
             'external_id',
-            ['attribute'=>'owner_id',
-                'value' => $model->owner->user->username,
-                'label'=>'Owner'],
+//            ['attribute'=>'owner_id',
+//                'value' => $model->owner->user->username,
+//                'label'=>'Owner'
+//            ],
             ['attribute'=>'doorLocks',
-                'label'=>'Door Lock on object',
+                'label'=>'Door Locks on object',
                 'format'=>'raw',
                 'value'=> function ($model) {
                     $doorLockList='';
@@ -46,7 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ['class' => '']). PHP_EOL.'</p>';
                     }
                     return $doorLockList;
-                },]
+                },
+                ]
             
         ],
     ]) ?>

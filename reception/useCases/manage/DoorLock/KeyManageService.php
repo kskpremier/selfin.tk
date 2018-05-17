@@ -10,21 +10,28 @@ namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\DoorLock\Key;
 use reception\entities\Booking\Booking;
+use reception\entities\User\events\UserKeySend;
+use reception\entities\User\User;
 use reception\forms\KeyEditForm;
 use reception\forms\KeyForm;
 use reception\forms\KeyForBookingForm;
+use reception\forms\KeyFormForNewUser;
 use reception\helpers\TTLHelper;
 use reception\repositories\DoorLock\KeyRepository;
 use reception\useCases\BusinessException;
 use reception\useCases\manage\TTL\TTL;
+use yii\mail\MailerInterface;
 
 
 class KeyManageService
 {
     private $keyRepository;
-    public function __construct(KeyRepository $keyRepository)
+    private $mailer;
+
+    public function __construct(KeyRepository $keyRepository, MailerInterface $mailer)
     {
         $this->keyRepository = $keyRepository;
+        $this->mailer = $mailer;
 
     }
     public function generate(KeyForm $form): Key
@@ -42,6 +49,29 @@ class KeyManageService
         $this->keyRepository->save($key);
         return $key;
     }
+
+    public function sendForNewUser(KeyFormForNewUser $form, User $parent): Key
+    {
+        $user = User::create($form->username, $form->email,$form->password);
+        $user->setParent($user);
+
+        $key = Key::create(
+            strtotime($form->startDate),
+            strtotime($form->endDate),
+            $form->type,
+            $form->bookingId,
+            $form->doorLockId,
+            $user,
+            $form->remarks
+        );
+        $key->recordEvent(new UserKeySend($user));
+
+        $this->keyRepository->save($key);
+        $this->SendLetter($user);
+//        $this->sendConfirmationLetter($user->email);
+        return $key;
+    }
+
     public function create(Booking $booking,$userId): array
     {
         $keys=[];
@@ -96,5 +126,22 @@ class KeyManageService
             $result[]=$key->id;
         }
         return $result;
+    }
+
+
+
+    public function SendLetter(User $user): void
+    {
+        $sent = $this->mailer
+            ->compose(
+                ['html' => 'auth/signup/confirm-key-html', 'text' => 'auth/signup/confirm-key-text'],
+                ['user' => $user]
+            )
+            ->setTo($user->email)
+            ->setSubject('new user for e-Key was generated')
+            ->send();
+        if (!$sent) {
+            throw new \RuntimeException('Email sending error.');
+        }
     }
 }

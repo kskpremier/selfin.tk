@@ -19,17 +19,21 @@ use reception\entities\DoorLock\KeyboardPwd;
 class KeyboardPwdSearch extends KeyboardPwd
 {
     public $doorLockName;
+    public $user;
+    public $owner;
+    public $tourist;
+    public $lockUser;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return[
-        [['keyboard_pwd_version', 'booking_id','value','door_lock_id'], 'integer'],
+            [['keyboard_pwd_version','value','door_lock_id',], 'integer'],
             [['keyboard_pwd_type'],'string','max' => 15],
-            [['start_date', 'end_date','doorLockName'], 'safe'],
+            [['start_date', 'end_date','doorLockName','booking_id','user','tourist','lockUser','owner'], 'safe'],
 
-    ];
+        ];
     }
 
     /**
@@ -66,16 +70,31 @@ class KeyboardPwdSearch extends KeyboardPwd
             return $dataProvider;
         }
         $query->joinWith(['doorLock']);
+        $query->joinWith(['booking']);
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
             'booking_id' => $this->booking_id,
             'door_lock_id' => $this->door_lock_id,
         ]);
+
+        if ($this->user) {
+            $query->forUser($this->user);
+        }
+        if ($this->lockUser) {
+            $query->forLockUser($this->lockUser);
+        }
+        if ($this->tourist) {
+            $query->isValidForTourist($this->tourist);
+            $query->isValidForUser($this->tourist);
+        }
+        if ($this->owner) {
+            $query->forOwner($this->owner);
+        }
+
         $query->andFilterWhere(['like', 'value', $this->value]);
         $query->andFilterWhere(['like', 'door_lock.lock_alias', $this->doorLockName]);
         $query->andFilterWhere(['like', 'keyboard_pwd_type', $this->keyboard_pwd_type])
-              ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version])
               ->andFilterWhere(['like', 'keyboard_pwd_version', $this->keyboard_pwd_version]);
         $query->andFilterWhere(['>=', 'keyboard_pwd.start_date', $this->start_date ? strtotime($this->start_date . ' 00:00:00'):null])
               ->andFilterWhere(['<=', 'keyboard_pwd.end_date', $this->end_date ? strtotime($this->end_date . ' 23:59:59'):null]);

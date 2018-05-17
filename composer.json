@@ -46,7 +46,15 @@
         "yii-dream-team/yii2-upload-behavior": "*",
         "yiisoft/yii2-queue": "^2.0",
         "dmstr/yii2-adminlte-asset": "2.*",
-        "kartik-v/yii2-widget-fileinput": "@dev"
+        "kartik-v/yii2-widget-fileinput": "@dev",
+        "johnson/yii2-webcam": "*",
+        "kartik-v/yii2-dropdown-x": "*",
+        "kartik-v/yii2-widget-typeahead": "*",
+        "zelenin/yii2-semantic-ui": "~2",
+        "kartik-v/yii2-widget-sidenav": "*",
+        "cinghie/yii2-multilanguage": "dev-master",
+        "kartik-v/yii2-date-range": "dev-master",
+        "yii2mod/yii2-google-maps-markers": "*"
 
 
     },

@@ -16,6 +16,7 @@ use yii\web\ServerErrorHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
+use yii\log\Logger;
 
 
 class PhotoImageController extends ActiveController
@@ -24,12 +25,14 @@ class PhotoImageController extends ActiveController
 
     private $photo;
     private $service;
+    private $logger;
 
-    public function __construct($id, $module, PhotoManageService $service, PhotoRepository $photo, $config = [])
+    public function __construct($id, $module, PhotoManageService $service, PhotoRepository $photo, $config = [], Logger $logger)
     {
         parent::__construct($id, $module, $config);
         $this->photo = $photo;
         $this->service = $service;
+        $this->logger = $logger;
 
     }
 
@@ -192,26 +195,29 @@ class PhotoImageController extends ActiveController
     {
         $form = new GuestPhotoForm();
 //        $form->load(Yii::$app->request->post(), '');
-        $form->load (Yii::$app->request->getBodyParams(), '');
+        $form->load(Yii::$app->request->getBodyParams(), '');
         if ($form->validate()) {
             try {
                 $form->user_id = Yii::$app->user->id;
-                $photo = $this->service->create($form);
-                if (!isset($photo) ) {
+                $images = $this->service->create($form);
+                if (isset($images)) {
                     Yii::$app->getResponse()->setStatusCode(201);
+                    return $this->serializePhoto($images);
+                } else {
+                    Yii::$app->getResponse()->setStatusCode(501);
+                    throw new DomainException("Photo was not built by some reasons");
                 }
-                return $this->serializePhoto($photo);
             } catch (\DomainException $e) {
-                throw new BadRequestHttpException($e->getMessage(), null, $e);
+                // throw new BadRequestHttpException($e->getMessage(), null, $e);
+                $this->logger->log("Verification is ok. Photo was not built by some reasons" . json_encode($form->getErrors()), Logger::LEVEL_ERROR);
             }
-        }
-        else {
+        } else {
             Yii::$app->getResponse()->setStatusCode(501);
-            throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->SelfyForm->getErrors()));
+            $this->logger->log("Photo was not built by some reasons. after verification" . json_encode($form->SelfyForm->getErrors()), Logger::LEVEL_ERROR);
+            //throw new ServerErrorHttpException('Failed to add the object'.' '.json_encode ($form->SelfyForm->getErrors()));
         }
+
     }
-
-
 
     private function fileUpload($result)
     {
@@ -248,15 +254,16 @@ class PhotoImageController extends ActiveController
         return $searchModel->search(Yii::$app->request->queryParams);
     }
 
-    public function serializePhoto($photo,$result=null): array
+    public function serializePhoto($photos,$result=null): array
     {
-
-        return [
-            'id' => $photo->id,
+        $result=[];
+        foreach ($photos as $photo){
+            $result[]=['id' => $photo->id,
             'date'=>$photo->date,
             'file_name'=>$photo->file_name,
-            'url'=>$photo->getUploadedFileUrl('file_name')
-        ];
+            'url'=>$photo->getUploadedFileUrl('file_name')];
+        }
+        return $result;
     }
 
 }

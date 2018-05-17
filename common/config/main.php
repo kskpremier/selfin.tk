@@ -16,12 +16,6 @@ return [
             'cachePath' => '@common/runtime/cache',
          //   'class' => 'yii\redis\Cache',
         ],
-//        'authManager' => [
-////            'class' => 'yii\rbac\PhpManager',
-//            'class' => 'yii\rbac\DbManager',
-//        ],
-
-
     //заменил как в shop
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
@@ -29,7 +23,7 @@ return [
             'itemChildTable' => '{{%auth_item_children}}',
             'assignmentTable' => '{{%auth_assignments}}',
             'ruleTable' => '{{%auth_rules}}',
-            'defaultRoles' => ['tourist']
+//            'defaultRoles' => ['']
         ],
         'queue' => [
 //            'class' => 'yii\queue\redis\Queue',

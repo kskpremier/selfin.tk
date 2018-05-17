@@ -7,7 +7,9 @@ use reception\dispatchers\AsyncEventDispatcher;
 use reception\dispatchers\DeferredEventDispatcher;
 use reception\dispatchers\EventDispatcher;
 use reception\dispatchers\SimpleEventDispatcher;
+use reception\entities\User\events\UserKeySend;
 use reception\jobs\AsyncEventJobHandler;
+use reception\listeners\User\UserKeySendListener;
 use reception\listeners\User\UserSignupConfirmedListener;
 use reception\listeners\User\UserSignupRequestedListener;
 use reception\entities\User\events\UserSignUpConfirmed;
@@ -75,6 +77,7 @@ class SetUp implements BootstrapInterface
                 UserMobileCreated::class=>[UserMobileCreatedListener::class],
                 UserMobileTimeToUpdate::class=>[UserMobileTimeToUpdateListener::class],
                 DocumentAddRequested::class => [DocumentAddListener::class],
+                UserKeySend::class=>[UserKeySendListener::class]
 
             ]);
         });

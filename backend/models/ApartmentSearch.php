@@ -12,6 +12,8 @@ use backend\models\Apartment;
  */
 class ApartmentSearch extends Apartment
 {
+    public $user;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +21,7 @@ class ApartmentSearch extends Apartment
     {
         return [
             [['id'], 'integer'],
-            [['location', 'name'], 'safe'],
+            [['location', 'name', 'user'], 'safe'],
         ];
     }
 
@@ -59,11 +61,12 @@ class ApartmentSearch extends Apartment
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'apartment.id' => $this->id,
         ]);
 
         $query->andFilterWhere(['like', 'location', $this->location])
-            ->andFilterWhere(['like', 'name', $this->name]);
+            ->andFilterWhere(['=', 'apartment.user_id', $this->user])
+            ->andFilterWhere(['like', 'apartment.name', $this->name]);
 
         return $dataProvider;
     }

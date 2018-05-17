@@ -74,7 +74,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $this->layout='mReception.php';
+        return $this->render('mReception');
     }
 
     /**
@@ -131,6 +132,15 @@ class SiteController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+    /**
+     * Displays contact page.
+     *
+     * @return mixed
+     */
+    public function actionSelfRegistration()
+    {
+        return $this->render('selfRegistration');
     }
 
     /**
@@ -313,5 +323,16 @@ class SiteController extends Controller
         ]);
 
 
+    }
+
+    /**
+     * Displays about page.
+     *
+     * @return mixed
+     */
+    public function actionReception()
+    {
+        $this->layout='mReception.php';
+        return $this->render('mReception');
     }
 }

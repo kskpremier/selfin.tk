@@ -10,10 +10,14 @@
 namespace reception\useCases\manage\DoorLock;
 
 use reception\entities\Apartment\Apartment;
+use reception\entities\DoorLock\DoorLock;
 use reception\entities\DoorLock\KeyboardPwd;
 use backend\models\Booking;
 use reception\forms\KeyboardPasswordForm;
 use reception\forms\KeyboardPwdForm;
+use reception\repositories\Booking\BookingRepository;
+use reception\repositories\DoorLock\DoorLockRepository;
+use reception\services\TTL\DoorLockChinaService;
 use reception\useCases\BusinessException;
 use reception\helpers\TTLHelper;
 use reception\useCases\manage\TTL\TTL;
@@ -27,52 +31,90 @@ use yii\web\ServerErrorHttpException;
 class KeyboardPwdManageService
 {
     private $keyboardPwdRepository;
+    private $doorLockRepository;
+    private $bookingRepository;
+    private $doorLockChinaService;
 
-    public function __construct(KeyboardPwdRepository $keyboardPwdRepository)
+    public function __construct(KeyboardPwdRepository $keyboardPwdRepository, DoorLockRepository $doorLockRepository, BookingRepository $bookingRepository,
+                                DoorLockChinaService $doorLockChinaService    )
     {
         $this->keyboardPwdRepository = $keyboardPwdRepository;
+        $this->doorLockRepository = $doorLockRepository;
+        $this->bookingRepository = $bookingRepository;
+        $this->doorLockChinaService =  $doorLockChinaService;
 
     }
 
-    public function generate(KeyboardPasswordForm $form)
+    public function generate(KeyboardPasswordForm $form) : array
     {
-
-        if ($form->externalApartmentId) {
-            $result=[];
-            foreach ($form->apartment->doorLocks as $doorlock)
-            {
-                $keyboardPwd = KeyboardPwd::create(
-                    strtotime($form->startDate),
-                    strtotime($form->endDate),
-                    TTLHelper::getKeyboardPwdType($form->type),
-                    $form->keyboardPwdVersion,
-                    $doorlock->id
-                );
-                $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
-                if ($data['success']) {
-                 $result[]=$keyboardPwd;
-                 $this->keyboardPwdRepository->save($keyboardPwd);
+        $result = [];
+        if ($form->type != TTLHelper::TTL_KEYBOARD_CUSTOMIZED) {
+            if ($form->externalApartmentId || $form->apartment_id) {
+                foreach ($form->apartment->doorLocks as $doorlock) {
+                    $result [] = $this->createKeyboardPwd($form, $doorlock);
+                    return $result;
                 }
-                else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+            }
+            if ($form->doorLockId != '' || $form->doorLockId != null) {
+                $doorlock = $this->doorLockRepository->get($form->doorLockId);
+                if ($doorlock) {
+                    $result[] = $this->createKeyboardPwd($form, $doorlock);
+                    return $result;
+                } else throw new ServerErrorHttpException('Wrong door lock ID.' . $form->doorLockId);
+            }
+            if ($form->bookingId || $form->booking_internal_id) {
+
+                if ($form->bookingModel) {
+                    foreach ($form->bookingModel->apartment->doorLocks as $doorlock) {
+                        $result [] = $this->createKeyboardPwd($form, $doorlock);
+                    }
+                    return $result;
+                }
+                throw new ServerErrorHttpException('Wrong booking ID.' . $form->bookingId);
+            }
+        }
+        else {
+            if ($form->value && $form->doorLockId) {
+                $doorlock = $this->doorLockRepository->get($form->doorLockId);
+                $result [] = $this->createCustomizedPwd($form,$doorlock);
             }
             return $result;
         }
-        else {
-            $keyboardPwd = KeyboardPwd::create(
-                strtotime($form->startDate),
-                strtotime($form->endDate),
-                TTLHelper::getKeyboardPwdType($form->type),
-                $form->keyboardPwdVersion,
-                $form->doorLockId
-            );
-            $data = json_decode($keyboardPwd->getKeyboardPwdFromChina(), true);
-            if ($data['success']) {
-                $this->keyboardPwdRepository->save($keyboardPwd);
-                return $keyboardPwd;
-            }
-            else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
-        }
+        return [];
     }
+
+    public function createKeyboardPwd(KeyboardPasswordForm $form, DoorLock $doorLock) {
+        $keyboardPwd = KeyboardPwd::create(
+        strtotime($form->startDate),
+        ($form->endDate) ? strtotime($form->endDate) : 0,
+        TTLHelper::getKeyboardPwdType($form->type),
+        $form->keyboardPwdVersion, $doorLock->id);
+        $data = json_decode($this->doorLockChinaService->getKeyboardPwdFromChina($doorLock, $keyboardPwd), true);
+        if ($data['success']) {
+             $this->keyboardPwdRepository->save($keyboardPwd);
+             return $keyboardPwd;
+        }
+        else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+    }
+
+public function createCustomizedPwd (KeyboardPasswordForm $form, DoorLock $doorLock) {
+    $keyboardPwd = KeyboardPwd::create(
+        strtotime($form->startDate),
+        ($form->endDate) ? strtotime($form->endDate) : 0,
+        TTLHelper::TTL_KEYBOARD_CUSTOMIZED,
+        $form->keyboardPwdVersion,
+        $doorLock->id,
+        null, //booking_id
+        $form->value);
+
+    $data = json_decode($this->doorLockChinaService->addKeyboardPwd($doorLock, $keyboardPwd, ($form->addType==TTLHelper::TTL_RECORD_VIA_GATEWAY)?$form->addType:TTLHelper::TTL_RECORD_VIA_BLUETOOTH), true);
+    if ($data['success']) {
+        $this->keyboardPwdRepository->save($keyboardPwd);
+        return $keyboardPwd;
+    }
+    else throw new ServerErrorHttpException('Failed to get information from China API for unknown reason.' . implode(',', $data));
+}
+
     public function generateForBooking(KeyboardPwdForBookingForm $form): array
     {
         $booking = Booking::find()->where(['or',['id'=>$form->bookingId,'external_id'=>$form->externalId]])->one();
@@ -88,7 +130,7 @@ class KeyboardPwdManageService
                 $doorLock->id
             );
             $this->keyboardPwdRepository->save($keyboardPwd);
-            if ($response = $this->getKeyboardPwdValueFromChina($keyboardPwd)) {
+            if ($response = $this->doorLockChinaService->getKeyboardPwdValueFromChina($keyboardPwd)) {
                 $keyboardPwd->value = $response['keyboardPwd'];
                 $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
                 $this->keyboardPwdRepository->save($keyboardPwd);
@@ -177,6 +219,37 @@ class KeyboardPwdManageService
                 return $data;
             } else if (array_key_exists('errcode', $data)) {
                 throw new ServerErrorHttpException('Response from TTL consider error :  code ' . $data['errcode']);
+            }
+        }
+        else throw new ServerErrorHttpException('Problems with request '. $response);
+    }
+
+    public function remove(KeyboardPwd $keyboardPwd, $deleteType) {
+        $client = $client = new Client([
+            'baseUrl' => TTL::TTL_URL_TO_DELETE_ONE_PASSCODE,
+            'responseConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],
+        ]);
+        $accessToken = TTL::getToken(User::findOne(['username'=>TTL::TTL_DOOR_LOCK_ADMIN_USERNAME])->id);
+        $response = $client->createRequest()
+            ->setMethod('post')
+            ->setData([
+                'clientId'=>TTL::TTL_CLIENT_ID,
+                'date'=> 1000 * time(),
+                'accessToken'=>$accessToken->access_token,
+                'keyboardPwdId'=>$keyboardPwd->keyboard_pwd_id,
+                'deleteType'=>$deleteType,
+                'lockId'=>$keyboardPwd->doorLock->lock_id,
+            ])
+            ->send();
+        $data = $response->data;
+        //в китайском ответе должно быть поле errcode
+        if (is_array($data)) {
+            if (array_key_exists('errcode', $data) && $data['errcode']==0) {
+                return true;
+            } else if (array_key_exists('errcode', $data)) {
+               return false;
             }
         }
         else throw new ServerErrorHttpException('Problems with request '. $response);

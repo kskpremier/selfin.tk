@@ -16,9 +16,17 @@ class ApartmentRepository
     public function get($id): Apartment
     {
         if (!$apartment = Apartment::findOne($id)) {
-            throw new NotFoundException('Order is not found.');
+            throw new NotFoundException('Apartment is not found.');
         }
         return $apartment;
+    }
+    public function getAllbyIds($ids): array
+    {
+        $apartments = [];
+        if(isset($ids))
+        $apartments = Apartment::find()->where(['id'=>$ids])->all();
+
+        return $apartments;
     }
 
     public function save(Apartment $apartment): void

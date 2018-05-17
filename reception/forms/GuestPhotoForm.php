@@ -77,7 +77,7 @@ class GuestPhotoForm extends CompositeForm
             'longitude','latitude','album_id','id','user_id'],'safe'],
           //  [['id','user_id',],'integer'],
             [['booking_id'],'validateBooking','message'=>'Booking with this ID should exist'],
-            [['booking_id'],'validateDocument','message'=>'Document with this number does\'t exist']
+            [['document_number'],'validateDocument','message'=>'Document with this number does\'t exist']
         ];
     }
     protected function internalForms(): array

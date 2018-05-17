@@ -7,8 +7,14 @@
  * */
 namespace api\controllers;
 
+use backend\models\KeyAdminSearch;
+use backend\models\KeyOpeningSearch;
+use reception\entities\DoorLock\DoorLock;
+use reception\entities\User\User;
 use reception\forms\KeyForm;
+use reception\helpers\TTLHelper;
 use reception\repositories\DoorLock\KeyRepository;
+use reception\repositories\UserRepository;
 use reception\useCases\manage\DoorLock\KeyManageService;
 use reception\forms\KeyForBookingForm;
 use Yii;
@@ -17,6 +23,7 @@ use backend\models\KeySearch;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
 use backend\models\Booking;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -33,13 +40,15 @@ class KeyController extends Controller
 {
     private $key;
     private $service;
+    private $users;
 
 
-    public function __construct($id, $module, KeyManageService $service, KeyRepository $key, $config = [])
+    public function __construct($id, $module, KeyManageService $service, KeyRepository $key, UserRepository $users, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->key = $key;
         $this->service = $service;
+        $this->users = $users;
 
     }
 
@@ -50,19 +59,25 @@ class KeyController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','index'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','index','list'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete','create-for-booking'],
+            'only' => ['create', 'update', 'delete','create-for-booking','index','list'],
+            'except' => ['keys-list-for-opening'],
             'rules' => [
                 [
                     'allow' => true,
-                    // ролей пока нет, поэтому я закоментировал
-                    'roles' => ['admin','receptionist'],
+                    'actions'=>['create', 'update', 'delete','create-for-booking','index','list'],
+                    'roles' => ['admin','receptionist','mobile','tourist'],
+                ],
+                [
+                    'allow' => true,
+                    'actions'=>['keys-list-for-opening'],
+                    'roles' => ['@'],
                 ],
             ],
         ];
@@ -79,42 +94,42 @@ class KeyController extends Controller
             'delete' => ['delete']
         ];
     }
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['create']);
-       // $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
-        return $actions;
-    }
+//    public function actions()
+//    {
+//        $actions = parent::actions();
+//        unset($actions['create']);
+//       // $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+//        return $actions;
+//    }
 
-    public function checkAccess($action, $model = null, $params = [])
-    {
-        if (in_array($action, ['create'])) {
-            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['delete'])) {
-            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['view'])) {
-            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['update'])) {
-            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-        if (in_array($action, ['index'])) {
-            if (!Yii::$app->user->can('tourist',[])) {
-                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
-            }
-        }
-    }
+//    public function checkAccess($action, $model = null, $params = [])
+//    {
+//        if (in_array($action, ['create'])) {
+//            if (!Yii::$app->user->can('createKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['delete'])) {
+//            if (!Yii::$app->user->can('deleteKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['view'])) {
+//            if (!Yii::$app->user->can('viewKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['update'])) {
+//            if (!Yii::$app->user->can('updateKey',['booking_id'=>$model->booking_id, 'start_date'=>$model->start_date,'end_date'=>$model->end_date])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//        if (in_array($action, ['index'])) {
+//            if (!Yii::$app->user->can('tourist',[])) {
+//                throw new ForbiddenHttpException('Wrong or expired token. No authorization.');
+//            }
+//        }
+//    }
 
     public function prepareDataProvider()
     {
@@ -182,8 +197,8 @@ class KeyController extends Controller
      */
     public function actionIndex(){
         $result=[];
-        $searchModel = new KeySearch();
-        $searchModel->userId = Yii::$app->user->id;
+        $searchModel = new KeySearch(['userId'=>Yii::$app->user->id]);
+       // $searchModel->userId = Yii::$app->user->id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $models = $dataProvider->getModels();
@@ -193,6 +208,44 @@ class KeyController extends Controller
         return $result;
     }
 
+    public function actionKeysListForOpening(){
+        $result=[];
+        if (Yii::$app->user->can('mobile') || Yii::$app->user->can('reception')) {
+            $searchModel = new KeyOpeningSearch(['userId'=>Yii::$app->user->id,'admin'=>true]);
+        }
+        else $searchModel = new KeyOpeningSearch(['userId'=>Yii::$app->user->id]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $models = $dataProvider->getModels();
+        $done=[];
+        foreach ($models as $model){
+            if (!in_array($model->door_lock_id, $done)) {
+                $result[] = $this->serializeKey($model);
+                $done[]=$model->door_lock_id;
+            }
+        }
+        return $result;
+    }
+
+    public function actionList(){
+        $result=[];
+        $user = Yii::$app->user->identity->getUserModel();
+        $parentsIDs = (isset($user->parentUsers))?ArrayHelper::getColumn($user->parentUsers, 'id'):[];
+        if (Yii::$app->user->can('tourist')) {
+            $searchModel = new KeyAdminSearch(['userId'=>$user->id]);
+        }
+        elseif (Yii::$app->user->can('mobile')) {
+            $searchModel = new KeyAdminSearch(['userId'=>$user->id, "parents"=>$parentsIDs]);
+        }
+        else $searchModel = new KeySearch(['user_id' => Yii::$app->user->id] );
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $models = $dataProvider->getModels();
+        foreach ($models as $model){
+            $result[]= $model->serializeKey();
+        }
+        return $result;
+    }
 
     /**
      * @SWG\Post(
@@ -312,6 +365,21 @@ class KeyController extends Controller
 
     public function serializeKey($key): array
     {
+        $apartments=[];
+        foreach ($key->doorLock->apartments as $apartment)
+        {
+            $apartments[]=[
+                'id' => $apartment->id,
+                'name' => $apartment->name,
+                'external_apartment_id' => $apartment->external_id,
+                'city_name'=>$apartment->city_name,
+                'address'=>$apartment->adress,
+                'latitude'=>$apartment->latitude,
+                'longitude'=>$apartment->longitude,
+                'user_id'=>$apartment->user_id
+            ];
+        }
+
         return [
             'startDate'=>$key->start_date*1000,//-7200000,
             'endDate'=>$key->end_date*1000,//-7200000,
@@ -321,7 +389,7 @@ class KeyController extends Controller
             'unlockKey'=>$key->doorLock->lock_key,
             'lockFlagPos'=>$key->doorLock->flag_pos,
             'aesKeyStr'=>$key->doorLock->aes_key_str,
-
+            'adminPs'=>($key->type==99)?$key->doorLock->admin_pwd:'',
             'timezoneOffset'=>$key->doorLock->timezone_raw_offset,
 
             'lockVersion'=>[
@@ -332,9 +400,13 @@ class KeyController extends Controller
                 'scene'=>$key->doorLock->getLockVersion()->one()->scene
             ],
             'apartment'=>[
-                'name'=>($key->doorLock->apartment)?$key->doorLock->apartment->name:'not yet installed',
+                'name'=>(count($apartments)>=1)?$apartments[0]['name']:'not yet installed',
+
             ],
-            'booking_id'=>($key->booking_id)?$key->booking->external_id:'not match with any booking'
+            'booking_id'=>$key->booking_id
         ];
+    }
+    public function actionGetType(){
+        return TTLHelper::getKeyTypeList();
     }
 }

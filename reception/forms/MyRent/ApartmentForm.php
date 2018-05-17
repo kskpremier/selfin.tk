@@ -28,6 +28,7 @@ use reception\forms\MyRent\DoorLockForm;
  * @property integer $owner_id
  * @property integer $worker_id
  * @property integer $user_id
+ * @property integer $id
  *
  * @property DoorLockForm $doorlocks
  
@@ -50,6 +51,8 @@ class ApartmentForm extends CompositeForm
     public $owner_id;
     public $worker_id;
     public $user_id;
+    public $door_id;
+    public $id;
 
     /**
      * ApartmentsForm constructor.
@@ -59,9 +62,9 @@ class ApartmentForm extends CompositeForm
         parent::__construct($config);
         if (isset($rentInfo) ){
             $this->load($rentInfo,'');
+//            $this->doorlocks = new DoorLockInstallForm([], (integer) ($rentInfo[0]["door_id"]));
         }
-//        $this->doorlocks = [new DoorLockInstallForm()];
-        $this->doorlocks = new DoorLockInstallForm();
+//        else $this->doorlocks = new DoorLockInstallForm();
     }
 
     /**
@@ -71,14 +74,14 @@ class ApartmentForm extends CompositeForm
     {
         return [
           
-            [['guid','object_code','object_name','object_color','city_name','country','latitude','longitude','adress','name'], 'string'],
-            [['object_id','user_id','owner_id','worker_id'], 'integer'],
+            [['guid','object_code','object_name','object_color','city_name','country','latitude','longitude','adress','name','door_id'], 'string'],
+            [['object_id','user_id','owner_id','worker_id','id'], 'integer'],
 
         ];
     }
     protected function internalForms(): array
     {
-        return ['doorlocks'];
+//        return ['doorlocks'];
     }
 
 }

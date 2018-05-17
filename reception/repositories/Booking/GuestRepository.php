@@ -8,6 +8,7 @@
 
 namespace reception\repositories\Booking;
 
+use backend\models\Country;
 use reception\entities\Booking\Guest;
 use reception\forms\MyRent\ContactForm;
 use reception\repositories\NotFoundException;
@@ -21,7 +22,14 @@ class GuestRepository
         }
         return $guest;
     }
-    public function isGuestExist($firstName, $secondName,$contactEmail): mixed
+    public function isGuest($firstName, $secondName, $country) {
+        $country = Country::find()->where(['code'=>$country])->one();
+        if ($guest = Guest::findOne(['first_name' => $firstName,'second_name'=>$secondName,'contact_country'=>$country])) {
+            return $guest;
+        }
+        return false;
+    }
+    public function isGuestExist($firstName, $secondName, $contactEmail)
     {
         if ($guest = Guest::findOne(['first_name' => $firstName,'second_name'=>$secondName,'contact_email'=>$contactEmail])) {
             return $guest;

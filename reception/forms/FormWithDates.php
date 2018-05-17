@@ -52,9 +52,9 @@ abstract class FormWithDates extends CompositeForm
 //            if (strtotime($this->endDate) < (time()) ){
 //                $this->addError('Start Date must be bigger then current time');
 //            }
-            if (strtotime($this->endDate) < strtotime($this->startDate) ){
-                $this->addError( 'End Date must be bigger then Start Date');
-            }
+//            if ((strtotime($this->endDate) < strtotime($this->startDate) )){
+//                $this->addError( 'End Date must be bigger then Start Date');
+//            }
 
     }
     public function load($data, $formName = null) : bool
@@ -66,9 +66,13 @@ abstract class FormWithDates extends CompositeForm
     }
 
     private function convertDates(){
-//        if ($this->startDateTimestamp && gettype($this->startDateTimestamp)=='integer'){
-//            $this->startDate = date('Y-m-d H:i:s',$this->startDateTimestamp);
-//        }
+        if ($this->startDate && gettype($this->startDate)=='integer'){
+            $this->startDate = date('Y-m-d H:i:s',$this->startDate/1000);
+        }
+        if ($this->endDate && gettype($this->endDate)=='integer'){
+            $this->endDate = date('Y-m-d H:i:s',$this->endDate/1000);
+        }
+
         if ($this->startDateTimestamp && gettype($this->startDateTimestamp)=='integer'){
             $this->startDate = date('Y-m-d H:i:s',$this->startDateTimestamp);
         }

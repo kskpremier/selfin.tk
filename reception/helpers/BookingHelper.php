@@ -3,6 +3,7 @@
 namespace reception\helpers;
 
 use reception\entities\Booking\Booking;
+use reception\entities\User\User;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use Yii;
@@ -46,6 +47,13 @@ class BookingHelper
         return Html::tag('span', ArrayHelper::getValue(self::statusList(), $status), [
             'class' => $class,
         ]);
+    }
+
+    public static function getBookingsForUser(User $user) {
+        $ids= ArrayHelper::getColumn($user->parentUsers,'id');
+        $ids[]=$user->id;
+        return Booking::find()->joinWith('apartment')->joinWith('apartment.doorLocks')
+            ->where(['apartment.user_id'=>$ids,'door_lock.user_id'=>$ids])->fromNow()->active()->all();
     }
 
 }

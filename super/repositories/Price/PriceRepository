@@ -1,0 +1,27 @@
+<?php
+
+namespace superprice\repositories\Price;
+
+use backend\models\ObjectsPricesDays;
+use reception\services\MyRent\MyRent;
+
+class PriceRepository
+{
+    public function get($id): ObjectsPricesDays
+    {
+        return $this->getBy(['id' => $id]);
+    }
+    public function save(ObjectsPricesDays $price): void
+    {
+        $price = MyRent::priceSet($price);
+        if (!$price) {
+            throw new \RuntimeException('Saving error.');
+        }
+    }
+    public function remove(ObjectsPricesDays $price): void
+    {
+        if (!$price->delete()) {
+            throw new \RuntimeException('Removing error.');
+        }
+    }
+}

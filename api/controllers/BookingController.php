@@ -9,6 +9,8 @@
 namespace api\controllers;
 
 
+use backend\models\ApartmentSearch;
+use const CURLGSSAPI_DELEGATION_POLICY_FLAG;
 use reception\forms\BookingForm;
 use reception\forms\BookingFormForNewApartments;
 use reception\forms\MyRent\ApartmentForm;
@@ -16,6 +18,7 @@ use reception\forms\MyRent\ContactForm;
 use reception\forms\MyRent\RentForm;
 use reception\repositories\Booking\BookingRepository;
 use reception\useCases\manage\Booking\BookingManageService;
+use reception\useCases\manage\Booking\SynchroService;
 use reception\useCases\manage\MyRent\MyRentManageService;
 use Yii;
 use reception\entities\Booking\Booking;
@@ -44,14 +47,16 @@ class  BookingController extends Controller
     private $booking;
     private $service;
     private $myRentService;
+    private $synchroService;
 
 
-    public function __construct($id, $module, BookingManageService $service, MyRentManageService $myRentService, BookingRepository $booking, $config = [])
+    public function __construct($id, $module, BookingManageService $service, MyRentManageService $myRentService, BookingRepository $booking, SynchroService $synchroService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->booking = $booking;
         $this->service = $service;
         $this->myRentService = $myRentService;
+        $this->synchroService = $synchroService;
     }
 
     /**
@@ -61,22 +66,22 @@ class  BookingController extends Controller
     {
 
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','view','view-external','bookings','booking'];
+        $behaviors['authenticator']['only'] = ['create', 'update', 'delete','view','view-external','bookings','rents','booking'];
         $behaviors['authenticator']['authMethods'] = [
             HttpBasicAuth::className(),
             HttpBearerAuth::className(),
         ];
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['create', 'update', 'delete','view','view-external','bookings','booking','create-for-owner'],
+            'only' => ['create', 'update', 'delete','view','view-external','bookings','rents','booking','create-for-owner','apartments'],
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','owner'],
+                    'roles' => ['receptionist','owner','mobile'],
                 ],
                 [
                     'allow' => true,
-                    'actions'=>['bookings'],
+                    'actions'=>['bookings','rents'],
                     'roles' => ['tourist'],
                 ],
 
@@ -195,21 +200,23 @@ class  BookingController extends Controller
         $form->load(Yii::$app->getRequest()->getBodyParams(),'');
         if ( $form->validate()) {
             try {
-                $booking = $this->service->create($form,false,$form->eKey, true); //без письма и потенциальным пользователем
+                $booking = $this->service->getKeys($form);
                 if ($booking) {
                     $response = Yii::$app->getResponse();
                     $response->setStatusCode(201);
-                    $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $booking->id], true));
                 } elseif (!$booking->hasErrors()) {
                     throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
                 }
                 return $this->serializeBooking($booking);
             } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
                 throw new BadRequestHttpException($e->getMessage(), null, $e);
             }
         }
         else {
-            throw new ServerErrorHttpException('Failed to create the object => '. \GuzzleHttp\json_encode($form->getFirstErrors()) );
+            $e = new ServerErrorHttpException('Failed to create the object => '. \GuzzleHttp\json_encode($form->getFirstErrors()));
+            Yii::$app->errorHandler->logException($e);
+            throw $e;
         }
     }
     /**
@@ -231,7 +238,7 @@ class  BookingController extends Controller
      * Displays all bookings model for guest(user)
      * @return mixed
      */
-    public function actionBookings()
+    public function actionBookingsOld()
     {
         $request = Yii::$app->request;
         $user = User::findOne(Yii::$app->user->id);
@@ -242,12 +249,14 @@ class  BookingController extends Controller
         $updateTime = time();
         $lastUpdate =  $user->myrent_update;
         //если пользователь владелец или рецепционист, то обновим его апартаменты и букинги
-        if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) ) {
+        if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) || Yii::$app->user->can('receptionist',[]) ) {
             if (($updateTime - $user->updated_at) > MyRent::MyRent_UPDATE_INTERVAL) {
-                //обновляем апартаменты
+                //обновляем список апартаментов у пользователя
                 try {
                  if  ( Yii::$app->user->can('mobile',[]) ){
-                        $this->myRentService->updateMyRentUser($user);
+                        if ($updateTime - $user->myrent_update > MyRent::MyRent_USER_UPDATE_INTERVAL) {
+                            $this->myRentService->updateMyRentUser($user);
+                        }
                         $rentList = MyRent::getBookingsUpdateForUser($user->external_id, date("Y-m-d H:i:s",$lastUpdate));
                         $owner_id=null;
                     }
@@ -273,7 +282,7 @@ class  BookingController extends Controller
             $bookings = ( Yii::$app->user->can('mobile',[]) )? $this->booking->getBookingsByMobileUser($user->id,$from,$to) :
                 $this->booking->getBookingsByOwner($user->owner->external_id,$from,$to);
         }
-
+    else
        { // иначе запрашивающий просто турист
            //найти все букинги , со статусом Активные для данного гостя (?)
            $guest = Guest::find()->where(['user_id' => Yii::$app->user->getId()])->one();
@@ -281,6 +290,34 @@ class  BookingController extends Controller
             $bookings = $this->booking->getBookingsByGuest($guest,$from,$to);
        }
        return $bookings;
+    }
+
+    public function actionBookings(){
+        $request = Yii::$app->request;
+        $user = User::findOne(Yii::$app->user->id);
+        $from = (!$request->get('date'))? date("Y-m-d", time()):$request->get('date') ;
+        $to = $request->get('to');
+        $to = ($to)? $to:$from;
+        $bookings=[];
+        $updateTime = time();
+        $lastUpdate =  $user->myrent_update;
+        if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) || Yii::$app->user->can('receptionist',[]) ) {
+            if (($updateTime - $user->updated_at) > MyRent::MyRent_USER_UPDATE_INTERVAL) {
+                $apartments = $this->synchroService->synchroApartmentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
+                $rents = $this->synchroService->synchroRentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
+            }
+            else $rents = $this->synchroService->synchroChangesRentsForUser($user, $lastUpdate, $updateTime, (Yii::$app->user->can('owner',[]))?$user->owner->external_id:null);
+
+            //найти все букинге в базе, независимо от статуса на дату запроса для owner или receptionist
+            $bookings = ( Yii::$app->user->can('mobile',[]) )? $this->booking->getBookingsByMobileUser($user->id,$from,$to) :
+                                                                            $this->booking->getBookingsByOwner($user->owner->external_id,$from,$to);
+        }
+        else {
+            $guest = Guest::find()->where(['user_id' => Yii::$app->user->getId()])->one();
+            if ($guest)
+                $bookings = $this->booking->getBookingsByGuest($guest,$from,$to);
+        }
+        return $bookings;
     }
 
     public function actionMyRent()
@@ -348,6 +385,17 @@ class  BookingController extends Controller
     public function actionView($id)
     {
         return $this->findModel($id);
+    }
+
+
+    public function actionApartments()
+    {
+        $searchModel = new ApartmentSearch(['user'=>Yii::$app->getUser()->getId()]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        foreach ($dataProvider->getModels() as $apartment) {
+            $result[] = $this->serializeAaprtment($apartment);
+        }
+        return $result;
     }
 
 
@@ -521,6 +569,19 @@ class  BookingController extends Controller
 //            'password' => ($booking->author->user->temporaryPassword)? $booking->author->user->temporaryPassword :'',
             'keyboardPwds' => $keyboardPwds,
 
+        ];
+    }
+
+    public function serializeAaprtment ($apartment){
+        return [
+            'id' => $apartment->id,
+            'name' => $apartment->name,
+//            'external_apartment_id' => $apartment->external_id,
+            'city_name'=>$apartment->city_name,
+            'address'=>$apartment->adress,
+            'latitude'=>$apartment->latitude,
+            'longitude'=>$apartment->longitude,
+            'user_id'=>$apartment->user_id
         ];
     }
     

@@ -38,22 +38,27 @@ class PhotoManageService
 
     }
 
-    public function create(GuestPhotoForm $form): AbstractImage
+    public function create(GuestPhotoForm $form):array
     {
         $images=[];
-        foreach ($form->SelfyForm->files as $image) {
-            $document = $this->documentRepository->get($form->document_number);
-            //Создаем Image
-            $photo = AbstractImage::create($image, AbstractImage:: ALBUM_IMAGES, $document, $form->booking_id, $form->user_id);
-            //Распознаем лица на имадже
-            $this->photoRepository->save($photo);
-            $this->processing->getDetectedFaces($photo);
+        $document = $this->documentRepository->get($form->document_number);
+        if ($document) {
+            foreach ($form->SelfyForm->files as $image) {
+                //Создаем Image
+                $photo = AbstractImage::create($image, AbstractImage:: ALBUM_IMAGES, $document, $form->booking_id, $form->user_id);
+                //Распознаем лица на имадже
+                $this->photoRepository->save($photo);
+                $this->processing->getDetectedFaces($photo);
 
-            $images[]=$photo;
+                $images[] = $photo;
+            }
+            //Генерируем событие о том, что создано дополнительное фото к документу
+            $document->recordEvent(new DocumentAddRequested($document, null, $form->SelfyForm));
+            $this->documentRepository->save($document);
         }
-        //Генерируем событие о том, что создано дополнительное фото к документу
-        $document->recordEvent(new DocumentAddRequested($document,null, $form->SelfyForm));
-        $this->documentRepository->save($document);
+        else {
+            throw new \DomainException("Document with such number was not found");
+        }
         return $images;
     }
 

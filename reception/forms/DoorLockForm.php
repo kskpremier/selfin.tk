@@ -17,20 +17,20 @@ class DoorLockForm extends CompositeForm
 {
 //    public  $lockVersion;
 
-    public $lockName;	//String	Y	Lockname
-    public $lockAlias;	//String	N	Lock alias
-    public $lockMac	;//String	Y	Lock mac address
-    public $lockKey	;//String	Y	Critical information locked door, open the door of
-    public $lockId;//Integer	Y	Lock id
-    public $keyId;//Int	Administrator key id
-    public $lockFlagPos	;//Int	Y	Lock flag
-    public $aesKeyStr	;//String	Y	Aes encryption and decryption Key
-    public $adminPwd	;//String	N	The administrator password lock, lock management related operations required to carry, check administrator privileges
-    public $noKeyPwd	;//String	N	Keyboard administrator password, administrator password to open the door with the
-    public $deletePwd	;//String	N	Clear codes, passwords for emptying locked
-    public $pwdInfo	;//String	N	Password data, for generating the password, the SDK provides
-    public $timestamp	;//String	N	Time stamp, used to initialize the password data, SDK provided
-    public $specialValue	;//Int	N	Lock feature value that indicates the function of the lock support
+    public $lockName;	        //String	Y	Lockname
+    public $lockAlias;	        //String	N	Lock alias
+    public $lockMac	;            //String	Y	Lock mac address
+    public $lockKey	;           //String	Y	Critical information locked door, open the door of
+    public $lockId;             //Integer	Y	Lock id
+    public $keyId   ;           //Int	Administrator key id
+    public $lockFlagPos	;       //Int	Y	Lock flag
+    public $aesKeyStr	;       //String	Y	Aes encryption and decryption Key
+    public $adminPwd	;       //String	N	The administrator password lock, lock management related operations required to carry, check administrator privileges
+    public $noKeyPwd	;       //String	N	Keyboard administrator password, administrator password to open the door with the
+    public $deletePwd	;       //String	N	Clear codes, passwords for emptying locked
+    public $pwdInfo	;           //String	N	Password data, for generating the password, the SDK provides
+    public $timestamp	;       //String	N	Time stamp, used to initialize the password data, SDK provided
+    public $specialValue	;   //Int	N	Lock feature value that indicates the function of the lock support
     public $timezoneRawOffset	;//Long	N	When the lock area where the number of poor and UTC time zone, the unit milliseconds, default (China time zone) 28,800,000
     public $date	;//Long	Y	Current time (milliseconds)
     public $modelNumber	;//String	Y	Aes encryption and decryption Key

@@ -49,11 +49,11 @@ class Key extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pin', 'booking_id','door_lock_id','guest_id','key_id','open_id','user_id'], 'integer'],
+            [['pin', 'booking_id','door_lock_id','guest_id','key_id','open_id','user_id','type'], 'integer'],
             [['remarks'], 'string', 'max'=>100],
             [['start_date', 'end_date'], 'safe'],
             [['e_key','last_update_date'], 'string', 'max' => 15],
-            [[ 'email', 'key_status','type'], 'string', 'max' => 255],
+            [[ 'email', 'key_status'], 'string', 'max' => 255],
             [['booking_id'], 'exist', 'skipOnError' => true, 'targetClass' => Booking::className(), 'targetAttribute' => ['booking_id' => 'id']],
             [['door_lock_id'], 'exist', 'skipOnError' => true, 'targetClass' => DoorLock::className(), 'targetAttribute' => ['door_lock_id' => 'id']],
         ];
@@ -106,12 +106,7 @@ class Key extends \yii\db\ActiveRecord
         //тут надо сформировать запрос и послать его на наш сервер
         $client = $client = new Client([
             'baseUrl' => DOMOUPRAV::DOMOUPRAB_ABSOLUTE_URL_TO_SEND_EKEY,
-//            'requestConfig' => [
-//                'format' => Client::FORMAT_JSON
-//            ],
-//            'responseConfig' => [
-//                'format' => Client::FORMAT_JSON
-//            ],
+
         ]);
         $response = $client->createRequest()
             ->setMethod('post')
@@ -144,8 +139,8 @@ class Key extends \yii\db\ActiveRecord
     public function sendEKeyValueFromChina() {
         $response = Key::SendPost(
             time(),
-            ($this->type == '2')?  0 : $this->start_date,
-            ($this->type == '2')?  0 : $this->end_date,
+            ($this->type == 2)?  0 : $this->start_date,
+            ($this->type == 2)?  0 : $this->end_date,
             $this->doorLock->lock_id,
             $this->email,
             TTL::TTL_CLIENT_ID,
@@ -155,8 +150,8 @@ class Key extends \yii\db\ActiveRecord
         if (is_array($data)) {
             if (array_key_exists('errcode', $data)) {
                 $this->e_key = ($data['errcode'] == 0) ? "1" : "0";
-                $this->start_date = ($this->type == '2')? 0: $this->start_date;
-                $this->end_date = ($this->type == '2')? 0: $this->end_date;
+                $this->start_date = ($this->type == 2)? 0: $this->start_date;
+                $this->end_date = ($this->type == 2)? 0: $this->end_date;
                 $this->key_id = $data['keyId'];
 
                 $data['success'] =  $this->save();
