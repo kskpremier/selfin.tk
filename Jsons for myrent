@@ -1,0 +1,60 @@
+    
+    BOOKING
+    "id             ": 28,
+    "guid           ": "3253bdfe-a1b2-11e5-94cf-0050563c3009",
+    "created        ": "2015-11-11T21:03:50",
+    "changed        ": "2017-10-30T09:28:58",
+    "price          ": 193.0,
+    "exchange       ": 7.618877,
+    "price_local    ":  1470.4432610000001,
+    "paid           ": "Y",
+    "from_date      ": "2015-11-11T00:00:00",
+    "from_time      ": "21:03:00",
+    "until_date     ": "2015-11-16T00:00:00",
+    "until_time     ": "10:00:00",
+    "rent_status    ": "Finished",
+    "currency_id    ": 2,
+    "label          ": "€",
+    "rent_adults     ": 2,
+    "rent_children      ": 0,
+    "total_guests       ": 2,
+    "active          ": "Y",
+    "note            ": "2 gosta"
+    "in_advance     " : 0.0,
+    "local_price    ": 1470.4432610000001,
+
+    GUEST - AUTHOR
+    "contact_name": "Liubauskas Mykolas",
+    "contact_email": "liubauskas.mykolas@gmail.com",
+    "contact_tel": "+370 672 05 053 ",
+    "contact_country": "Lithuania",
+    "contact_country_code1": "LTU",
+    
+
+    APARTMENT
+    "object_id": 9,
+    "object_name": "Apartment Palcec",
+    "object_color": "#0000ff",
+    "city_name": "Zagreb",
+    "country": "Croatia",
+    "adress": "Ul. Vijekoslava Klaića 14",
+    "latitude": "45.8092068",
+    "longitude": "15.965249",
+
+
+  "object_code": "A1",
+    "contact_country_code2": "LT",
+    "rents_status_id": 15,
+    "label_advance": "$",
+    "status_color": "#dbdbdb",
+    "unit_name": "Apartment Center",
+    "rents_sources_name": null,
+    "rents_sources_color": null,
+    "erp_id": null,
+    "foreign_id": null,
+    "object_erp_id": null,
+    "note_user": null,
+    "note_extra": "",
+    "number": 1,
+   "unit": "LOC1",
+    

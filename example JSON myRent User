@@ -1,0 +1,27 @@
+Create user for mobile application for owners or receptionist or workers
+
+{
+  "id": 28,
+  "username": "Neven",
+  "password": "neven123",
+  "contact_name": "Neven Palcec",
+  "contact_email": "neven@gmail.com",
+  "contact_tel": "+370 672 05 053",
+  "created": "2015-11-09 16:50:46",
+  "changed": "2017-07-04 11:37:38",
+  "guid":"f4e08415-c6e7-11e5-b7cf-0050563c3009"
+  "role": "myrentuser"
+}
+
+{
+  "id": 30,
+  "username": "Neven",
+  "password": "neven123",
+  "contact_name": "Neven Palcec",
+  "contact_email": "neven@gmail.com",
+  "contact_tel": "+370 672 05 053",
+  "created": "2015-11-09 16:50:46",
+  "changed": "2017-07-04 11:37:38",
+  "guid":"f4e08415-c6e7-11e5-b7cf-0050563c3009"
+  "role": "guest"
+}
