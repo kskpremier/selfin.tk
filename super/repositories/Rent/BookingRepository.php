@@ -9,7 +9,7 @@
 
 namespace reception\repositories\Rent;
 
-use backend\models\Rents;
+use reception\entities\MyRent\Rents;
 use reception\repositories\NotFoundException;
 
 class RentsRepository
@@ -28,6 +28,7 @@ class RentsRepository
             throw new \RuntimeException('Saving error.');
         }
     }
+    
 
     public function remove(Rents $rent): void
     {
@@ -44,4 +45,6 @@ class RentsRepository
             }
         }
     }
+    
+    
 }

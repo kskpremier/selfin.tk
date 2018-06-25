@@ -40,11 +40,12 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     ]);
     if (!Yii::$app->user->isGuest) {
         $menuItems = [
-//            ['label' => 'Hosta', 'url' => ['/superuser/hosta'] , 'visible' => Yii::$app->user->can('hosta')],
+
             ['label' => 'Super', 'url' => ['/superuser/index'] , 'visible' => Yii::$app->user->can('superuser')],
             ['label' => 'Yielding', 'url' => ['/superuser/availability'] , 'visible' => Yii::$app->user->can('superuser')],
             ['label' => 'Filters', 'url' => ['/filters/index'] , 'visible' => Yii::$app->user->can('superuser')],
             ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Feefo', 'url' => ['/feefo/index'] , 'visible' => Yii::$app->user->can('feefo')],
             ['label' => 'Apartments', 'url' => ['/apartment/index'],'visible' => Yii::$app->user->can('admin') || Yii::$app->user->can('mobile') and !Yii::$app->user->can('superuser')],
             ['label' => 'Bookings', 'url' => ['/booking/index'],'visible' => Yii::$app->user->can('admin') and !Yii::$app->user->can('superuser')],
             ['label' => 'Faces', 'url' => ['/photo-image/index'],'visible' => Yii::$app->user->can('admin') and !Yii::$app->user->can('superuser')],

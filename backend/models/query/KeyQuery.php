@@ -58,7 +58,7 @@ class KeyQuery extends \yii\db\ActiveQuery
             $ids = array_values($doorLockIds);
         }
 
-        return ($userIds)? $this->andWhere(['and',['door_lock.id'=>$ids],['key.type'=>99]]) : $this->andWhere('1=1');
+        return ($userIds)? $this->andFilterWhere(['and',['door_lock.id'=>$ids],['key.type'=>99]]) : $this->andFilterWhere('1=1');
     }
 
 

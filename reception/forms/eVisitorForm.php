@@ -88,7 +88,8 @@ class eVisitorForm extends Model
                 [['country'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country'=>'code']],
                  [['country'],'validateCountry','message'=>'Country set on default value - hrv'],
                 [['identityData'],'validateType','message'=>'Type of document set on default value - 027'],
-                [['bookingId'],'validateBooking','message'=>'Booking with this ID should exist']
+                [['bookingId'],'validateBooking','message'=>'Booking with this ID should exist'],
+
             ]
         );
         return $rules;
@@ -123,7 +124,10 @@ class eVisitorForm extends Model
         $this->firstName = str_replace('1', 'I',$this->firstName);
         $this->secondName = str_replace('1', 'I',$this->secondName);
         $this->firstName = str_replace('5', 'S',$this->firstName);
-        $this->secondName = str_replace('5', 'S',$this->secondName);
+        $this->secondName = str_replace('0', 'O',$this->secondName);
+        $this->firstName = str_replace('0', 'O',$this->firstName);
+        $this->secondName = str_replace('8', 'B',$this->secondName);
+        $this->firstName = str_replace('8', 'B',$this->firstName);
 
     }
 

@@ -53,15 +53,36 @@ class GuestManageService
                 $user
             );
 
-            $this->GuestRepository->save($guest);
+            $this->guestRepository->save($guest);
             return $guest;
         }
 
     }
 
-    public function addToBooking(Booking $booking)
+    public function createGuestAsTourist(eVisitorForm $form): Guest
     {
-        $this->bookings = $booking;
-        return $this;
+        if ($guest=$this->guestRepository->isGuest($form->firstName,$form->secondName,$form->country)){
+            return $guest;
+        }
+        else {
+            $guest = Guest::createAsTourist(
+                $form->firstName ,
+                $form->secondName,
+                $form->country,
+                $form->booking
+            );
+
+            $this->guestRepository->save($guest);
+            return $guest;
+        }
+
     }
+
+//
+//
+//    public function addToBooking(Booking $booking)
+//    {
+//        $this->bookings = $booking;
+//        return $this;
+//    }
 }

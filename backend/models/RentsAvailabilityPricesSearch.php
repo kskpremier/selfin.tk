@@ -71,7 +71,7 @@ class RentsAvailabilityPricesSearch extends Objects
          if ($this->property!=''&& $this->property!=null)
                 $query->andFilterWhere(['rents.object_id'=>$this->property]);
         if ($this->reception!=''&& $this->reception!=null)
-        $query->forReception($this->reception);
+            $query->forReception($this->reception);
         if ($this->filterName ) {
             if (is_array($this->filterName)) {
                 $list = [];

@@ -60,7 +60,7 @@ echo SideNav::widget([
     'heading' => '<div class="categoty-content">'.'<i class="glyphicon glyphicon-user"></i>  '. Yii::$app->user->identity->getUsername() .'</div>'  ,
     'containerOptions'=>['id'=>'','class'=>''],
     'items' => [
-        ['label' => 'MyRent', 'icon' => 'myrent-icon', 'url' => Url::to(['/redirect/myrent', 'id'=>Yii::$app->user->getId()]), 'active' => ($item == 'home'),'options'=>['class'=>'faa-parent animated-hover']],
+        ['label' => 'MyRentReception', 'icon' => 'myrent-icon', 'url' => Url::to(['/redirect/myrent', 'id'=>Yii::$app->user->getId()]), 'active' => ($item == 'home'),'options'=>['class'=>'faa-parent animated-hover']],
         ['label' => 'Receptions', 'icon' => 'glyphicon glyphicon-tower', 'options'=>['class'=>'faa-parent animated-hover'], 'items' => [
             ['label' => 'Kvarner',
                 'url' => ['/rents/reception','reception'=>'Kvarner']],

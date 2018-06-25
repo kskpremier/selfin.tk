@@ -135,19 +135,13 @@ class CalendarHelper{
         $month = date("M", strtotime($data));
         $day = date("D", strtotime($data));
         $date = date("d", strtotime($data)); //border-bottom: 2px solid #c7c7c7; text-align: center; width: 40px; background-color: white;
-        $classTh = ($day == 'Sat'|| $day == "Sun")?'weekend':'';
-        $contentForA = Html::tag('div', $month, [
-                "class"=>  $classTh,
-                "style"=>"font-weight: 400;"
-            ]);
-//            .
-//            Html::tag('div',$date,[  "class"=>  $classTh]).
-//            Html::tag('div',$day,[  "class"=>  $classTh, 'style'=>"font-weight: 400;"]);
+        $classTh = ($day == 'Sat')?' weekend-th-saturday ': ($day == "Sun")?' weekend-th-sunday ':'';
+        $contentForA = Html::tag('div', $month, ["class"=>  $classTh,]);
 
 
-        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
+//        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
 
-        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$content, [
+        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$contentForA, [
             "class"=>  $classTh,
             "style"=>"border-bottom: 2px solid #c7c7c7; 
             text-align: center; 
@@ -155,7 +149,7 @@ class CalendarHelper{
             width: 40px; background-color:#e6ffff; 
             border-top: 3px solid blue;"
         ]):
-            Html::tag('th',$content,[
+            Html::tag('th',$contentForA,[
                 "class"=>  $classTh,
                 "style"=>"border-bottom: 2px solid #c7c7c7;
                  text-align: center;
@@ -170,21 +164,12 @@ class CalendarHelper{
         $month = date("M", strtotime($data));
         $day = date("D", strtotime($data));
         $date = date("d", strtotime($data)); //border-bottom: 2px solid #c7c7c7; text-align: center; width: 40px; background-color: white;
-        $classTh = ($day == 'Sat'|| $day == "Sun")?'weekend':'';
-        $contentForA = Html::tag('div', $date, [
-            "class"=>  $classTh,
-            "style"=>"font-weight: 400; 
-            background-color: #f8f8f8; 
-            border-bottom: dotted 1px silver; "
-        ]);
-//            .
-//            Html::tag('div',$date,[  "class"=>  $classTh]).
-//            Html::tag('div',$day,[  "class"=>  $classTh, 'style'=>"font-weight: 400;"]);
+        $classTh = ($day == 'Sat')?' weekend-th-saturday ': ($day == "Sun")?' weekend-th-sunday ':'';
+        $contentForA = Html::tag('div', $day, ["class"=>  $classTh,]);
 
+//        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
 
-        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
-
-        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$content, [
+        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$contentForA, [
             "class"=>  $classTh,
             "style"=>"border-bottom: 2px solid #c7c7c7; 
             text-align: center; 
@@ -192,7 +177,7 @@ class CalendarHelper{
             width: 40px; background-color:#e6ffff; 
             border-top: 3px solid blue;"
         ]):
-            Html::tag('th',$content,[
+            Html::tag('th',$contentForA,[
                 "class"=>  $classTh,
                 "style"=>"border-bottom: 2px solid #c7c7c7;
                  text-align: center;
@@ -207,21 +192,12 @@ class CalendarHelper{
         $month = date("M", strtotime($data));
         $day = date("D", strtotime($data));
         $date = date("d", strtotime($data)); //border-bottom: 2px solid #c7c7c7; text-align: center; width: 40px; background-color: white;
-        $classTh = ($day == 'Sat'|| $day == "Sun")?'weekend':'';
-        $contentForA = Html::tag('div', $day, [
-            "class"=>  $classTh,
-            "style"=>"font-weight: 400; 
-            background-color: #f8f8f8; 
-            border-bottom: dotted 1px silver; "
-        ]);
-//            .
-//            Html::tag('div',$date,[  "class"=>  $classTh]).
-//            Html::tag('div',$day,[  "class"=>  $classTh, 'style'=>"font-weight: 400;"]);
+        $classTh = ($day == 'Sat')?' weekend-th-saturday ': ($day == "Sun")?' weekend-th-sunday ':'';
+        $contentForA = Html::tag('div', $date, ["class"=>  $classTh,]);
 
+//        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
 
-        $content =  Html::tag('a', $contentForA,["class"=>"calendar-row-td-link", "href"=>"/rents/date/".$data, "style"=>"color: black", "onclick"=>'block($("#main_panel"));']);
-
-        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$content, [
+        $string = ($date == date("Y-m-d", time()) ) ? Html::tag('th',$contentForA, [
             "class"=>  $classTh,
             "style"=>"border-bottom: 2px solid #c7c7c7; 
             text-align: center; 
@@ -229,7 +205,7 @@ class CalendarHelper{
             width: 40px; background-color:#e6ffff; 
             border-top: 3px solid blue;"
         ]):
-            Html::tag('th',$content,[
+            Html::tag('th',$contentForA,[
                 "class"=>  $classTh,
                 "style"=>"border-bottom: 2px solid #c7c7c7;
                  text-align: center;
@@ -324,42 +300,57 @@ class CalendarHelper{
 
     public static function getRowForPrice ($object, $days, $start, $id) {
         $content='';
-        $classes='';
+        $classes = '';
         $string='';
         for ($i=0; $i<$days; $i++) {
-            $day = date("D",$start);
-            $classes = ($day == 'Sat'|| $day == "Sun")?'info':'success';
+            $classes = 'prices_td ';
+            $day = date("D",$start + $i*24*3600 );
+            $weekend = ($day == 'Sat'|| $day == "Sun")?' weekend ':'';
             if (key_exists('availability',$object[$i]) && $object[$i]['availability']==0)
                 $classes.= ' danger';
-//            $content = Html::tag('h3', $object[$i]['price'],['class'=>'price']);
-//            $content .= Html::tag('h6', $object[$i]['min_stay'],['class'=>'minimum_stay']);
+            else $classes.=' success';
             $content = Html::tag('input', $object[$i]['price'],
-                ['type'=>"text", 'id'=>'table_price_'.$id.'_'.$i, 'class'=>"form-control yielding text-center ".$classes, 'name'=>"PriceTableSetForm[price]", 'placeholder'=>$object[$i]['price'],'value'=>$object[$i]['price'], 'aria-invalid'=>"false"]);
-//            $content .= Html::tag('h6', $object[$i]['min_stay'],[]);
-            $string .= Html::tag('td',$content,['class'=>'yielding text-center '.$classes,  'data-id'=>$id, 'data-index'=>$i, 'id'=>'price_'.$id.'_'.$i]);
+                ['type'=>"text", 'id'=>'table_price_'.$id.'_'.$i, 'class'=>"form-control yielding text-center ".$classes,
+                    'name'=>"PriceTableSetForm[price]", 'placeholder'=>$object[$i]['price'],'value'=>$object[$i]['price'],
+                    'onchange'=>"setPrice(this)",
+                    'aria-invalid'=>"false"]);
+            $string .= Html::tag('td',$content,['class'=>'yielding text-center '.$classes. $weekend,  'data-id'=>$id, 'data-type'=>'price','data-index'=>$i, 'id'=>'price_'.$id.'_'.$i]);
         }
         return  $string;
     }
 
     public static function getRowForMinStay ($object, $days, $start, $id) {
+
         $content='';
-        $classes='';
+        $classes ='';
+
         $string='';
         for ($i=0; $i<$days; $i++) {
-            $day = date("D",$start);
-            $classes = ($day == 'Sat'|| $day == "Sun")?'info':'success';
+            $classes ='min_stay_td ';
+            $day = date("D",$start + $i*24*3600 );
+            $weekend = ($day == 'Sat'|| $day == "Sun")?' weekend ':'';
             if (key_exists('availability',$object[$i]) && $object[$i]['availability']==0)
                 $classes.= ' danger';
-//            $content = Html::tag('h3', $object[$i]['price'],['class'=>'price']);
-//            $content .= Html::tag('h6', $object[$i]['min_stay'],['class'=>'minimum_stay']);
-//            $content = Html::tag('h4', $object[$i]['price'],[]);
-            if ($object[$i]['holeAlert']==1) {
-                $content = Html::tag('h6', (key_exists('min_stay', $object[$i])) ? $object[$i]['min_stay'] : '-', ['class'=>'blink']);
-                $string .= Html::tag('td', $content, ['class' => 'yielding text-center ' . $classes, 'data-id'=>$id, 'data-index'=>$i, 'id'=>'min_stay_'.$id.'_'.$i]);
+            else $classes.=' success';
+            if ($object[$i]['hole']==1) {
+                $content = Html::tag('input', $object[$i]['price'],
+                    ['type'=>"text", 'id'=>'table_min_stay_'.$id.'_'.$i,
+                        'class'=>"form-control yielding text-center blink ".$classes,
+                        'name'=>"PriceTableSetForm[min_stay]",
+                        'placeholder'=>(key_exists('min_stay',$object[$i]))?$object[$i]['min_stay']:'-',
+                        'onchange'=>"setPrice(this)",
+                        'value'=>(key_exists('min_stay', $object[$i]))?$object[$i]['min_stay']:'-', 'aria-invalid'=>"false"]);
+                $string .= Html::tag('td', $content, ['class' => 'yielding text-center ' . $classes. $weekend, 'data-id'=>$id, 'data-type'=>'min_stay', 'data-index'=>$i, 'id'=>'min_stay_'.$id.'_'.$i]);
             }
             else {
-            $content = Html::tag('h6', (key_exists('min_stay', $object[$i]))?$object[$i]['min_stay']:'-',[]);
-            $string .= Html::tag('td',$content,['class'=>'yielding text-center '.$classes, 'data-id'=>$id, 'data-index'=>$i, 'id'=>'min_stay_'.$id.'_'.$i]);
+                $content = Html::tag('input', $object[$i]['price'],
+                    ['type'=>"text", 'id'=>'table_min_stay_'.$id.'_'.$i,
+                        'class'=>"form-control yielding text-center ".$classes,
+                        'name'=>"PriceTableSetForm[min_stay]",
+                        'placeholder'=>(key_exists('min_stay',$object[$i]))?$object[$i]['min_stay']:'-',
+                        'onchange'=>"setPrice(this)",
+                        'value'=>(key_exists('min_stay', $object[$i]))?$object[$i]['min_stay']:'-', 'aria-invalid'=>"false"]);
+            $string .= Html::tag('td',$content,['class'=>'yielding text-center '.$classes. $weekend, 'data-id'=>$id, 'data-type'=>'min_stay','data-index'=>$i, 'id'=>'min_stay_'.$id.'_'.$i]);
             }
         }
         return  $string;

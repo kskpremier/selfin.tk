@@ -33,13 +33,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attributes' => [
                     'id',
                     ['attribute'=>'external_id',
-                        'label'=>"MyRent User Id"],
+                        'label'=>"MyRentReception User Id"],
                     [   'attribute'=>'myrent_update',
                         'value'=> function($model){
                                 $value = ($model->myrent_update)? date("Y-m-d H:i:s",$model->myrent_update):'';
                                 return $value.' '.UserHelper::getSynchroTime($model);
                         },
-                        'label'=>"MyRent Update",
+                        'label'=>"mReception Last Update",
                         'format'=>'raw'
                     ],
                     'username',

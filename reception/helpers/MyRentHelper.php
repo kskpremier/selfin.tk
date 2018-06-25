@@ -8,6 +8,9 @@
 
 namespace reception\helpers;
 
+
+use class_with_method_named_empty;
+
 class MyRentHelper {
     
     
@@ -28,6 +31,14 @@ class MyRentHelper {
             case 612:
                 return "d9ddc81c-2b11-11e7-b171-0050563c3009";
         }
+    }
+
+    public static function getType($class, $attribute) {
+        $model = new $class() ;
+        $dbType = $model->getTableSchema()->columns[$attribute]->dbType;
+            $phpType = $model->getTableSchema()->columns[$attribute]->phpType;
+            $type = $model->getTableSchema()->columns[$attribute]->type;
+           return $dbType;//$model->getTableSchema()->columns[$attribute]->type;
     }
     
 }

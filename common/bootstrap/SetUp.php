@@ -2,7 +2,8 @@
 
 namespace common\bootstrap;
 
-
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use reception\dispatchers\AsyncEventDispatcher;
 use reception\dispatchers\DeferredEventDispatcher;
 use reception\dispatchers\EventDispatcher;
@@ -29,6 +30,8 @@ use yii\di\Instance;
 use yii\mail\MailerInterface;
 use yii\rbac\ManagerInterface;
 use yii\queue\Queue;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 
 class SetUp implements BootstrapInterface
@@ -36,6 +39,18 @@ class SetUp implements BootstrapInterface
     public function bootstrap($app)
     {
         $container = \Yii::$container;
+
+//        $container->setSingleton(Logger::class, function () {
+//            $logger = new Logger('Monolog');
+//            $logger->pushHandler(new StreamHandler('/Users/superbrodyaga/Sites/reception/console/runtime/logs/monolog.log', Logger::debug));
+//            return $logger;
+//        });
+
+        $container->setSingleton(Client::class, function ()  {
+            $logger = new Logger('Monolog');
+            $logger->pushHandler(new StreamHandler('/Users/superbrodyaga/Sites/reception/console/runtime/logs/monolog.log', Logger::DEBUG));
+            return ClientBuilder::create()->setLogger($logger)->build();
+        });
 
         $container->setSingleton(MailerInterface::class, function () use ($app) {
             return $app->mailer;

@@ -64,7 +64,7 @@ class MobileController extends Controller
 
 
     /**
-     * Creates a new User model for external MyRent User
+     * Creates a new User model for external MyRentReception User
      * If creation is successful, return model
      * @return Active Record model
      */

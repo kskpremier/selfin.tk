@@ -54,7 +54,10 @@
         "kartik-v/yii2-widget-sidenav": "*",
         "cinghie/yii2-multilanguage": "dev-master",
         "kartik-v/yii2-date-range": "dev-master",
-        "yii2mod/yii2-google-maps-markers": "*"
+        "yii2mod/yii2-google-maps-markers": "*",
+        "elasticsearch/elasticsearch": "~6.0",
+        "kartik-v/yii2-slider": "*",
+        "monolog/monolog": "^2.0@dev"
 
 
     },

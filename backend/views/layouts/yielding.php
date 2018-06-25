@@ -67,25 +67,10 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     NavBar::end();
     ?>
 
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-    </div>
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-top: 60px;">
         <?= $content ?>
     </div>
 </div>
-
-
-<!--<footer class="footer">-->
-<!--    <div class="container">-->
-<!--        <p class="pull-left">&copy; Domouprav --><?//= date('Y') ?><!--</p>-->
-<!---->
-<!--        <p class="pull-right">--><?//= Yii::powered() ?><!--</p>-->
-<!--    </div>-->
-<!--</footer>-->
 
 <?php $this->endBody() ?>
 </body>

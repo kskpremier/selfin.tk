@@ -117,7 +117,7 @@ class MobileUserController extends Controller
         ]);
     }
     /**
-     * Creates a new User model for MyRent.
+     * Creates a new User model for MyRentReception.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
@@ -146,7 +146,7 @@ class MobileUserController extends Controller
     }
 
     /**
-     * Update User model for MyRent.
+     * Update User model for MyRentReception.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */

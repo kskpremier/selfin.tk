@@ -50,7 +50,7 @@ class MyRent extends ActiveRecord
 //Rona Gajac;8900c86d-2b11-11e7-b171-0050563c3009
 //Rona Kvarner;bc8da49e-2b11-11e7-b171-0050563c3009
 //Rona Savudrija;d9ddc81c-2b11-11e7-b171-0050563c3009
-//Demo MyRent;5dc7a80b-e254-11e7-b893-0050563c3009
+//Demo MyRentReception;5dc7a80b-e254-11e7-b893-0050563c3009
 
 
     public const MyRent_SICRET_KEY = "bc8da49e-2b11-11e7-b171-0050563c3009";
@@ -98,7 +98,7 @@ class MyRent extends ActiveRecord
             $post = //[
                // "object_id" => $objectId,
               //  "from_date" => date("Y-m-d", time()),
-              //  "until_date" => date("Y-m-d", time() + MyRent::RENT_TIME_PERIOD),
+              //  "until_date" => date("Y-m-d", time() + MyRentReception::RENT_TIME_PERIOD),
               //  "changed" => date("Y-m-d h:i:s", time())
            // ];
 
@@ -119,7 +119,7 @@ class MyRent extends ActiveRecord
 
     public static function getBookingsFromTo($userId,$from,$to=null)
     {
-//        $token = MyRent::token();
+//        $token = MyRentReception::token();
         $from = (isset($from))? date("Y-m-d",time()):$from;
         $to=(isset($to))?$to:$from;
         $client = new Client();
@@ -136,7 +136,7 @@ class MyRent extends ActiveRecord
     }
 
     /**
-     * MyRent constructor.
+     * MyRentReception constructor.
      * @param $_token
      * @param $_expires
      */
@@ -162,7 +162,7 @@ class MyRent extends ActiveRecord
     public static function getBookingsUpdateForUser($userId, $date = null)
     {
         $client = new Client();
-        $date = ($date)? $date : date("Y-m-d H:i:s",($date==0)?$date: time());
+        $date = ($date)? date("Y-m-d H:i:s",$date):"2018-06-01";
         $response = $client->get(MyRent::MyRent_URL_TO_UPDATE_BOOKINGS_FOR_USER . "/".$userId, ['date'=>$date],[],[])->send();
         if ($response->content != "NoContent" && is_array($rentsList = json_decode($response->content, true))) {
             if (!key_exists("Message", $rentsList))
@@ -209,7 +209,7 @@ class MyRent extends ActiveRecord
     {
         $client = new Client();
 
-        $response = $client->get('https://api.my-rent.net/vacationkey/list/653', [],[],[])->send();
+        $response = $client->get('https://apit.my-rent.net/vacationkey/list/653', [],[],[])->send();
         if ($response->content != "NoContent" && is_array($vacationkey = json_decode($response->content, true)))
             return $vacationkey;
         else return [];
@@ -219,7 +219,7 @@ class MyRent extends ActiveRecord
     {
         $client = new Client();
 
-        $response = $client->get('https://api.my-rent.net/vacationkey/get/'.$id, [],[],[])->send();
+        $response = $client->get('https://apit.my-rent.net/vacationkey/get/'.$id, [],[],[])->send();
         if ($response->content != "NoContent" && $vacationkey = simplexml_load_string($response->content))
             return $vacationkey;
         else return false;

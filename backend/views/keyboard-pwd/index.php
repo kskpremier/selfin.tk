@@ -126,7 +126,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'delete' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                            ['keyboard-pwd/delete', 'id' => $model->id ],
+                            ['keyboard-pwd/delete', 'id' => $model->id, ['data' =>
+                                [
+                                'confirm' => "Are you sure you want to delete keyboard passcode?",
+                                'method' => 'DELETE',
+                            ], ]
+                                ],
                             ['class' => '']
                         );
                     },

@@ -10,6 +10,7 @@ namespace backend\controllers;
 
 use reception\forms\KeyboardPasswordForm;
 use reception\helpers\BookingHelper;
+use reception\helpers\TTLHelper;
 use Yii;
 use reception\entities\DoorLock\KeyboardPwd;
 use reception\forms\KeyboardPwdForm;
@@ -69,9 +70,9 @@ class KeyboardPwdController extends Controller
         ];
        $behaviors ['verbs'] = [
         'class' => VerbFilter::className(),
-            'actions' => [
-                 'delete' => ['DELETE','POST'],
-            ]
+//            'actions' => [
+//                 'delete' => ['DELETE','POST'],
+//            ]
         ];
 
         return $behaviors;
@@ -194,7 +195,7 @@ class KeyboardPwdController extends Controller
                 return $this->redirect(['index']);
             }
             else {
-                Yii::$app->session->setFlash('error', 'Something went wrong. Send info for site administator');
+                Yii::$app->session->setFlash('error', 'Something went wrong. May be there is no any gateway connected to the door lock...');
                 return $this->render('create', [
                     'model' => $model,
                     'user'=>$user,
@@ -232,12 +233,19 @@ class KeyboardPwdController extends Controller
      * Deletes an existing KeyboardPwd model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
+     * @param integer $deleteType
      * @return mixed
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
+    public function actionDelete($id, $deleteType=TTLHelper::TTL_RECORD_VIA_GATEWAY)
+        {
+        $keyboardPwd = $this->findModel($id);
+        if ($keyboardPwd) {
+            $respond = $this->service->remove($keyboardPwd, $deleteType);
+            if ($respond)
+                Yii::$app->session->setFlash('success', 'Password(s) was successfully deleted via Gateway');
+            else
+                Yii::$app->session->setFlash('error', 'Something went wrong. May be there is no any gateway connected to the door lock...');
+        }
         return $this->redirect(Yii::$app->request->referrer);
     }
 

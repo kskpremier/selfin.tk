@@ -73,20 +73,33 @@ class UserHelper
         return $rolesArray;
     }
     public static function getSynchroTime($user){
-        $needToUpdate = ($user->myrent_update == null) || (time() - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL);
-        switch ($needToUpdate) {
+        $needToUpdateApartment = ($user->updated_at == null) || (time() - $user->updated_at > MyRent::MyRent_USER_UPDATE_INTERVAL);
+        switch ($needToUpdateApartment) {
             case true:
-                $class = 'glyphicon glyphicon-refresh label label-danger';
+                $classApartments = 'glyphicon glyphicon-refresh label label-danger';
                 break;
             case false:
-                $class = 'glyphicon glyphicon-refresh label label-success';
+                $classApartments = 'glyphicon glyphicon-refresh label label-success';
                 break;
             default:
-                $class = 'btn btn-danger';
+                $classApartments = 'btn btn-danger';
+        }
+        $needToUpdateRents = ($user->myrent_update == null) || (time() - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL);
+        switch ($needToUpdateRents) {
+            case true:
+                $classRents = 'glyphicon glyphicon-refresh label label-danger';
+                break;
+            case false:
+                $classRents = 'glyphicon glyphicon-refresh label label-success';
+                break;
+            default:
+                $classRents = 'btn btn-danger';
         }
 
-        return Html::a(ArrayHelper::getValue(self::statusUpdateList(), $needToUpdate),  ['synchro', 'id' => $user->id], [
-            'class' => $class,
-        ]);
+        return Html::a(ArrayHelper::getValue(self::statusUpdateList(), $needToUpdateApartment),  ['/user/synchro-apartments', 'id' => $user->id], [
+            'class' => $classApartments, 'title'=>'Refresh Apartments list for user']).Html::a(ArrayHelper::getValue(self::statusUpdateList(), $needToUpdateRents),
+                ['/user/synchro-rents', 'id' => $user->id], [
+                'class' => $classRents,'title'=>'Refresh Rents list for user'
+            ]);
     }
 }

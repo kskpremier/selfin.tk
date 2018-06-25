@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php $form = ActiveForm::begin(); ?>
 
-<!--     <?php//echo $form->field($model, 'id')->textInput(['maxLength' => true])->label("MyRent ID") ?>-->
+<!--     <?php//echo $form->field($model, 'id')->textInput(['maxLength' => true])->label("MyRentReception ID") ?>-->
     <?= $form->field($model, 'username')->textInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'password')->passwordInput(['maxLength' => true]) ?>
     <?= $form->field($model, 'contact_name')->textInput(['maxLength' => true]) ?>

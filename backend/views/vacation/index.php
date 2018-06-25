@@ -34,7 +34,7 @@ yii\bootstrap\Modal::begin([
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Sync with MyRent', ['sync'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Sync with MyRentReception', ['sync'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php
@@ -112,8 +112,8 @@ yii\bootstrap\Modal::begin([
     'persistResize' => false,
     'toggleDataOptions' => ['minCount' => 10],
     'exportConfig' => true,
-    'itemLabelSingle' => 'book',
-    'itemLabelPlural' => 'books',
+    'itemLabelSingle' => 'property',
+    'itemLabelPlural' => 'properties',
 
 
 //

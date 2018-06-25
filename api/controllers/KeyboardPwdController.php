@@ -149,7 +149,7 @@ class KeyboardPwdController extends Controller
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $models = $dataProvider->getModels();
+        $models = $dataProvider->query->all(); //$dataProvider->getModels();
         foreach ($models as $model){
             $result[]= $this->serializeKeyboardPwd($model);
         }
@@ -331,7 +331,6 @@ class KeyboardPwdController extends Controller
 
     public function serializeKeyboardPwd($key): array
     {
-
 
         return [
             'value'=>$key->value,

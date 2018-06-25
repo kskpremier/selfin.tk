@@ -1,0 +1,31 @@
+[2018-06-21T10:25:07,535][INFO ][o.e.n.Node               ] [] initializing ...
+[2018-06-21T10:25:07,654][INFO ][o.e.e.NodeEnvironment    ] [nfEnReX] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [67.6gb], net total_space [238.2gb], types [apfs]
+[2018-06-21T10:25:07,654][INFO ][o.e.e.NodeEnvironment    ] [nfEnReX] heap size [989.8mb], compressed ordinary object pointers [true]
+[2018-06-21T10:25:07,676][INFO ][o.e.n.Node               ] node name [nfEnReX] derived from node ID [nfEnReXsT_2hngFM5DAzbw]; set [node.name] to override
+[2018-06-21T10:25:07,677][INFO ][o.e.n.Node               ] version[6.2.4], pid[17925], build[ccec39f/2018-04-12T20:37:28.497551Z], OS[Mac OS X/10.13.4/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/9/9+181]
+[2018-06-21T10:25:07,677][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/m0/kr54r4ss3l72xtjdspsh_myw0000gn/T/elasticsearch.V1oNGWzi, -XX:+HeapDumpOnOutOfMemoryError, -Xlog:gc*,gc+age=trace,safepoint:file=logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m, -Djava.locale.providers=COMPAT, -Des.path.home=/Users/superbrodyaga/Sites/reception/elasticsearch-6.2.4, -Des.path.conf=/Users/superbrodyaga/Sites/reception/elasticsearch-6.2.4/config]
+[2018-06-21T10:25:08,555][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [aggs-matrix-stats]
+[2018-06-21T10:25:08,556][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [analysis-common]
+[2018-06-21T10:25:08,556][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [ingest-common]
+[2018-06-21T10:25:08,556][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [lang-expression]
+[2018-06-21T10:25:08,556][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [lang-mustache]
+[2018-06-21T10:25:08,556][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [lang-painless]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [mapper-extras]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [parent-join]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [percolator]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [rank-eval]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [reindex]
+[2018-06-21T10:25:08,557][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [repository-url]
+[2018-06-21T10:25:08,558][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [transport-netty4]
+[2018-06-21T10:25:08,558][INFO ][o.e.p.PluginsService     ] [nfEnReX] loaded module [tribe]
+[2018-06-21T10:25:08,558][INFO ][o.e.p.PluginsService     ] [nfEnReX] no plugins loaded
+[2018-06-21T10:25:12,267][INFO ][o.e.d.DiscoveryModule    ] [nfEnReX] using discovery type [zen]
+[2018-06-21T10:25:12,895][INFO ][o.e.n.Node               ] initialized
+[2018-06-21T10:25:12,895][INFO ][o.e.n.Node               ] [nfEnReX] starting ...
+[2018-06-21T10:25:13,180][INFO ][o.e.t.TransportService   ] [nfEnReX] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2018-06-21T10:25:16,251][INFO ][o.e.c.s.MasterService    ] [nfEnReX] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {nfEnReX}{nfEnReXsT_2hngFM5DAzbw}{6_m9rHHcRxa5sipMg9SXBg}{127.0.0.1}{127.0.0.1:9300}
+[2018-06-21T10:25:16,256][INFO ][o.e.c.s.ClusterApplierService] [nfEnReX] new_master {nfEnReX}{nfEnReXsT_2hngFM5DAzbw}{6_m9rHHcRxa5sipMg9SXBg}{127.0.0.1}{127.0.0.1:9300}, reason: apply cluster state (from master [master {nfEnReX}{nfEnReXsT_2hngFM5DAzbw}{6_m9rHHcRxa5sipMg9SXBg}{127.0.0.1}{127.0.0.1:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
+[2018-06-21T10:25:16,275][INFO ][o.e.h.n.Netty4HttpServerTransport] [nfEnReX] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2018-06-21T10:25:16,275][INFO ][o.e.n.Node               ] [nfEnReX] started
+[2018-06-21T10:25:16,534][INFO ][o.e.g.GatewayService     ] [nfEnReX] recovered [1] indices into cluster_state
+[2018-06-21T10:25:17,274][INFO ][o.e.c.r.a.AllocationService] [nfEnReX] Cluster health status changed from [RED] to [YELLOW] (reason: [shards started [[reception][2]] ...]).

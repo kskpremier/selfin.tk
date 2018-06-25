@@ -62,7 +62,7 @@ class BookingSearch extends Booking
                 'external_id'=> [
                     'asc' => ['external_id' => SORT_ASC],
                     'desc' => ['external_id' => SORT_DESC],
-                    'label' => 'MyRent #',
+                    'label' => 'MyRentReception #',
                     'default' => ['external_id' => SORT_DESC]
                 ]
             ]

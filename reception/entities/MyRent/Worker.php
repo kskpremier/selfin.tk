@@ -9,8 +9,8 @@
 
 namespace reception\entities\MyRent;
 
-use reception\entities\User\User;
-use reception\entities\Apartment\Apartment;
+use reception\entities\MyRent\User\User;
+use reception\entities\MyRent\Apartment\Apartment;
 use yii\db\ActiveRecord;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 
@@ -83,7 +83,7 @@ class Worker extends ActiveRecord
     {
         return [
             [
-                'class' => SaveRelationsBehavior::className(),
+                'class' => SaveRelationsBehavior::class,
                 'relations' => ['user','apartments'],
             ],
         ];
@@ -94,7 +94,7 @@ class Worker extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
@@ -102,6 +102,6 @@ class Worker extends ActiveRecord
      */
     public function getApartments()
     {
-        return $this->hasMany(Apartment::className(), ['owner_id' => 'id']);
+        return $this->hasMany(Apartment::class, ['owner_id' => 'id']);
     }
 }

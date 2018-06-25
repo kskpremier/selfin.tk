@@ -3,7 +3,7 @@
 namespace reception\entities\User\events;
 
 //use reception\entities\Booking\Guest;
-//use reception\entities\MyRent\Owner;
+//use reception\entities\MyRentReception\Owner;
 use reception\entities\User\User;
 
 class UserMobileCreated

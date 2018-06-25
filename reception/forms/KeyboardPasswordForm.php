@@ -44,6 +44,7 @@ class KeyboardPasswordForm extends FormWithDates
     //поля для записи обнаруженных букингов или апартаментов
     public $apartment;
     public $bookingModel;
+    public $doorLocks;
 
     public function __construct(array $config = [])
     {

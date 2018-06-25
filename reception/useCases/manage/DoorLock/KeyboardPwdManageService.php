@@ -47,13 +47,40 @@ class KeyboardPwdManageService
 
     public function generate(KeyboardPasswordForm $form) : array
     {
-        $result = [];
+        $result = []; $master=null;
         if ($form->type != TTLHelper::TTL_KEYBOARD_CUSTOMIZED) {
             if ($form->externalApartmentId || $form->apartment_id) {
-                foreach ($form->apartment->doorLocks as $doorlock) {
-                    $result [] = $this->createKeyboardPwd($form, $doorlock);
-                    return $result;
+                if ($form->type == TTLHelper::TTL_KEYBOARD_PERIOD_TYPE) {
+                    foreach ($form->apartment->doorLocks as $doorlock) {
+                        if ($doorlock->apartment_id) {  //поле apartment_id заполняется только для замка, стоящего в 1-м апартаменте
+                            $master = $doorlock;
+                        }
+                    }
+                    if ($master) {
+                        $masterPasscode = $this->createKeyboardPwd($form, $master);
+                        foreach ($form->apartment->doorLocks as $doorlock) {
+                            $form->type = TTLHelper::TTL_KEYBOARD_CUSTOMIZED;
+                            $form->value = $masterPasscode->value;
+                            $form->addType = TTLHelper::TTL_RECORD_VIA_GATEWAY;
+                            if ($doorlock->id != $master->id) {
+                                $keyboardPwd = $this->createCustomizedPwd($form, $doorlock);
+                                if ($keyboardPwd)
+                                    $result[] = $keyboardPwd;
+                            }
+                            $result[] = $masterPasscode;
+                        }
+                    } else {
+                        foreach ($form->apartment->doorLocks as $doorlock) {
+                            $result [] = $this->createKeyboardPwd($form, $doorlock);
+                        }
+                    }
                 }
+                else {
+                    foreach ($form->apartment->doorLocks as $doorlock) {
+                        $result [] = $this->createKeyboardPwd($form, $doorlock);
+                    }
+                }
+                return $result;
             }
             if ($form->doorLockId != '' || $form->doorLockId != null) {
                 $doorlock = $this->doorLockRepository->get($form->doorLockId);
@@ -142,7 +169,7 @@ public function createCustomizedPwd (KeyboardPasswordForm $form, DoorLock $doorL
 
     public function edit(KeyboardPwdEditForm $form): void
     {
-        $KeyboardPwd = KeyboardPwd::edit(
+        $keyboardPwd = KeyboardPwd::edit(
             strtotime($form->startDate),
             strtotime($form->endDate),
             $form->type,
@@ -154,7 +181,15 @@ public function createCustomizedPwd (KeyboardPasswordForm $form, DoorLock $doorL
             $form->keyboardPwdId
 
         );
-        $this->keyboardPwdRepository->save($KeyboardPwd);
+
+        if ($response = $this->doorLockChinaService->editKeyboardPwdValueFromChina($keyboardPwd)) {
+            $keyboardPwd->value = $response['keyboardPwd'];
+            $keyboardPwd->keyboard_pwd_id = $response['keyboardPwdId'];
+            $this->keyboardPwdRepository->save($keyboardPwd);
+            $result[] = ['id'=>$keyboardPwd->id,'lock_name' => $doorLock->lock_alias, 'password' => $keyboardPwd->value];
+        } else throw new BusinessException("Problems with getting password. Error 22.");
+
+        $this->keyboardPwdRepository->save($keyboardPwd);
     }
 
     public function getKeyboardPwdLocal()
@@ -247,6 +282,7 @@ public function createCustomizedPwd (KeyboardPasswordForm $form, DoorLock $doorL
         //в китайском ответе должно быть поле errcode
         if (is_array($data)) {
             if (array_key_exists('errcode', $data) && $data['errcode']==0) {
+                $this->keyboardPwdRepository->remove($keyboardPwd);
                 return true;
             } else if (array_key_exists('errcode', $data)) {
                return false;

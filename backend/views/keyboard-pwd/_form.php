@@ -4,6 +4,7 @@ use backend\helpers\DoorLockHelper;
 use reception\forms\KeyboardPasswordForm;
 use reception\forms\KeyboardPwdForm;
 use reception\helpers\BookingHelper;
+use reception\helpers\TTLHelper;
 use yii\helpers\Html;
 use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
@@ -172,6 +173,9 @@ use kartik\select2\Select2;
                                  $('#endDate').removeClass('hidden');
                                   $('#startDate').removeClass('hidden');
                             }
+                             if (value != '15') {
+                                 $('#password-value').addClass('hidden');                              
+                            }
 //                             if (value != '13') {
 //                                 $('#endDate').removeClass('hidden');
 //                            }
@@ -189,6 +193,9 @@ use kartik\select2\Select2;
                                  $('#endDate').addClass('hidden');
                                   $('#startDate').addClass('hidden');
                             }
+                             if (value == '15') {
+                                 $('#password-value').removeClass('hidden');                              
+                            }
                         }"
                 ),
             ],
@@ -197,6 +204,9 @@ use kartik\select2\Select2;
 
         <div id="password-value" class="hidden">
             <?= $form->field($model, 'value')->textInput(['value'=>$model->value])->label('Value of Pin code'); ?>
+        </div>
+        <div id="password-value-addType" class="hidden">
+            <?= $form->field($model, 'addType')->hiddenInput(['value'=>TTLHelper::TTL_RECORD_VIA_GATEWAY])->label(false); ?>
         </div>
         <div id="startDate" class="">
             <?= $form->field($model, 'startDate')->widget(DateTimePicker::className(), [
@@ -207,7 +217,7 @@ use kartik\select2\Select2;
                     'autoclose' => true,
                     'minView'=> 1
                 ]
-            ]);
+            ]);TTLHelper::TTL_RECORD_VIA_GATEWAY
             ?>
         </div>
     </div>
@@ -227,7 +237,7 @@ use kartik\select2\Select2;
 
 
     <div class="form-group">
-        <?= Html::submitButton( 'Create' , ['btn btn-success']) ?>
+        <?= Html::submitButton( 'Create' , ['class'=>'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

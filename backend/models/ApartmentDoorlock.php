@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use backend\models\query\AparmentDoorlockQuery;
 use Yii;
 
 /**

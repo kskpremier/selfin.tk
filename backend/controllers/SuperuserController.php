@@ -301,11 +301,6 @@ class SuperuserController extends Controller
 
     public function actionAvailability (){
         $filterForm = new Filters();
-        $detailFilter = new DetailFilterForm();
-
-        if ($detailFilter->load(Yii::$app->request->queryParams,'DetailFilterForm') && $detailFilter->validate()) {
-
-        }
 
 //        if ($filterForm->load(Yii::$app->request->queryParams,'FilterForm') && $filterForm->validate()) {
 //            $filterForm->save();
@@ -340,7 +335,7 @@ class SuperuserController extends Controller
         //загружаем данные из фильтра формы (Reception, Property, Filters
         //data provider for Objects
         $objectDataProvider =  $searchObjects->search(Yii::$app->request->queryParams);
-        $pages = new Pagination(['totalCount' => $objectDataProvider->query->count(), 'pageSize' => 20,]);
+        $pages = new Pagination(['totalCount' => $objectDataProvider->query->count(), 'pageSize' => 50,]);
         $objects = $objectDataProvider->query->offset($pages->offset)->limit($pages->limit)->all();
 
         $objectsIds = ArrayHelper::getColumn($objects,['id']);
@@ -399,7 +394,7 @@ class SuperuserController extends Controller
             'pages'=>$pages,
             'priceForm'=>$priceForm,
             'filterForm'=>$filterForm,
-            'detailFilter'=>$detailFilter,
+
         ]);
 
     }

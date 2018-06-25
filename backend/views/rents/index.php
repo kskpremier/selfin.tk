@@ -136,7 +136,7 @@ use yii\widgets\Pjax;
 
 <!--    --><?php //Pjax::begin(); ?>
 
-    <?=  $this->render('/objects/index', ['searchModel' => $searchObjectModel,'dataProvider' => $objectDataProvider]); ?>
+<!--    --><?php //echo  $this->render('/objects/index', ['searchModel' => $searchObjectModel,'dataProvider' => $objectDataProvider]); ?>
 <!--    --><?php //Pjax::end(); ?>
 </div>
 

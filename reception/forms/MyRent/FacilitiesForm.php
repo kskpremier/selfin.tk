@@ -69,8 +69,7 @@ use backend\models\Objects;
  */
 class FacilitiesForm extends Model
 {
-    public $user_id;
-    public $object_id;
+
     public $seaview;
     public $babycot;
     public $breakfast;
@@ -113,8 +112,6 @@ class FacilitiesForm extends Model
     public $for_large_groups;
     public $for_wedings;
     public $total_privacy;
-    public $created;
-    public $changed;
 
     public function __construct(array $config = [])
     {
@@ -127,7 +124,6 @@ class FacilitiesForm extends Model
     public function rules()
     {
         return [
-            [['user_id', 'object_id'], 'integer'],
             [['seaview', 'babycot', 'breakfast', 'halfboard', 'fullboard',
                 'berth', 'jacuzzi', 'terrace', 'tv_satelite', 'wifi', 'internet_fast',
                 'internet', 'smoking', 'luxurious', 'air_conditioning', 'tv_lcd', 'wheelchair_accessible',
@@ -135,10 +131,7 @@ class FacilitiesForm extends Model
                 'swimming_pool_indoor', 'swimming_pool_indoor_heated', 'swimming_pool_outdoor', 'swimming_pool_outdoor_heated',
                 'parking', 'sauna', 'gym', 'separate_kitchen', 'elevator', 'heating', 'towels', 'linen', 'for_couples', 'for_family',
                 'for_friends', 'for_large_groups',
-                'for_wedings', 'total_privacy'], 'in','range'=>['Y','N']],
-            [['created', 'changed'], 'safe'],
-            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Objects::className(), 'targetAttribute' => ['object_id' => 'id']],
-//            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+                'for_wedings', 'total_privacy'], 'safe']//'in','range'=>['Y','N']],
         ];
     }
 

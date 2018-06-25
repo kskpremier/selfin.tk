@@ -114,7 +114,7 @@ class VacationController extends Controller
                         $model->response = true;
                         $model->updated_at = date("Y-m-dd H:i:s", time());
                         $model->XML=$result;
-
+//                        $model->keyId=$result;
                         $model->save();
                     }
                 }

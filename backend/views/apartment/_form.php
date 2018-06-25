@@ -23,7 +23,7 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label('Apartment name'); ?>
 
-    <?= $form->field($model, 'external_id')->textInput(['maxlength' => true])->label('Identity in MyRent or Mars system'); ?>
+    <?= $form->field($model, 'external_id')->textInput(['maxlength' => true])->label('Identity in MyRentReception or Mars system'); ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

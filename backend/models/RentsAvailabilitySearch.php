@@ -24,9 +24,7 @@ class RentsAvailabilitySearch extends Objects
     public $property;
     public $occupancy;
     public $filterName;
-
-// private $filter1 = [6994, 6993, 6992, 6991, 6989, 6974, 6973, 6970, 6969, 6949, 6948, 6947, 6946, 6945, 6944];
-//    private $filter2 = [11970, 11754, 11371, 11370, 11369, 11368, 11367, 11366, 11365, 11125, 11124, 11122, 11105, 10889, 10180, 10179, 10178, 10166, 10165, 10164, 10163, 10136];
+    public $items;
     /**
      * @inheritdoc
      */
@@ -35,7 +33,7 @@ class RentsAvailabilitySearch extends Objects
         return [
            [['searchString','name'],'string'],
             [['occupancy'],'integer'],
-            [['userIds','start','until','reception','property','filterName'],'safe']
+            [['userIds','start','until','reception','property','filterName','items'],'safe']
         ];
     }
 
@@ -74,9 +72,16 @@ class RentsAvailabilitySearch extends Objects
         $query->joinWith('rents.rentsStatus');
         $query->joinWith('rents.currency');
         $query->joinWith('rents.country');
+        $query->joinWith('pictures');
 
 //        $query->joinWith('rents.country');
         $query->joinWith('unit');
+        if (count($this->items)>0) {
+            $query->andFilterWhere(['objects.id' => $this->items]);
+        }
+        else {
+            $query->limit(0);
+        }
         $query->forReception($this->reception);
         if ($this->filterName ) {
             if (is_array($this->filterName)) {

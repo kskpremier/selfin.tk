@@ -74,21 +74,16 @@ use yii\base\Model;
  */
 class RealEstatesForm extends Model
 {
-        public $object_id;
-        public $object_type_id;
-        public $property_type_id;
-        public $object_name_id;
+
         public $can_sleep_max;
-        public $promotion_id;
         public $can_sleep_optimal;
         public $floor;
         public $min_stay;
         public $security_deposit_type;
         public $down_deposit_type;
         public $standard_guests;
-        public $classification_star;
-        public $note;
-        public $description;
+
+
         public $smoking;
         public $luxurius;
         public $air_conditioning;
@@ -114,15 +109,11 @@ class RealEstatesForm extends Model
         public $space_yard;
         public $price_standard;
         public $guest_review;
-        public $created;
-        public $changed;
+
         public $name;
         public $motto;
         public $changeover;
-        public $wifi_network;
-        public $wifi_password;
-        public $check_in;
-        public $check_out;
+
         public $tripadvisor_review;
 
     public function __construct(array $config = [])
@@ -136,22 +127,15 @@ class RealEstatesForm extends Model
     public function rules()
     {
         return [
-            [['object_id', 'object_type_id', 'property_type_id', 'object_name_id', 'can_sleep_max', 'promotion_id', 'can_sleep_optimal', 'floor', 'min_stay', 'security_deposit_type', 'down_deposit_type', 'standard_guests', 'classification_star'], 'integer'],
-            [['note', 'description', 'smoking', 'luxurius',
+            [['can_sleep_max', 'can_sleep_optimal', 'floor', 'min_stay', 'security_deposit_type', 'down_deposit_type', 'standard_guests'], 'integer'],
+            [[ 'smoking', 'luxurius',
                 'air_conditioning', 'internet', 'wheelchair_accessible',
                 'pets', 'swimming_pool', 'parking', 'loc_beach', 'loc_country', 'loc_city'] , 'in','range'=>['Y','N']],
             [['beds', 'beds_extra', 'bathrooms', 'bedrooms',
                 'toilets', 'baby_coat', 'high_chair', 'security_deposit',
                 'down_deposit', 'cleaning_price', 'space', 'space_yard', 'price_standard',
                 'guest_review'], 'number'],
-            [['created', 'changed'], 'safe'],
-            [['name'], 'string', 'max' => 100],
-            [['motto'], 'string', 'max' => 150],
-            [['changeover', 'wifi_network', 'wifi_password', 'check_in', 'check_out'], 'string', 'max' => 50],
             [['tripadvisor_review'], 'string', 'max' => 250],
-            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Objects::className(), 'targetAttribute' => ['object_id' => 'id']],
-            [['object_name_id'], 'exist', 'skipOnError' => true, 'targetClass' => ObjectsNames::className(), 'targetAttribute' => ['object_name_id' => 'id']],
-            [['property_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ObjectsRealstatesPropertyTypes::className(), 'targetAttribute' => ['property_type_id' => 'id']],
         ];
     }
 

@@ -8,6 +8,7 @@
 
 namespace reception\entities\Apartment;
 
+use backend\models\ApartmentDoorlock;
 use backend\models\query\ApartmentQuery;
 use reception\entities\Booking\Booking;
 use reception\entities\DoorLock\DoorLock;
@@ -96,7 +97,7 @@ class Apartment extends ActiveRecord
 
     public function edit(ApartmentForm $form, $user_id = null, $updateTime = null, $owner_id=null)
     {
-//        if ((($updateTime - $this->myrent_update) < MyRent::MyRent_UPDATE_INTERVAL) || $this->myrent_update===null){
+//        if ((($updateTime - $this->myrent_update) < MyRentReception::MyRent_UPDATE_INTERVAL) || $this->myrent_update===null){
             $this->name = ($form->name)?$form->name:$form->object_name;
             $this->latitude = $form->latitude;
             $this->longitude = $form->longitude;
@@ -182,6 +183,7 @@ class Apartment extends ActiveRecord
     {
         return $this->hasMany(DoorLock ::className(), ['id' =>'doorlock_id'])->viaTable('{{%apartment_doorlock}}', ['apartment_id'=>'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */

@@ -187,6 +187,7 @@ class TTLHelper{
             1=>"One-time",
             2=>"Permanent",
             3=>"Period",
+            15=>"Custom",
             4=>"Delete",
 //            5=>"No peripheral repeat",
 //            6=>"Daily repeat",
@@ -198,6 +199,7 @@ class TTLHelper{
             12=>"Friday repeat",
             13=>"Saturday repeat",
             14=>"Sunday repeat",
+
         ];
      }
 

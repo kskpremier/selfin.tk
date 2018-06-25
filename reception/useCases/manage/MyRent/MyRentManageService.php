@@ -31,7 +31,7 @@ use yii\base\ErrorHandler;
 
 /**
  * Class MyRentManageService
- * @package reception\useCases\manage\MyRent
+ * @package reception\useCases\manage\MyRentReception
  */
 class MyRentManageService
 {
@@ -116,7 +116,7 @@ class MyRentManageService
 
 
     /**
-     * Making synchronization data with MyRent for user
+     * Making synchronization data with MyRentReception for user
      * Get apartments list for user, update every apartment with its door locks
      * If apartment were disconnect from this user - make unlink
      * @param User $user
@@ -127,7 +127,7 @@ class MyRentManageService
         $this->transaction->wrap(function () use ($user) {
             $updateTime = time();
             if (($user->myrent_update == null) || ($updateTime - $user->myrent_update > MyRent::MyRent_UPDATE_INTERVAL)) {
-                //запросить список апартаментов на момент обновления в MyRent
+                //запросить список апартаментов на момент обновления в MyRentReception
                 $apartmentList = MyRent::getApartmentsForUser($user->external_id);
                 //Сохранить список апартаментов из нашей базы
                 $apartmentDBList = $user->apartments;
@@ -246,7 +246,7 @@ class MyRentManageService
         return false;
     }
     /**
-     * Making synchronization data with MyRent for user
+     * Making synchronization data with MyRentReception for user
      * Get bookings list for $user, from $user->myrent_update
      * $owner_id is used for creating new apartment, if it has not built before
      * if $owner_id = null , then no link between apartment and owner will be done

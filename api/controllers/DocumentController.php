@@ -146,7 +146,7 @@ class DocumentController extends Controller
                         $result[]= $this->serializeDocument($model->document, null,$booking);
                     }
                     return $result;
-//                    $result = MyRent::addGuest($document, $form->eVisitorForm->bookingId, $form->eVisitorForm->eVisitor, Yii::$app->user->id);
+//                    $result = MyRentReception::addGuest($document, $form->eVisitorForm->bookingId, $form->eVisitorForm->eVisitor, Yii::$app->user->id);
 //                    if ($result) {
 //                        $this->service->updateRegistration($result);
 //                        $this->service->checkin( $document, $booking );

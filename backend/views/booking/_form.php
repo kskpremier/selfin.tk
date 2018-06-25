@@ -57,7 +57,7 @@ use kartik\select2\Select2;
     <?= $form->field($model, 'number_of_tourist')->textInput() ?>
 
     <?= $form->field($model, 'guest_id')->hiddenInput()->label(false); ?>
-    <?= $form->field($model, 'external_id')->textInput()->label('Booking external # (from MyRent)'); ?>
+    <?= $form->field($model, 'external_id')->textInput()->label('Booking external # (from MyRentReception)'); ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

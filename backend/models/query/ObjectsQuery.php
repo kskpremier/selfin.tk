@@ -1,6 +1,7 @@
 <?php
 
 namespace backend\models\query;
+
 use backend\helpers\AvailabilityHelper;
 use backend\models\Rents;
 use reception\forms\MyRent\DetailFilterForm;
@@ -41,7 +42,16 @@ class ObjectsQuery extends \yii\db\ActiveQuery
      */
     public function forUsers($userIds)
     {
-        return $this->andWhere(['user_id'=>$userIds]);
+        return $this->andWhere(['objects.user_id'=>$userIds]);
+    }
+
+    public function active()
+    {
+        return $this->andWhere(['objects.active'=>"Y"]);
+    }
+
+    public function withUnit() {
+        return $this->andWhere(['not',['objects.unit_id'=>null]]);
     }
 
     /**

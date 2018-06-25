@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label'=>'Number',
             ],
             [   'attribute'=>'external_id',
-                'label'=>'MyRent #',
+                'label'=>'MyRentReception #',
             ],
             ['attribute'=>'start_date',
                 'label'=>'From',

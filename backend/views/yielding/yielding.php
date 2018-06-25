@@ -31,24 +31,16 @@ $this->registerJsFile('/js/multifreezer.js');
         ],
     ]); ?>
     <div class="objects-index">
-
-
         <?php
-
         $countObjects= count($availabilityList);
         $page=0;
         //пропорции между календарем и названиями
         $widthCalendar = 75;
         $widthName = 25;
-
         ?>
-
-
 <?php Pjax::begin(); ?>
-
 <?php $form = ActiveForm::begin([
     'action' => ['superuser/yielding'],
-
     'method' => 'get',
     'options' => [
         'data-pjax' => 1,
@@ -131,7 +123,7 @@ $this->registerJsFile('/js/multifreezer.js');
                 'tokenSeparators' => [',', ' '],
                 'maximumInputLength' => 10
             ],
-            'data'=> ArrayHelper::map(Filters::find()->all(),'id','name'),
+            'data'=> ArrayHelper::map(Filters::find()->all()->orderBy(['sort'=>SORT_ASC]),'id','name'),
             'value'=> $searchObjectModel->filterName,
 
         ])

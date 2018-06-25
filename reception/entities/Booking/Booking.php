@@ -9,6 +9,7 @@
 namespace reception\entities\Booking;
 
 use backend\models\query\BookingQuery;
+use reception\entities\MyRent\Rents;
 use function key_exists;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use reception\entities\Apartment\Apartment;
@@ -328,6 +329,7 @@ class Booking extends \yii\db\ActiveRecord
     public function fields()
     {
         $guests = $this->guests;
+        $rent = Rents::findOne($this->external_id);
         $number_of_guest = count($guests);
         $duration = intdiv((strtotime( $this->end_date)-strtotime($this->start_date))/24/60,60);
         return [
@@ -340,6 +342,9 @@ class Booking extends \yii\db\ActiveRecord
             'apartment_id'=>'apartment_id',
             'apartment_name'=>function (){return $this->apartment->name;},
             'external_apartment_id' => function (){return $this->apartment->external_id;},
+            'rent_status'=> $rent->rentStatus?$rent->rentStatus->name??'':'',
+            'url'=> "https://app.my-rent.net/users/login_rent?id=".$this->guid,
+            'color'=>function ($rent){ return $rent->rentStatus?$rent->rentStatus->color??'':'';},
             'price'=>function (){ return $this->price. $this->label; },
             'paid'=>function (){ return  ($this->paid=="N")?false:true;},
             'duration'=>function (){ $duration = intdiv((strtotime( $this->end_date)-strtotime($this->start_date))/24/60,60);
@@ -382,7 +387,7 @@ class Booking extends \yii\db\ActiveRecord
     {
         $booking = $this;
         //Костыль - пока не знаю как поступить с человекочитаемым паролем
-        //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRent
+        //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRentReception
         //Перезатирается пароль
         $this->temporary_password = (isset($password))? $password : $booking->author->user->getNewReadablePassword();
 

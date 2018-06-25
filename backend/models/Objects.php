@@ -61,6 +61,7 @@ use Yii;
  * @property Cleaners $cleaner
  * @property Currency $currency
  * @property Rents[] $rents
+ *  * @property Price[] $prices
  */
 class Objects extends \yii\db\ActiveRecord
 {
@@ -181,9 +182,49 @@ class Objects extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getFacilities()
+    {
+        return $this->hasOne(ObjectsFacilities::className(), ['object_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRealEstates()
+    {
+        return $this->hasOne(ObjectsRealestates::className(), ['object_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrices()
+    {
+        return $this->hasMany(ObjectsPricesDays::className(), ['object_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPictures()
+    {
+        return $this->hasOne(ObjectsRealestatesPictures::className(), ['object_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getUnit()
     {
         return $this->hasOne(Units::className(), ['id' => 'unit_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getObjectType()
+    {
+        return $this->hasOne(ObjectTypes ::className(), ['id' => 'object_type_id']);
     }
 
 

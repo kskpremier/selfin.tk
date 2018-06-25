@@ -139,7 +139,7 @@ class DoorLock extends ActiveRecord
         else {$this->apartments = $apartments; }
     }
 
-    //Используется при обновлении апартаментов из под MyRent
+    //Используется при обновлении апартаментов из под MyRentReception
     public function installInApartment($apartmentId,  $user_id, $updateTime){
         $this->apartment_id = $apartmentId;
 //        $this->user_id = $user_id;

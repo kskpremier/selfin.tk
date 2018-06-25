@@ -54,6 +54,19 @@ class Guest extends \yii\db\ActiveRecord
         $guest->bookings = $booking;
         return $guest;
     }
+
+    public static function createAsTourist( $first_name, $second_name, $contact_country_code1, $booking) :self
+    {
+            $guest = new static();
+            $guest->first_name = $first_name;
+            $guest->second_name = $second_name;
+            $guest->contact_country_code1 = $contact_country_code1;
+            $guest->myrent_update =  time();
+
+        $guest->bookings = $booking;
+        return $guest;
+    }
+
     public function editGuest($first_name, $second_name, $contact_email=null, $booking = null, $contact_tel = null, $updatetime = null, $guid = null) :self
     {
         //$names = explode(' ', $second_name);

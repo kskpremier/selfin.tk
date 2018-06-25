@@ -38,8 +38,8 @@ class RentsQuery extends \yii\db\ActiveQuery
      */
     public function forReception($reception)
     {
-        return $this->andWhere(['objects.user_id'=>$this->getUserId($reception)]);
-        return $this->andWhere(['objects.user_id'=>$this->getUserId($reception)]);
+        return $this->andWhere(['objects.user_id'=>$reception]);
+
     }
 
     /**

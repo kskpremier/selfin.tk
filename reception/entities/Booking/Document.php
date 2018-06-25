@@ -57,12 +57,29 @@ class Document extends \yii\db\ActiveRecord
 
     use EventTrait;
 
-    public static function create(  $firstName, $secondName, 
-                                    $identityData,
-                                    $numberOfDocument, $gender,
-                                    $country,  $city,
-                                    $countryOfBirth,$citizenshipOfBirth,
-                                    $cityOfBirth, $dateOfBirth,  $address, $validBefore=null, $updatedTime=null) :self
+    /**
+     * @param $firstName
+     * @param $secondName
+     * @param $identityData
+     * @param $numberOfDocument
+     * @param $gender
+     * @param $country
+     * @param $city
+     * @param $countryOfBirth
+     * @param $citizenshipOfBirth
+     * @param $cityOfBirth
+     * @param $dateOfBirth
+     * @param $address
+     * @param null $validBefore
+     * @param null $updatedTime
+     * @return Document
+     */
+    public static function create($firstName, $secondName,
+                                  $identityData,
+                                  $numberOfDocument, $gender,
+                                  $country, $city,
+                                  $countryOfBirth, $citizenshipOfBirth,
+                                  $cityOfBirth, $dateOfBirth, $address, $validBefore=null, $updatedTime=null) :self
     {
 
             $document = new static();
@@ -84,7 +101,25 @@ class Document extends \yii\db\ActiveRecord
 
         return $document;
     }
-    public function edit($identityData, $gender, $country, $city, $countryOfBirth, $citizenshipOfBirth,   $dateOfBirth, $documentNumber, $address, $firstName, $secondName, $validBefore = null,$updatedTime=null) :self
+
+    /**
+     * @param $identityData
+     * @param $gender
+     * @param $country
+     * @param $city
+     * @param $countryOfBirth
+     * @param $citizenshipOfBirth
+     * @param $dateOfBirth
+     * @param $documentNumber
+     * @param $address
+     * @param $firstName
+     * @param $secondName
+     * @param null $validBefore
+     * @param null $updatedTime
+     * @return Document
+     */
+    public function edit($identityData, $gender, $country, $city, $countryOfBirth, $citizenshipOfBirth, $dateOfBirth,
+                         $documentNumber, $address, $firstName, $secondName, $validBefore = null, $updatedTime=null) :self
 
     {
         $this->document_type_id = $identityData;
@@ -98,7 +133,7 @@ class Document extends \yii\db\ActiveRecord
         $this->number = $documentNumber;
         $this->address = $address;
         $this->date_of_birth = $dateOfBirth;
-        $this->valid_before = ($validBefore)?$this->valid_before : $validBefore;
+        $this->valid_before = ($validBefore)?$this->valid_before : date("Y-m-d",$validBefore/1000);
         $this->updated_at = ($updatedTime)?$updatedTime:time();
 
         return $this;
@@ -113,6 +148,9 @@ class Document extends \yii\db\ActiveRecord
         return 'document';
     }
 
+    /**
+     * @return array
+     */
     public function fields(){
         return [
             "name_first"=>$this->first_name,
@@ -133,6 +171,10 @@ class Document extends \yii\db\ActiveRecord
             "tt_payment_category"  => "14"
         ];
     }
+
+    /**
+     * @return array
+     */
     public function fieldsForMyRent(){
         $urls=[];
         foreach($this->documentImages as $image){
@@ -251,6 +293,11 @@ class Document extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @param $image
+     * @param $repositoryComparation
+     * @return int
+     */
     public function  getTheMostSimilarFaceMatchedProbability($image, $repositoryComparation) {
         $probability = 0;$comparation=null;
         foreach ($this->images as $documentImages)

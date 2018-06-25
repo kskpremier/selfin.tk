@@ -61,7 +61,7 @@
 ////echo PHP_EOL;
 ////echo time()+60*60*24*4;
 ////echo PHP_EOL;
-echo password_hash("admin123",1,['cost'=>13]);
+echo password_hash("smilana123",1,['cost'=>13]);
 echo PHP_EOL;
 ////echo time();
 ////echo PHP_EOL;
@@ -88,4 +88,6 @@ echo PHP_EOL;
 
 
 echo password_hash("maricic123",1,['cost'=>13]);
+echo PHP_EOL;
+echo date("Y-m-d", 1522919216);
 echo PHP_EOL;

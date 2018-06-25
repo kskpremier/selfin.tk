@@ -39,16 +39,18 @@ class DocumentManageService
     private $imageRepository;
     private $imageProcessManagement;
     private $registrationRepository;
+    private $guestManageService;
 
     public function __construct(DocumentRepository $documentRepository, GuestRepository $guestRepository,
                                 AbstractImageRepository $imageRepository, ImageProcessManagement $imageProcessManagement,
-                                RegistrationRepository $registrationRepository)
+                                RegistrationRepository $registrationRepository, GuestManageService $guestManageService)
     {
         $this->documentRepository = $documentRepository;
         $this->registrationRepository = $registrationRepository;
         $this->guestRepository = $guestRepository;
         $this->imageRepository = $imageRepository;
         $this->imageProcessManagement = $imageProcessManagement;
+        $this->guestManageService = $guestManageService;
 
     }
 
@@ -68,20 +70,9 @@ class DocumentManageService
 
 
     public function addDocumentData(eVisitorForm $form, User $user): Document
-
     {
-        $guest = $this->GuestManageService->isGuest($form->firstName,$form->secondName,$form->contact_country);
-        if (!$guest)
-            $guest = $this->GuestManageService->addToBookingGuestList( $form->firstName,$form->secondName, $booking );
-
-
-
-
-
-        $this->guestRepository->save($guest);
-
+        $guest = $this->guestManageService->createGuestAsTourist($form);
         $document = $this->documentRepository->isDocumentExist($form->firstName, $form->secondName, $form->numberOfDocument, $form->country, $form->dateOfBirth, $form->city);
-
             $country=Country::find()->where(['code'=>$form->country])->one();
             $citizen = ($country !=null) ? $country->id : 237; ///по умолчанию Зимбабве
             $countryOfBirth=(Country::find()->where(['code'=>$form->countryOfBirth])->one());

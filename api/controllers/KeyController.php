@@ -215,7 +215,7 @@ class KeyController extends Controller
         }
         else $searchModel = new KeyOpeningSearch(['userId'=>Yii::$app->user->id]);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $models = $dataProvider->getModels();
+        $models = $dataProvider->query->all();
         $done=[];
         foreach ($models as $model){
             if (!in_array($model->door_lock_id, $done)) {
@@ -240,7 +240,7 @@ class KeyController extends Controller
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $models = $dataProvider->getModels();
+        $models = $dataProvider->query->all();
         foreach ($models as $model){
             $result[]= $model->serializeKey();
         }

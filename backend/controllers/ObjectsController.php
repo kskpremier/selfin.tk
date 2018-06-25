@@ -3,6 +3,10 @@
 namespace backend\controllers;
 
 use backend\models\RentsAvailabilitySearch;
+use reception\forms\MyRent\DetailFilterForm;
+use reception\forms\MyRent\SearchForm;
+use reception\services\search\ObjectsIndexer;
+use reception\services\search\SearchService;
 use Yii;
 use backend\models\Objects;
 use backend\models\ObjectsSearch;
@@ -15,6 +19,17 @@ use yii\filters\VerbFilter;
  */
 class ObjectsController extends Controller
 {
+    private $indexer;
+    private  $searchService;
+
+    public function __construct($id, $module, ObjectsIndexer $indexer, SearchService $searchService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->indexer = $indexer;
+        $this->searchService = $searchService;
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -44,6 +59,39 @@ class ObjectsController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Objects models.
+     * @return mixed
+     */
+    public function actionSearch()
+    {
+//        $this->layout='booking-engine';
+//        $searchForm = new SearchForm();
+//        $searchForm->load(Yii::$app->request->queryParams,'');
+        $detailFilterForm = new DetailFilterForm();
+        $detailFilterForm->load(Yii::$app->request->queryParams,'DetailFilterForm');
+        $userIds=[606,607,608,609,610,611,612];
+        $searchModel = new RentsAvailabilitySearch(['userIds'=>$userIds,'start'=>date("Y-m-d",time()),'until'=>date("Y-m-d",time()+60*60*24*100),'items'=>($items)?$items:null]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $items = $this->searchService->search($dataProvider,$detailFilterForm->location, $detailFilterForm->from,
+            $detailFilterForm->to, $detailFilterForm->stars, $detailFilterForm->numberOfGuests,
+            $detailFilterForm->space,
+            explode(',',$detailFilterForm->priceRange),100, 1);
+
+
+//        $pages = new Pagination(['totalCount' => $dataProvider->query->count(), 'pageSize' => 20,]);
+
+        return $this->render('/yielding/search', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+//            'searchForm'=> $detailFilterForm,
+            'detailFilterForm'=>$detailFilterForm,
+//            'items'=>$items
+//            'pages'=>$pages
         ]);
     }
 

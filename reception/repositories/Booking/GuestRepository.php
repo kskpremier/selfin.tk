@@ -24,7 +24,7 @@ class GuestRepository
     }
     public function isGuest($firstName, $secondName, $country) {
         $country = Country::find()->where(['code'=>$country])->one();
-        if ($guest = Guest::findOne(['first_name' => $firstName,'second_name'=>$secondName,'contact_country'=>$country])) {
+        if ($guest = Guest::findOne(['first_name' => $firstName,'second_name'=>$secondName,'contact_country_code1'=>$country])) {
             return $guest;
         }
         return false;

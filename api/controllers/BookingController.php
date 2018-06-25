@@ -11,6 +11,7 @@ namespace api\controllers;
 
 use backend\models\ApartmentSearch;
 use const CURLGSSAPI_DELEGATION_POLICY_FLAG;
+use reception\entities\MyRent\Rents;
 use reception\forms\BookingForm;
 use reception\forms\BookingFormForNewApartments;
 use reception\forms\MyRent\ApartmentForm;
@@ -300,24 +301,25 @@ class  BookingController extends Controller
         $to = ($to)? $to:$from;
         $bookings=[];
         $updateTime = time();
-        $lastUpdate =  $user->myrent_update;
         if ( Yii::$app->user->can('mobile',[]) || Yii::$app->user->can('owner',[]) || Yii::$app->user->can('receptionist',[]) ) {
-            if (($updateTime - $user->updated_at) > MyRent::MyRent_USER_UPDATE_INTERVAL) {
-                $apartments = $this->synchroService->synchroApartmentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
-                $rents = $this->synchroService->synchroRentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
-            }
-            else $rents = $this->synchroService->synchroChangesRentsForUser($user, $lastUpdate, $updateTime, (Yii::$app->user->can('owner',[]))?$user->owner->external_id:null);
-
+//            if (($updateTime - $user->myrent_update) > MyRent::MyRent_USER_UPDATE_INTERVAL) {
+//                $apartments = $this->synchroService->synchroApartmentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
+//                $rents = $this->synchroService->synchroRentsForUser($user, $updateTime, (Yii::$app->user->can('owner',[])&&! Yii::$app->user->can('mobile',[]))?$user->owner->id:null);
+//            }
+//            else $rents = $this->synchroService->synchroChangesRentsForUser($user, $lastUpdate, $updateTime, (Yii::$app->user->can('owner',[]))?$user->owner->external_id:null);
+            if (($updateTime - $user->myrent_update) > MyRent::MyRent_UPDATE_INTERVAL)
+                $rents = $this->synchroService->synchroChangesRentsForUser($user, $user->myrent_update,
+                    $updateTime, (Yii::$app->user->can('owner',[]))?$user->owner->external_id:null);
             //найти все букинге в базе, независимо от статуса на дату запроса для owner или receptionist
             $bookings = ( Yii::$app->user->can('mobile',[]) )? $this->booking->getBookingsByMobileUser($user->id,$from,$to) :
-                                                                            $this->booking->getBookingsByOwner($user->owner->external_id,$from,$to);
+                                                                                $this->booking->getBookingsByOwner($user->owner->external_id,$from,$to);
         }
         else {
             $guest = Guest::find()->where(['user_id' => Yii::$app->user->getId()])->one();
             if ($guest)
                 $bookings = $this->booking->getBookingsByGuest($guest,$from,$to);
         }
-        return $bookings;
+        return $this->serializeRents($bookings);
     }
 
     public function actionMyRent()
@@ -328,7 +330,7 @@ class  BookingController extends Controller
             $user = User::findOne(Yii::$app->user->id);
             // затем списка для регистрации туристов
             foreach ($user->owner->apartments as $object) {
-                //$response = MyRent::getBookingsForOwner($user->owner->external_id, $object->external_id);
+                //$response = MyRentReception::getBookingsForOwner($user->owner->external_id, $object->external_id);
                 $response = Yii::$app->getRequest()->getBodyParams();
 //                $response = $bookingForm->load(Yii::$app->getRequest()->getBodyParams(),'');
                 //в ответе должен быть массив Json  c букингами - их надо разобрать
@@ -532,7 +534,7 @@ class  BookingController extends Controller
     }
 
     /**
-     * Give a unique link on a new User portal model for external MyRent User
+     * Give a unique link on a new User portal model for external MyRentReception User
 
      * @return string
      */
@@ -583,6 +585,46 @@ class  BookingController extends Controller
             'longitude'=>$apartment->longitude,
             'user_id'=>$apartment->user_id
         ];
+    }
+
+    public function serializeRents($bookings)
+    {
+        
+        $rents = [];
+        foreach ($bookings as $booking) {
+            $rent = Rents::findOne($booking->external_id);
+            $guests = $booking->guests;
+            $number_of_guest = count($guests);
+            $duration = intdiv((strtotime($booking->end_date) - strtotime($booking->start_date)) / 24 / 60, 60);
+            $rents[] = [
+                'booking_id' => $booking->id,
+                'external_booking_id' => $booking->external_id,
+                'start_date' => date("Y-m-d", strtotime($booking->start_date)) . " " . date("H:i", strtotime($booking->from_time)),
+                'end_date' => date("Y-m-d", strtotime($booking->end_date)) . " " . date("H:i", strtotime($booking->until_time)),
+                'apartment_id' => $booking->apartment_id,
+                'apartment_name' => $booking->apartment->name,
+                'external_apartment_id' => $booking->apartment->external_id,
+                'rent_status' => $rent->rentStatus ? $rent->rentStatus->name ?? '' : '',
+
+
+                'url' => "https://app.my-rent.net/users/login_rent?id=" . $booking->guid,
+                'color' =>  $rent->rentStatus ? $rent->rentStatus->color ?? '' : '',
+                'price' => $booking->price . $booking->label,
+                'paid' => ($booking->paid == "N") ? false : true,
+                'duration' =>   intdiv((strtotime($booking->end_date) - strtotime($booking->start_date)) / 24 / 60, 60),
+                'number_of_guests' => $booking->number_of_tourist,
+                'address' => $booking->apartment->adress . ", " . $booking->apartment->city_name,
+                'latitude' => $booking->apartment->latitude,
+                'longitude' =>  $booking->apartment->longitude,
+                'note' =>  $booking->note,
+                'contact' => $booking->author->contact_name,
+                'contact_email' => $booking->author->contact_email,
+                'contact_tel' =>$booking->author->contact_tel,
+                "contact_country" => $booking->author->contact_country,
+                "contact_country_code" => $booking->author->contact_country_code1
+            ];
+        }
+        return $rents;
     }
     
 }

@@ -11,6 +11,7 @@ namespace reception\useCases\manage\DoorLock;
 use function array_merge;
 use function in_array;
 use function isEmpty;
+use reception\entities\Apartment\Apartment;
 use reception\entities\DoorLock\DoorLock;
 use reception\entities\DoorLock\Key;
 use reception\forms\DoorLockForm;
@@ -310,14 +311,18 @@ class DoorLockManageService
      * @param int $user_id
      * @return bool
      */
-    public function addApartment($door_lock_id, $apartmentId, string $name, int $user_id){
+    public function addApartment($door_lock_id, Apartment $apartment, string $name, int $user_id){
         $doorLock = $this->doorLockRepository->get($door_lock_id);
         //надо добавить к старым апартаментам новые
         if ($doorLock->apartments){
             $ids = ArrayHelper::getColumn($doorLock->apartments, 'id');
-            $ids[] = $apartmentId;
+            $ids[] = $apartment->id;
+            $doorLock->apartment_id = null; //если замок ставиться на несколько апартаментов, мы отвязываем его от "единственного апартамента"
         }
-        else $ids= $apartmentId;
+        else {
+            $ids= $apartment->id;
+            $doorLock->apartment_id = $apartment->id; //записываем в каком апартаменте стоит этот замок (то есть то, что он не общий для нескольких)
+        }
         $doorLock->apartments = $ids;
         $doorLock->lock_alias = $name;
         $doorLock->user_id = $user_id;
@@ -354,7 +359,7 @@ class DoorLockManageService
             foreach ($ids as $id){
                 // формируем список апартаментов, оставшихся в списке
                 if ($id != $apartmentId) {
-                    $list=$id;
+                    $list[]=$id;
                 }
             }
         }

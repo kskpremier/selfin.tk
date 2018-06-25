@@ -141,18 +141,18 @@ class SynchroService {
     }
 
     /**
-     * Get all Property for User from MyRent and synchronize them with existing one or build new
+     * Get all Property for User from MyRentReception and synchronize them with existing one or build new
      * @param int $user_id
      * @param int $updateTime
      * @param $owner_id
      * @return array
      */
-    public function synchroApartmentsForUser(User $user, int $updateTime, $owner_id) {
+    public function synchroApartmentsForUser(User $user, int $updateTime, $owner_id, $echo=true) {
         $existingApartments = $user->apartments;
         $list =  MyRent::getApartmentsForUser($user->external_id);
         $apartmentsList=[];
         foreach ($list as $property) {
-            $apartmentsList[] =  $this->updateApartment($property['id'],$user->id, $updateTime, $owner_id);
+            $apartmentsList[] =  $this->updateApartment($property['id'],$user->id, $updateTime, $owner_id, $echo);
         }
         $apartmentForUnset = array_diff(ArrayHelper::getColumn($existingApartments,'id'),ArrayHelper::getColumn($apartmentsList,'id'));
         foreach ($apartmentForUnset as $id) {
@@ -172,7 +172,7 @@ class SynchroService {
      * @param $owner_id
      * @return Apartment
      */
-    public function updateApartment($apartment_external_id, $user_id, $updateTime, $owner_id) :Apartment {
+    public function updateApartment($apartment_external_id, $user_id, $updateTime, $owner_id, $echo=true) :Apartment {
         $apartment = $this->apartmentRepository->findByMyRentId($apartment_external_id);
         $apartmentInfo = MyRent::getApartmentsById($apartment_external_id);
         $form = new ApartmentForm();
@@ -182,6 +182,7 @@ class SynchroService {
         }
         else $apartment->edit($form, $user_id, $updateTime, $owner_id);
         $this->apartmentRepository->save($apartment);
+        if ($echo) echo 'Updated apartment  #' . $apartment->id . PHP_EOL;
         return $apartment;
     }
 
@@ -190,15 +191,17 @@ class SynchroService {
      * @param int $user_id
      * @param $updateTime
      * @param $owner_id
+     * @param $date
      */
-    public function synchroRentsForUser(User $user, $updateTime, $owner_id){
-        $existingRents = $this->bookingRepository->getBookingsForApartmentsSet(ArrayHelper::getColumn($user->apartments,'id'));
-        $list = Myrent::getBookingsUpdateForUser($user->external_id, 0);
-        $rentsList = $this->updateRents($list, $updateTime, $user->id, $owner_id);
-        $array = array_diff(ArrayHelper::getColumn($existingRents,'id'),ArrayHelper::getColumn($rentsList,'id'));
-        foreach ($array as $id) {
-            $this->bookingRepository->removeById($id);
-        }
+    public function synchroRentsForUser(User $user, $updateTime, $owner_id=null, $date=null, $echo=true){
+//        $existingRents = $this->bookingRepository->getBookingsForApartmentsSet(ArrayHelper::getColumn($user->apartments,'id'));
+        $list = Myrent::getBookingsUpdateForUser($user->external_id, $date);
+        $rentsList = $this->updateRents($list, $updateTime, $user->id, $owner_id, $echo);
+//        $array = array_diff(ArrayHelper::getColumn($existingRents,'id'),ArrayHelper::getColumn($rentsList,'id'));
+//
+//        foreach ($array as $id) {
+//            $this->bookingRepository->removeById($id);
+//        }
         return $rentsList;
     }
 
@@ -212,17 +215,13 @@ class SynchroService {
     public function synchroChangesRentsForUser(User $user, $lastUpdateTime, $updateTime, $owner_id){
 
         $list = Myrent::getBookingsUpdateForUser($user->external_id, $lastUpdateTime);
-        $rentsList = $this->updateRents($list, $updateTime, $user->id, $owner_id);
+        $rentsList = $this->updateRents($list, $updateTime, $user->id, $owner_id, false);
         $user->myrent_update = $updateTime;
         $this->userRepository->save($user);
 
         return $rentsList;
     }
 
-//    public function synchroRentsForApartment(int $apartment_id, $updateTime, $owner_id){
-//        $list = Myrent::getBookingsUpdateForUser($user_id);
-//        $this->synhroRents($list, $updateTime, $user_id, $owner_id);
-//    }
 
     /**
      * @param array $list
@@ -230,13 +229,13 @@ class SynchroService {
      * @param $user_id
      * @param $owner_id
      */
-    public function updateRents(array $list, int $updateTime, $user_id, $owner_id)
+    public function updateRents(array $list, int $updateTime, $user_id, $owner_id, $echo=true)
     {
         $rentsList=[];
         foreach ($list as $rent) {
             $form = new RentForm($rent);
             $form->load($rent, '');
-            $apartment = $this->updateApartment($form->property->object_id, $user_id, $updateTime, $owner_id);
+            $apartment = $this->updateApartment($form->property->object_id, $user_id, $updateTime, $owner_id, $echo);
             $this->apartmentRepository->save($apartment);
             $author = $this->updateAuthorOfRent($form->contact, $updateTime);
             $this->guestRepository->save($author);
@@ -247,6 +246,7 @@ class SynchroService {
                 $booking->edit($form, $updateTime, $apartment->id, $author->id);
             //список гостей
             $this->bookingRepository->save($booking);
+            if ($echo) echo 'Updated rent  #' . $booking->id . PHP_EOL;
             $this->updateGuestListForRent($booking, $updateTime);
             $this->bookingRepository->save($booking);
             $rentsList[] = $booking;
@@ -302,7 +302,7 @@ class SynchroService {
      * @param Guest $guest
      * @return bool|null|Document|static
      */
-    public function updateDocument (GuestForm $form, $updateTime, Guest $guest) {
+    public function updateDocument (GuestForm $form, $updateTime, Guest $guest, $echo=true) {
         $document = $this->documentRepository->isDocumentExist($form->name_first, $form->name_last, $form->document_number, $form->citizenship, $form->birth_date, $form->residence_city);
         $country = Country::find()->where(['code' => $form->citizenship])->one();
         $citizen = ($country != null) ? $country->id : 237; ///по умолчанию Зимбабве
@@ -318,6 +318,7 @@ class SynchroService {
             $document->edit($identityType, ($form->gender == "muški") ? "M" : "F", $citizen, $form->residence_city, $birthCountry, $birthCitizenship,
             $form->birth_date, $form->document_number, $form->residence_adress, $form->name_first, $form->name_last, null, $updateTime, $guest);
         $this->documentRepository->save($document);
+        if ($echo) echo 'Document updated #' . $document->id . PHP_EOL;
         return $document;
     }
 
@@ -330,13 +331,14 @@ class SynchroService {
      * @param Guest $guest
      * @return array|bool|null|Registration|\yii\db\ActiveRecord
      */
-    public function updateRegistration(GuestForm $form, $updateTime, Booking $booking, Document $document, Guest $guest) {
+    public function updateRegistration(GuestForm $form, $updateTime, Booking $booking, Document $document, Guest $guest, $echo=true) {
         $registration = $this->registrationRepository->findByMyRentId($form->id);
         if ($registration==false)
             //если не найдена - создаем новую
             $registration = Registration::create($form->id, $form->date_from, $form->date_until, $booking->from_time, $booking->until_time, $document, $booking, $guest, $form->guid, $form->checkin, $form->checkout, $updateTime);
          else $registration->edit($form->id, $form->date_from, $form->date_until, $booking->from_time, $booking->until_time, $document, $booking, $guest, $form->guid, $form->checkin, $form->checkout, $updateTime);
         $this->registrationRepository->save($registration);
+        if ($echo) echo 'Registration updated #' . $registration->id . PHP_EOL;
         return $registration;
     }
 
@@ -347,7 +349,7 @@ class SynchroService {
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function updateGuestListForRent (Booking $booking, $updatedTime)
+    public function updateGuestListForRent (Booking $booking, $updatedTime,$echo=true)
     {
         $guestList = MyRent::getGuestsForBooking($booking);
         $existingGuests = $booking->getGuests()->all();
@@ -372,10 +374,12 @@ class SynchroService {
             $array = array_diff(ArrayHelper::getColumn($existingRegistrations,'id'),ArrayHelper::getColumn($currentRegistrations,'id'));
             foreach ($array as $id) {
                 $this->registrationRepository->removeById($id);
+                if ($echo) echo 'Removed registration #' . $id . PHP_EOL;
             }
             $array = array_diff(ArrayHelper::getColumn($existingDocuments,'id'),ArrayHelper::getColumn($currentDocuments,'id'));
             foreach ($array as $id) {
                     $this->documentRepository->removeById($id);
+                if ($echo) echo 'Removed document #' . $id . PHP_EOL;
             }
             $array = array_diff(ArrayHelper::getColumn($existingGuests,'id'),ArrayHelper::getColumn($currentGuests,'id'));
             foreach ($array as $id) {
@@ -383,7 +387,7 @@ class SynchroService {
             }
             $booking->myrent_update = $updatedTime;
             $this->bookingRepository->save($booking);
-
+           if ($echo) echo 'Rent guests updted #' . $booking->external_id . PHP_EOL;
         return;
     }
 

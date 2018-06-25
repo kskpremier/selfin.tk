@@ -314,7 +314,7 @@ class Booking extends \yii\db\ActiveRecord
     {
         $booking = $this;
         //Костыль - пока не знаю как поступить с человекочитаемым паролем
-        //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRent
+        //Проблема будет в том, что наше письмо будет конфликтовать с тем, которое посылает MyRentReception
         //Перезатирается пароль
         $this->temporary_password = $booking->author->user->getNewReadablePassword();
 

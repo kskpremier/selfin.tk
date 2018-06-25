@@ -64,6 +64,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        if (Yii::$app->user->can('feefo')) {
+            $this->layout='feefo';
+            return $this->redirect('/feefo/create');
+        }
+
+
         return $this->render('index');
     }
 

@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Create MyRent user', ['create-myrent'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create MyRentReception user', ['create-myrent'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="box">
@@ -36,9 +36,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                     'email:email',
                     ['attribute' =>'external_id',
-                        'label'=>'MyRent ID' ],
+                        'label'=>'MyRent ID',
+                        'value'=>function ($model){
+                            return $model->external_id??'-';
+                        }
+                    ],
                     [
                         'attribute' => 'created_at',
+                         'value'=>function ($model){
+                            return date("Y-m-d", $model->created_at);
+                        },
                         'filter' => DatePicker::widget([
                             'model' => $searchModel,
                             'attribute' => 'date_from',
@@ -51,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'yyyy-mm-dd',
                             ],
                         ]),
-                        'format' => 'datetime',
+                        'format' => 'raw',
                     ],
 
                     [
@@ -89,7 +96,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             return  $result;
                         },
                         'label'=>"Users",
-
                     ],
                     ['class' => ActionColumn::class],
                 ],

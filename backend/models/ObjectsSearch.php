@@ -6,7 +6,7 @@ use backend\helpers\RentsHelper;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Objects;
+use reception\entities\MyRent\Objects;
 
 /**
  * ObjectsSearch represents the model behind the search form of `backend\models\Objects`.
@@ -14,13 +14,11 @@ use backend\models\Objects;
 class ObjectsSearch extends Objects
 {
     public $userIds;
-
     public $searchString;
-
     public $reception;
-
     public $start;
     public $until;
+
 
     /**
      * @inheritdoc
@@ -82,8 +80,11 @@ class ObjectsSearch extends Objects
         $query->andFilterWhere([
             'id' => $this->id,]);
 
-        $query->joinWith('rents');//->andWhere(['rents.active'=>'Y']);
+//        $query->joinWith('rents');//->andWhere(['rents.active'=>'Y']);
         $query->joinWith('unit');
+
+        if ($this->searchString)
+            $query->andFilterWhere(['or',['like','objects.name' ,$this->searchString],['like','units.name', $this->searchString]]);
 
 //            ->andFilterWhere([
 //                'or',

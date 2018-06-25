@@ -36,7 +36,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Signup form
  */
-class MyRentUserForm extends CompositeForm
+class MyRentUserForm extends Model//CompositeForm
 {
     public $username;
     public $contact_name;
@@ -60,7 +60,7 @@ class MyRentUserForm extends CompositeForm
     public function __construct(array $config = [])
     {
         parent::__construct($config);
-        $this->apartments = new ApartmentForm();
+//        $this->apartments = new ApartmentForm();
       //  if ($this->role === "tourist")
    //         $this->rent = new RentForm();
 //        $this->owners = new OwnerForm();
@@ -102,11 +102,11 @@ class MyRentUserForm extends CompositeForm
         ];
     }
 
-    protected function internalForms(): array
-    {
-        //return ['apartments','owners','workers'];
-        return ['apartments', 'rent'];
-    }
+//    protected function internalForms(): array
+//    {
+//        //return ['apartments','owners','workers'];
+//        return ['apartments', 'rent'];
+//    }
     public function validateRent()
     {
         if ( in_array('tourist',$this->roles) && !($this->rent_id || $this->booking_id)) {

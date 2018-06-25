@@ -5,6 +5,7 @@ namespace backend\controllers;
 use reception\forms\manage\User\UserCreateForm;
 use reception\forms\manage\User\UserEditForm;
 use reception\forms\MyRent\MyRentUserForm;
+use reception\useCases\manage\Booking\SynchroService;
 use reception\useCases\manage\MyRent\MyRentManageService;
 use reception\useCases\manage\UserManageService;
 use Yii;
@@ -22,12 +23,14 @@ class UserController extends Controller
 {
     private $service;
     private $myRent;
+    private $synchroService;
 
-    public function __construct($id, $module, UserManageService $service, MyRentManageService $myRent, $config = [])
+    public function __construct($id, $module, UserManageService $service, MyRentManageService $myRent,  SynchroService $synchroService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
         $this->myRent = $myRent;
+        $this->synchroService = $synchroService;
     }
 
     /**
@@ -38,11 +41,11 @@ class UserController extends Controller
         $behaviors = parent::behaviors();
         $behaviors['access'] = [
             'class' => AccessControl::className(),
-            'only' => ['index','create', 'update', 'delete','view'],
+            'only' => ['index','create', 'update', 'delete','view','create-myrent'],
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['receptionist','admin', 'mobile'],
+                    'roles' => ['receptionist','admin', 'mobile','create-myrent'],
                 ],
             ],
         ];
@@ -115,48 +118,62 @@ class UserController extends Controller
         ]);
     }
     /**
-     * Creates a new User model for MyRent.
+     * Creates a new User model for MyRentReception.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreateMyrent()
     {
         $form = new MyRentUserForm();
-        $form->load(Yii::$app->request->post());
-        if ($form->validate()) {
+        if ($form->load(Yii::$app->request->post(),'MyRentUserForm')&&$form->validate()) {
             try {
                 $user = $this->myRent->createMyRentUser($form);
                 return $this->redirect(['view', 'id' => $user->id]);
             } catch (\DomainException $e) {
                 Yii::$app->errorHandler->logException($e);
-                Yii::$app->session->setFlash('error', $e->getMessage());
+                Yii::$app->session->setFlash('error', 'Something went wrong -> '. json_encode ($form->getErrors() ));
+
             }
         }
-        else {
-            Yii::$app->session->setFlash('error', 'Something went wrong -> '. json_encode ($form->getErrors() ));
-        }
+        else
         return $this->render('create_my_rent_user', [
             'model' => $form,
         ]);
     }
 
     /**
-     * Update User model for MyRent.
+     * Update User model for MyRentReception.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionSynchro($id)
+    public function actionSynchroApartments($id)
     {
         $user = $this->findModel($id);
-
+        $updateTime = time();
         if ($user) {
             try {
-                $this->myRent->updateMyRentUser($user);
+
                 if ($user->owners)
-                foreach ($user->owners as $owner) {
-                    $this->myRent->updateBookings($user,$owner->id);
-                }
-                else $this->myRent->updateBookings($user);
+                    foreach ($user->owners as $owner){
+                        $apartments = $this->synchroService->synchroApartmentsForUser($user, $updateTime, $owner->id,false);
+                    }
+                else $apartments = $this->synchroService->synchroApartmentsForUser($user, $updateTime, null,false);
+                return $this->redirect(['view', 'id' => $user->id]);
+            } catch (\DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
+        return $this->redirect(['view', 'id' => $user->id]);
+    }
+
+    public function actionSynchroRents($id)
+    {
+        $user = $this->findModel($id);
+        $updateTime = time();
+        if ($user) {
+            try {
+                $rents = $this->synchroService->synchroRentsForUser($user, $updateTime, null, $user->myrent_update,false);
                 return $this->redirect(['view', 'id' => $user->id]);
             } catch (\DomainException $e) {
                 Yii::$app->errorHandler->logException($e);
